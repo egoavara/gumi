@@ -1,4 +1,3 @@
-
 Copyright (c) 2017 [iamGreedy](https://plus.google.com/u/0/102001914699890514608), 
 All rights reserved.
 
