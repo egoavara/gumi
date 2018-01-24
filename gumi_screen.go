@@ -9,8 +9,6 @@ type Screen struct {
 	//
 	frame Frame
 	//
-	cache *FrameCache
-	//
 	root GUMIElem
 }
 
