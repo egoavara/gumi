@@ -1,4 +1,4 @@
-package gumi
+package deprecate
 
 import (
 	"fmt"
@@ -9,17 +9,17 @@ var AUTOSIZE = Size{AUTOLENGTH, AUTOLENGTH}
 
 //
 type Size struct {
-	Vertical   Length
-	Horizontal Length
+	Vertical   Leng
+	Horizontal Leng
 }
 
-func (s *Size) VModify(vertical Length) Size {
+func (s *Size) VModify(vertical Leng) Size {
 	return Size{
 		Vertical:   vertical,
 		Horizontal: s.Horizontal,
 	}
 }
-func (s *Size) HModify(horizontal Length) Size {
+func (s *Size) HModify(horizontal Leng) Size {
 	return Size{
 		Vertical:   s.Vertical,
 		Horizontal: horizontal,
@@ -62,13 +62,13 @@ func FixedSize(h, v uint16) Size {
 }
 func MinSize(h, v uint16) Size {
 	return Size{
-		Vertical:   Length{v, AUTOLENGTH.Max},
-		Horizontal: Length{h, AUTOLENGTH.Max},
+		Vertical:   Leng{v, AUTOLENGTH.Max},
+		Horizontal: Leng{h, AUTOLENGTH.Max},
 	}
 }
 func MaxSize(h, v uint16) Size {
 	return Size{
-		Vertical:   Length{AUTOLENGTH.Min, v},
-		Horizontal: Length{AUTOLENGTH.Min, h},
+		Vertical:   Leng{AUTOLENGTH.Min, v},
+		Horizontal: Leng{AUTOLENGTH.Min, h},
 	}
 }

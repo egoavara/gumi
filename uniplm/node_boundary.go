@@ -1,4 +1,4 @@
-package gumi
+package uniplm
 
 import (
 	"github.com/fogleman/gg"

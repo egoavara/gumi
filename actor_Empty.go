@@ -1,13 +1,28 @@
 package gumi
 
+import "image"
+
 type aEmpty struct {
-	GUMILINK_EMPTY
+	VoidStructure
 }
 
-func (s *aEmpty) size(drawing *Drawing, style *Style) Size {
-	return AUTOSIZE
+func (aEmpty) draw(frame *image.RGBA) {
 }
-func (s *aEmpty) draw(drawing *Drawing, style *Style, frame Frame) {
+
+func (aEmpty) size() Size {
+	return Size{
+		AUTOLENGTH,
+		AUTOLENGTH,
+	}
+}
+
+func (aEmpty) rect(image.Rectangle) {
+}
+
+func (aEmpty) update(info *Information, style *Style) {
+}
+
+func (aEmpty) Occur(event Event) {
 }
 
 //

@@ -1,28 +1,28 @@
 package gumi
 
-func LinkingFrom(lks ...GUMILinker) (from GUMILink) {
-	r := lks[0].(GUMILink)
-	p := r.(GUMILinker)
+func LinkingFrom(lks ...GUMI) (from GUMI) {
+	r := lks[0].(GUMI)
+	p := r
 	for _, v := range lks {
-		p.Link(v)
+		p.Breed([]GUMI{v})
 		p = v
 	}
 	return r
 }
-func LinkingTo(lks ...GUMILinker) (to GUMILink) {
-	r := lks[0].(GUMILink)
-	p := r.(GUMILinker)
+func LinkingTo(lks ...GUMI) (to GUMI) {
+	r := lks[0].(GUMI)
+	p := r.(GUMI)
 	for _, v := range lks {
-		p.Link(v)
+		p.Breed([]GUMI{v})
 		p = v
 	}
-	return lks[len(lks)-1].(GUMILink)
+	return lks[len(lks)-1].(GUMI)
 }
 
-func DrawListing(fns ...[]DrawFunc) []DrawFunc {
-	var temp []DrawFunc
-	for _, fn := range fns {
-		temp = append(temp, fn...)
-	}
-	return temp
-}
+//func DrawListing(fns ...[]DrawFunc) []DrawFunc {
+//	var temp []DrawFunc
+//	for _, fn := range fns {
+//		temp = append(temp, fn...)
+//	}
+//	return temp
+//}

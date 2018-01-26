@@ -1,23 +1,38 @@
 package gumi
 
 import (
+	"image"
 	"image/draw"
 )
 
 type nBackground struct {
-	GUMILINK_SINGLE
+	SingleStructure
+	BoundStore
+	StyleStore
+}
+
+func (s *nBackground) draw(frame *image.RGBA) {
+	draw.Draw(frame, s.bound, s.style.Face, s.style.Face.Bounds().Min, draw.Over)
+	s.child.draw(frame)
+}
+
+func (s nBackground) size() Size {
+	return s.child.size()
+}
+func (s *nBackground) rect(rect image.Rectangle) {
+	s.bound = rect
+	s.child.rect(rect)
+}
+
+func (s *nBackground) update(info *Information, style *Style) {
+	s.style = style
+	s.child.update(info, style)
+}
+
+func (s *nBackground) Occur(event Event) {
+	s.child.Occur(event)
 }
 
 func NBackground() *nBackground {
 	return &nBackground{}
-}
-func (s *nBackground) size(drawing *Drawing, style *Style) Size {
-
-	return s.child.(GUMIElem).size(drawing, style)
-}
-func (s *nBackground) draw(drawing *Drawing, style *Style, frame Frame) {
-	draw.Draw(frame, frame.Bounds(), style.Face, style.Face.Bounds().Min, draw.Over)
-	if s.child != nil {
-		s.child.(GUMIElem).draw(drawing, style, frame)
-	}
 }

@@ -1,4 +1,4 @@
-package gumi
+package deprecate
 
 import (
 	"fmt"
@@ -6,10 +6,10 @@ import (
 )
 
 var NOBLANK = Blank{
-	Length{0, 0},
-	Length{0, 0},
-	Length{0, 0},
-	Length{0, 0},
+	Leng{0, 0},
+	Leng{0, 0},
+	Leng{0, 0},
+	Leng{0, 0},
 }
 var MAXBLANK = Blank{
 	FixedLength(math.MaxUint16),
@@ -19,7 +19,7 @@ var MAXBLANK = Blank{
 }
 
 type Blank struct {
-	L, B, R, T Length
+	L, B, R, T Leng
 }
 
 func (s *Blank) VMin() uint16 {
@@ -34,14 +34,14 @@ func (s Blank) String() string {
 	)
 }
 
-func SymmetryBlank(h, v Length) Blank {
+func SymmetryBlank(h, v Leng) Blank {
 	return MakeBlank(h, v, h, v)
 }
-func RegularBlank(r Length) Blank {
+func RegularBlank(r Leng) Blank {
 	return MakeBlank(r, r, r, r)
 }
 
-func MakeBlank(l, b, r, t Length) Blank {
+func MakeBlank(l, b, r, t Leng) Blank {
 	return Blank{
 		l, b, r, t,
 	}

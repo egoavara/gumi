@@ -5,29 +5,27 @@ import (
 	"golang.org/x/image/font/gofont/goregular"
 	"image"
 	"image/color"
+	"github.com/iamGreedy/gumi/gutl"
 )
 
 type Style struct {
-	Font *Font
+	Font *gutl.Font
 	//
 	LineWidth float64
 	//
 	Line image.Image
 	Face image.Image
 }
-
-var DefaultStyle *Style
-
-func init() {
+func DefaultStyle() *Style {
 	f, _ := freetype.ParseFont(goregular.TTF)
-	DefaultStyle = &Style{
-		Font:      NewFont(f, 12),
+	temp := &Style{
+		Font:      gutl.NewFont(f, 12),
 		LineWidth: 1,
 		Line:      image.NewUniform(color.RGBA{113, 251, 254, 255}),
 		Face:      image.NewUniform(color.RGBA{28, 30, 29, 255}),
 	}
+	return temp
 }
-
 func (s *Style) Create(style *Style) *Style {
 	temp := &Style{
 		Font:      s.Font,

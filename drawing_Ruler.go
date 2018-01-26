@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fogleman/gg"
 	"strconv"
+	"github.com/iamGreedy/gumi/gutl"
 )
 
 type RulerType uint16
@@ -28,6 +29,7 @@ const RulerWidth = 10
 const RulerDash1 = 2.
 const RulerDash2 = 4.
 
+type DrawFunc func(context *gg.Context, style *Style)
 func BuildRuler(ruler RulerType, pivot int) []DrawFunc {
 	var temp []DrawFunc
 	if ruler&RULER_GRADUATION_VERTICAL == RULER_GRADUATION_VERTICAL {
@@ -138,10 +140,10 @@ func BuildRuler(ruler RulerType, pivot int) []DrawFunc {
 	}
 	if ruler&RULER_STANDARDSCREEN == RULER_STANDARDSCREEN {
 		temp = append(temp, func(context *gg.Context, style *Style) {
-			for x := 0.; x <= float64(context.Width()); x += float64(pivot) {
-				for y := 0.; y <= float64(context.Height()); y += float64(pivot) {
-					context.DrawPoint(x, y, style.LineWidth)
-				}
+			for _, v := range gutl.DefinedResolutions.Smaller(context.Width(), context.Height()){
+				context.DrawRectangle(0,0, float64(v.Width), float64(v.Height))
+				w, _ := context.MeasureString(v.Name)
+				context.DrawString(v.Name, float64(v.Width) - w - 5, float64(v.Height) - 5)
 			}
 			context.Stroke()
 		})
