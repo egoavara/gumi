@@ -44,3 +44,6 @@ func (s *Screen) Update(info *Information, style *Style) {
 func (s *Screen) Frame() image.Image {
 	return s.frame
 }
+func (s *Screen) RGBA() *image.RGBA {
+	return s.frame
+}

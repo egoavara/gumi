@@ -5,6 +5,23 @@ import "math"
 type Blank struct {
 	L, B, R, T Length
 }
+
+func SymmetryBlank(horizontal, vertical Length) Blank {
+	return Blank{
+		L:horizontal,
+		R:horizontal,
+		B:vertical,
+		T:vertical,
+	}
+}
+func RegularBlank(regular Length) Blank {
+	return Blank{
+		L:regular,
+		R:regular,
+		B:regular,
+		T:regular,
+	}
+}
 type Size struct {
 	Vertical   Length
 	Horizontal Length
