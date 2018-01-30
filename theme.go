@@ -5,6 +5,7 @@ import (
 	"golang.org/x/image/font/gofont/goregular"
 	"image"
 	"image/color"
+	"github.com/iamGreedy/gumi/gutl"
 )
 
 const (
@@ -27,7 +28,7 @@ var DefaultDarkTheme Theme
 func init() {
 	f, _ := freetype.ParseFont(goregular.TTF)
 	DefaultDarkTheme = Theme{
-		Font:      NewFont(f, 12),
+		Font:      gutl.NewFont(f, 12),
 		LineWidth: 2,
 		NormalColors: [THEME_NORMAL]image.Image{
 			image.NewUniform(color.RGBA{72, 79, 87, 255}),
@@ -49,7 +50,7 @@ func init() {
 }
 
 type Theme struct {
-	Font         *Font
+	Font         *gutl.Font
 	LineWidth    float64
 	NormalColors [THEME_NORMAL]image.Image
 	Colors       [THEME_COLOR]image.Image

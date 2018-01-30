@@ -1,4 +1,4 @@
-package gumi
+package gutl
 
 import "sort"
 
@@ -45,9 +45,9 @@ var DefinedResolutions = STDResolutions([]STDResolution{
 
 // sorting util
 type STDResolution struct {
-	name string
-	w    int
-	h    int
+	Name   string
+	Width  int
+	Height int
 }
 type STDResolutions []STDResolution
 
@@ -60,13 +60,20 @@ func (s STDResolutions) Swap(i, j int) {
 }
 func (s STDResolutions) Less(i, j int) bool {
 	temp := ([]STDResolution)(s)
-	return temp[i].w*temp[i].h < temp[j].w*temp[j].h
+	return temp[i].Width*temp[i].Height < temp[j].Width*temp[j].Height
 }
-
+func (s STDResolutions) Smaller(w, h int) (res []STDResolution) {
+	for _, v := range s{
+		if v.Width <= w && v.Height <= h{
+			res = append(res, v)
+		}
+	}
+	return res
+}
 func (s STDResolutions) Get(name string) (w, h int) {
 	for _, v := range ([]STDResolution)(s) {
-		if v.name == name {
-			return v.w, v.h
+		if v.Name == name {
+			return v.Width, v.Height
 		}
 	}
 	return 0, 0
@@ -75,15 +82,15 @@ func (s STDResolutions) Kinds() []string {
 	tmp := ([]STDResolution)(s)
 	temp := make([]string, len(tmp))
 	for i, v := range tmp {
-		temp[i] = v.name
+		temp[i] = v.Name
 	}
 	return temp
 }
 func (s STDResolutions) Under(w, h int) []string {
 	var temp []string
 	for _, v := range ([]STDResolution)(s) {
-		if v.w <= w && v.h < h {
-			temp = append(temp, v.name)
+		if v.Width <= w && v.Height < h {
+			temp = append(temp, v.Name)
 		}
 	}
 	return temp

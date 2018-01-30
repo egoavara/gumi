@@ -1,4 +1,4 @@
-package gumi
+package gutl
 
 import (
 	"github.com/golang/freetype"
@@ -49,7 +49,9 @@ func (s *Font) FontSize() float64 {
 func (s *Font) ChangeSource(image2 image.Image) {
 	s.ctx.SetSrc(image2)
 }
-
+func (s *Font) Face() font.Face {
+	return s.face
+}
 func (s *Font) Release() {
 	s.mtx.Unlock()
 }

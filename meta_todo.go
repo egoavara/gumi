@@ -1,4 +1,0 @@
-package gumi
-
-// VERSIONSS
-

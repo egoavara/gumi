@@ -1,4 +1,4 @@
-package gumi
+package uniplm
 
 type nColumn12 struct {
 	GUMILINK_MULTIPLE

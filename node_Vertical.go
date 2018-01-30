@@ -5,47 +5,66 @@ import (
 )
 
 type nVertical struct {
-	GUMILINK_MULTIPLE
+	MultipleStructure
+	rule Dispensor
 }
 
-func (s *nVertical) size(drawing *Drawing, style *Style) Size {
-	size := Size{
-		Horizontal: AUTOLENGTH,
-		Vertical:   AUTOLENGTH,
+func (s *nVertical) draw(frame *image.RGBA) {
+	for _, v := range s.child{
+		v.draw(frame)
 	}
-	for _, v := range s.child {
-		temp := v.(GUMILink).size(drawing, style)
-		size.Vertical.Min += temp.Vertical.Min
-	}
-	return size
 }
-func (s *nVertical) draw(drawing *Drawing, style *Style, frame Frame) {
-	var start uint16 = 0
-	var snc = make(chan struct{})
-	var cnt = len(s.child) - 1
+
+func (s *nVertical) size() Size {
+	return Size{
+		AUTOLENGTH,
+		AUTOLENGTH,
+	}
+}
+
+
+func (s *nVertical) rect(r image.Rectangle) {
 	//
-	for i, v := range s.child {
-		v2 := v.(GUMILink)
-		temp := v2.size(drawing, style)
-		sf := frame.SubFrame(
-			image.Rect(0, int(start), int(temp.Horizontal.Max), int(start+temp.Vertical.Min)),
-		)
-		if !sf.Bounds().Empty() {
-			go func(a int) {
-				v2.draw(drawing, style, sf)
-				if cnt == a {
-					close(snc)
-				}
-			}(i)
-		}
-		start += temp.Vertical.Min
+	var temp = make([]Length, len(s.child))
+	for i, v := range s.child{
+		temp[i] = v.size().Vertical
 	}
-	for range snc {
+	dis := s.rule(r.Dy(), temp)
+	//
+	var startat = r.Min.Y
+	for i, v := range s.child{
+		v.rect(image.Rect(
+			r.Min.X,
+			startat,
+			r.Max.X,
+			startat + dis[i],
+		))
+		startat += dis[i]
 	}
 }
 
-func NVertical(childrun ...GUMILinker) *nVertical {
-	s := &nVertical{}
-	s.Link(childrun...)
+func (s *nVertical) update(info *Information, style *Style) {
+	for _, v := range s.child{
+		v.update(info, style)
+	}
+}
+
+func (s *nVertical) Occur(event Event) {
+	for _, v := range s.child{
+		v.Occur(event)
+	}
+}
+func NVertical(rule Dispensor, childrun ...GUMI) *nVertical {
+	s := &nVertical{
+		rule:rule,
+	}
+	s.Breed(childrun)
+	return s
+}
+func NVertical1(childrun ...GUMI) *nVertical {
+	s := &nVertical{
+		rule: DispensorMinimalize,
+	}
+	s.Breed(childrun)
 	return s
 }

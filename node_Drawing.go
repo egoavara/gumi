@@ -2,42 +2,56 @@ package gumi
 
 import (
 	"github.com/fogleman/gg"
+	"image"
 )
 
-type DrawFunc func(context *gg.Context, style *Style)
 type nDrawing struct {
-	GUMILINK_SINGLE
+	SingleStructure
+	BoundStore
+	StyleStore
+	//
 	afterdraw bool
 	drawfuncs []DrawFunc
 }
 
-func (s *nDrawing) size(drawing *Drawing, style *Style) Size {
-	return s.child.(GUMIElem).size(drawing, style)
-}
-func (s *nDrawing) draw(drawing *Drawing, style *Style, frame Frame) {
-	ctx := gg.NewContextForRGBA(frame.rgbaCompatible())
-	ctx.SetFontFace(style.Font.face)
-	ctx.SetLineWidth(style.LineWidth)
-	ctx.SetColor(style.Line.At(0, 0))
+func (s *nDrawing) draw(frame *image.RGBA) {
+	ctx := gg.NewContextForRGBA(frame.SubImage(s.bound).(*image.RGBA))
+	ctx.SetFontFace(s.style.Font.Face())
+	ctx.SetLineWidth(s.style.LineWidth)
+	ctx.SetColor(s.style.Line.At(0, 0))
 	if !s.afterdraw {
-		style.Font.Use()
+		s.style.Font.Use()
 		for _, f := range s.drawfuncs {
 			ctx.Push()
-			f(ctx, style)
+			f(ctx, s.style)
 			ctx.Pop()
 		}
-		style.Font.Release()
+		s.style.Font.Release()
 	}
-	s.child.(GUMIElem).draw(drawing, style, frame)
+	s.child.draw(frame)
 	if s.afterdraw {
-		style.Font.Use()
+		s.style.Font.Use()
 		for _, f := range s.drawfuncs {
 			ctx.Push()
-			f(ctx, style)
+			f(ctx, s.style)
 			ctx.Pop()
 		}
-		style.Font.Release()
+		s.style.Font.Release()
 	}
+}
+func (s *nDrawing) size() Size {
+	return s.child.size()
+}
+func (s *nDrawing) rect(r image.Rectangle) {
+	s.bound = r
+	s.child.rect(r)
+}
+func (s *nDrawing) update(info *Information, style *Style) {
+	s.style = style
+	s.child.update(info, style)
+}
+func (s *nDrawing) Occur(event Event) {
+	s.child.Occur(event)
 }
 
 //
