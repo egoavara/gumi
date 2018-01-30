@@ -23,6 +23,12 @@ func (s *Screen) Resize(w, h int) {
 func (s *Screen) Root(root GUMI) {
 	s.root = root
 }
+func (s *Screen) Event(event Event) {
+	if event == nil{
+		return
+	}
+	s.root.Occur(event)
+}
 func (s *Screen) Draw() {
 	s.root.draw(s.frame)
 }

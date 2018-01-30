@@ -57,6 +57,15 @@ func main() {
 	window.SetKeyCallback(func(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 
 	})
+	window.SetCursorPosCallback(func(w *glfw.Window, xpos float64, ypos float64) {
+
+	})
+	window.SetCharCallback(func(w *glfw.Window, char rune) {
+
+	})
+	window.SetScrollCallback(func(w *glfw.Window, xoff float64, yoff float64) {
+
+	})
 	window.MakeContextCurrent()
 
 	// Initialize Glow

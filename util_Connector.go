@@ -18,11 +18,3 @@ func LinkingTo(lks ...GUMI) (to GUMI) {
 	}
 	return lks[len(lks)-1].(GUMI)
 }
-
-//func DrawListing(fns ...[]DrawFunc) []DrawFunc {
-//	var temp []DrawFunc
-//	for _, fn := range fns {
-//		temp = append(temp, fn...)
-//	}
-//	return temp
-//}

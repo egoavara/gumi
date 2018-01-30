@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/color"
 	"github.com/iamGreedy/gumi/gutl"
+	"github.com/fogleman/gg"
 )
 
 type Style struct {
@@ -16,6 +17,9 @@ type Style struct {
 	Line image.Image
 	Face image.Image
 }
+
+
+
 func DefaultStyle() *Style {
 	f, _ := freetype.ParseFont(goregular.TTF)
 	temp := &Style{
@@ -47,3 +51,12 @@ func (s *Style) Create(style *Style) *Style {
 	}
 	return temp
 }
+func (s *Style) useContext(ctx *gg.Context) {
+	s.Font.Use()
+	ctx.SetLineWidth(s.LineWidth)
+	ctx.SetFontFace(s.Font.Face())
+}
+func (s *Style) releaseContext(ctx *gg.Context) {
+	s.Font.Release()
+}
+

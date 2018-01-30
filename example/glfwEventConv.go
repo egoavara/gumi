@@ -1,4 +1,4 @@
-package gutl
+package main
 
 import (
 	"github.com/go-gl/glfw/v3.2/glfw"
@@ -237,13 +237,49 @@ func ConvertGLFWKey(key glfw.Key, action glfw.Action) gumi.Event {
 	case glfw.KeyLeftControl:
 		convkey = gumi.KEY_CONTROL
 	case glfw.KeyLeftAlt:
-		convkey = gumi.KEY_AL
+		convkey = gumi.KEY_ALT
 	case glfw.KeyLeftSuper:
+		convkey = gumi.KEY_UNKNOWN
 	case glfw.KeyRightShift:
+		convkey = gumi.KEY_SHIFT
 	case glfw.KeyRightControl:
+		convkey = gumi.KEY_CONTROL
 	case glfw.KeyRightAlt:
+		convkey = gumi.KEY_ALT
 	case glfw.KeyRightSuper:
+		convkey = gumi.KEY_UNKNOWN
 	case glfw.KeyMenu:
+		convkey = gumi.KEY_UNKNOWN
 	case glfw.KeyLast:
+		convkey = gumi.KEY_UNKNOWN
+	}
+//
+	switch action {
+	case glfw.Press:
+		return gumi.EventKeyPress{Key:convkey}
+	case glfw.Release:
+		return gumi.EventKeyRelease{Key:convkey}
+	default:
+		fallthrough
+	case glfw.Repeat:
+		return nil
+	}
+}
+
+func ConvertGLFWCursor(xpos, ypos float64) gumi.Event{
+	return gumi.EventCursor{
+		X:uint16(xpos),
+		Y:uint16(ypos),
+	}
+}
+func ConvertGLFWRune(r rune) gumi.Event{
+	return gumi.EventRune{
+		Rune:r,
+	}
+}
+func ConvertGLFWScroll(xoff, yoff float64) gumi.Event{
+	return gumi.EventScroll{
+		X:uint16(xoff),
+		Y:uint16(yoff),
 	}
 }

@@ -28,7 +28,7 @@ func (s *aText) draw(frame *image.RGBA) {
 	case Align_TOP:
 		dot.Y = fixed.I(0 + expecth)
 	}
-	dot.Y += fixed.I(1)
+	dot.Y -= fixed.I(1)
 	switch h {
 	case Align_RIGHT:
 		dot.X = fixed.I(s.bound.Max.X - expectw)
@@ -37,7 +37,7 @@ func (s *aText) draw(frame *image.RGBA) {
 	case Align_LEFT:
 		dot.X = fixed.I(0)
 	}
-	s.style.Font.Draw(frame.Rect, frame, s.text, dot)
+	s.style.Font.Draw(s.bound, frame, s.text, dot)
 }
 func (s *aText) size() Size {
 	s.style.Font.Use()

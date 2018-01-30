@@ -33,7 +33,6 @@ func (s *nVertical) rect(r image.Rectangle) {
 	//
 	var startat = r.Min.Y
 	for i, v := range s.child{
-
 		v.rect(image.Rect(
 			r.Min.X,
 			startat,

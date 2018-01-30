@@ -29,7 +29,7 @@ func (s *nMargin) size() Size {
 	if uint(sz.Vertical.Max) + uint(s.b.B.Max) + uint(s.b.T.Max) > uint(AUTOLENGTH.Max){
 		vmax = AUTOLENGTH.Max
 	}else {
-		vmax = sz.Horizontal.Max + s.b.L.Max + s.b.R.Max
+		vmax = sz.Vertical.Max + s.b.L.Max + s.b.R.Max
 	}
 	return Size{
 		Length{vmin, vmax},
@@ -64,8 +64,9 @@ func helper(have int, l, a, b Length) (resl, resa, resb int) {
 	return
 }
 func (s *nMargin) rect(rect image.Rectangle) {
-	sz := s.size()
+	sz := s.child.size()
 	//
+
 	var w, l, _ = helper(rect.Dx(), sz.Horizontal, s.b.L, s.b.R)
 	var h, _, t = helper(rect.Dy(), sz.Vertical, s.b.B, s.b.T)
 	s.child.rect(image.Rect(
