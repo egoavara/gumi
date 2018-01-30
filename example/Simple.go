@@ -19,8 +19,10 @@ func main() {
 		gumi.NVertical1(
 			gumi.LinkingFrom(
 				gumi.NMargin(gumi.RegularBlank(gumi.MinLength(30))),
-				gumi.NStyle(gumi.DefaultDarkTheme.ColorFace(3, gumi.INTENSE3)),
-				gumi.AButton("Hello, World!"),
+				gumi.NStyle(gumi.DefaultDarkTheme.ColorFace(3, gumi.INTENSE1)),
+				gumi.NButtonEmpty(),
+				gumi.NStyle(gumi.DefaultDarkTheme.Style(gumi.INTENSE3)),
+				gumi.AText("Button!", gumi.Align_CENTER),
 			),
 			gumi.AText("Hello, World!", gumi.Align_CENTER),
 		),

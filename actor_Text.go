@@ -28,7 +28,6 @@ func (s *aText) draw(frame *image.RGBA) {
 	case Align_TOP:
 		dot.Y = fixed.I(0 + expecth)
 	}
-	dot.Y -= fixed.I(1)
 	switch h {
 	case Align_RIGHT:
 		dot.X = fixed.I(s.bound.Max.X - expectw)
@@ -57,6 +56,7 @@ func (s *aText) rect(r image.Rectangle) {
 }
 func (s *aText) update(info *Information, style *Style) {
 	s.style = style
+
 }
 func (s *aText) Occur(event Event) {
 }
