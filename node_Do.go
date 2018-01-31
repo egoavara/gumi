@@ -6,7 +6,8 @@ type nDo struct {
 	SingleStructure
 	fnDraw   struct{ Before, After func(frame *image.RGBA) }
 	fnRect   func(rect *image.Rectangle)
-	fnUpdate func(info *Information, style *Style)(*Information, *Style)
+	fnUpdate func(info *Information, style *Style) (*Information, *Style)
+	fnOccur  func(event Event) Event
 }
 
 func (s *nDo) draw(frame *image.RGBA) {
@@ -24,19 +25,19 @@ func (s *nDo) size() Size {
 }
 
 func (s *nDo) rect(r image.Rectangle) {
-	if s.fnRect != nil{
+	if s.fnRect != nil {
 		s.fnRect(&r)
 	}
 	s.child.rect(r)
 }
 
 func (s *nDo) update(info *Information, style *Style) {
-	if s.fnUpdate != nil{
+	if s.fnUpdate != nil {
 		temp1, temp2 := s.fnUpdate(info, style)
-		if temp1 != nil{
+		if temp1 != nil {
 			info = temp1
 		}
-		if temp2 != nil{
+		if temp2 != nil {
 			style = temp2
 		}
 	}
@@ -44,6 +45,12 @@ func (s *nDo) update(info *Information, style *Style) {
 }
 
 func (s *nDo) Occur(event Event) {
+	if s.fnOccur != nil {
+		event = s.fnOccur(event)
+		if event == nil {
+			return
+		}
+	}
 	s.child.Occur(event)
 }
 
@@ -51,17 +58,19 @@ func NDo(
 	fnDraw *struct{ Before, After func(frame *image.RGBA) },
 	fnRect func(rect *image.Rectangle),
 	fnUpdate func(info *Information, style *Style) (*Information, *Style),
+	fnOccur func(event Event) Event,
 ) *nDo {
 
-	if fnDraw == nil{
-		fnDraw = &struct{Before, After func(frame *image.RGBA)}{
-			After:nil,
-			Before:nil,
+	if fnDraw == nil {
+		fnDraw = &struct{ Before, After func(frame *image.RGBA) }{
+			After:  nil,
+			Before: nil,
 		}
 	}
 	return &nDo{
 		fnRect:   fnRect,
 		fnUpdate: fnUpdate,
 		fnDraw:   *fnDraw,
+		fnOccur:  fnOccur,
 	}
 }

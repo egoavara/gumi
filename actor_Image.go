@@ -28,6 +28,7 @@ func (s *aImage) rect(rect image.Rectangle) {
 }
 
 func (s *aImage) update(info *Information, style *Style) {
+
 }
 
 func (s *aImage) Occur(event Event) {

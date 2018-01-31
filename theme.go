@@ -2,10 +2,10 @@ package gumi
 
 import (
 	"github.com/golang/freetype"
+	"github.com/iamGreedy/gumi/gutl"
 	"golang.org/x/image/font/gofont/goregular"
 	"image"
 	"image/color"
-	"github.com/iamGreedy/gumi/gutl"
 )
 
 const (
@@ -85,35 +85,43 @@ func (s *Theme) From(theme Theme) Theme {
 
 func (s *Theme) BackgroundStyle() *Style {
 	return &Style{
-		Font:      s.Font,
-		LineWidth: s.LineWidth,
-		Face:      s.Background[BACKGROUND_INACTIVE],
-		Line:      s.NormalColors[INTENSE3],
+		Default: StyleDefault{
+			Font:      s.Font,
+			LineWidth: s.LineWidth,
+			Face:      s.Background[BACKGROUND_INACTIVE],
+			Line:      s.NormalColors[INTENSE3],
+		},
 	}
 }
 func (s *Theme) Style(intense int) *Style {
 	return &Style{
-		Font:      s.Font,
-		LineWidth: s.LineWidth,
-		Face:      s.Background[BACKGROUND_ACTIVE],
-		Line:      s.NormalColors[intense],
+		Default: StyleDefault{
+			Font:      s.Font,
+			LineWidth: s.LineWidth,
+			Face:      s.Background[BACKGROUND_ACTIVE],
+			Line:      s.NormalColors[intense],
+		},
 	}
 }
 func (s *Theme) ColorLine(color int) *Style {
-	temp := &Style{
+	temp := StyleDefault{
 		Font:      s.Font,
 		LineWidth: s.LineWidth,
 	}
 	temp.Face = s.Background[BACKGROUND_ACTIVE]
 	temp.Line = s.Colors[color]
-	return temp
+	return &Style{
+		Default: temp,
+	}
 }
 func (s *Theme) ColorFace(color int, intense int) *Style {
-	temp := &Style{
+	temp := StyleDefault{
 		Font:      s.Font,
 		LineWidth: s.LineWidth,
 	}
 	temp.Face = s.Colors[color]
 	temp.Line = s.NormalColors[intense]
-	return temp
+	return &Style{
+		Default: temp,
+	}
 }

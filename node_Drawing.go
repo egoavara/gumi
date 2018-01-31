@@ -15,28 +15,24 @@ type nDrawing struct {
 }
 
 func (s *nDrawing) draw(frame *image.RGBA) {
-	ctx := gg.NewContextForRGBA(frame.SubImage(s.bound).(*image.RGBA))
-	ctx.SetFontFace(s.style.Font.Face())
-	ctx.SetLineWidth(s.style.LineWidth)
-	ctx.SetColor(s.style.Line.At(0, 0))
+	var ctx = GGContextRGBASub(frame, s.bound)
+	s.style.useContext(ctx)
+	defer  s.style.releaseContext(ctx)
+	ctx.SetColor(s.style.Default.Line.At(0, 0))
 	if !s.afterdraw {
-		s.style.Font.Use()
 		for _, f := range s.drawfuncs {
 			ctx.Push()
 			f(ctx, s.style)
 			ctx.Pop()
 		}
-		s.style.Font.Release()
 	}
 	s.child.draw(frame)
 	if s.afterdraw {
-		s.style.Font.Use()
 		for _, f := range s.drawfuncs {
 			ctx.Push()
 			f(ctx, s.style)
 			ctx.Pop()
 		}
-		s.style.Font.Release()
 	}
 }
 func (s *nDrawing) size() Size {

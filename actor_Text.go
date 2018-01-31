@@ -14,10 +14,10 @@ type aText struct {
 }
 
 func (s *aText) draw(frame *image.RGBA) {
-	s.style.Font.Use()
-	defer s.style.Font.Release()
-	s.style.Font.ChangeSource(s.style.Line)
-	expectw, expecth := s.style.Font.CalculateSize(s.text)
+	s.style.Default.Font.Use()
+	defer s.style.Default.Font.Release()
+	s.style.Default.Font.ChangeSource(s.style.Default.Line)
+	expectw, expecth := s.style.Default.Font.CalculateSize(s.text)
 	v, h := ParseAlign(s.align)
 	var dot fixed.Point26_6
 	switch v {
@@ -36,13 +36,13 @@ func (s *aText) draw(frame *image.RGBA) {
 	case Align_LEFT:
 		dot.X = fixed.I(0)
 	}
-	s.style.Font.Draw(s.bound, frame, s.text, dot)
+	s.style.Default.Font.Draw(s.bound, frame, s.text, dot)
 }
 func (s *aText) size() Size {
-	s.style.Font.Use()
-	defer s.style.Font.Release()
+	s.style.Default.Font.Use()
+	defer s.style.Default.Font.Release()
 
-	h, v := s.style.Font.CalculateSize(s.text)
+	h, v := s.style.Default.Font.CalculateSize(s.text)
 
 	temp := Size{
 		Horizontal: MinLength(uint16(h)),

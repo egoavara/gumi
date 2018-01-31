@@ -27,14 +27,14 @@ func (s *nToggle) draw(frame *image.RGBA) {
 	var ok bool
 	var clr color.Color
 	if s.active {
-		_, clr = IsColorImage(s.style.Line)
+		_, clr = IsColorImage(s.style.Default.Line)
 		ctx.SetColor(clr)
 		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 		ctx.DrawRectangle(radius, 0, w-radius*2, h-1)
 		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 		ctx.Fill()
 	} else {
-		ok, clr = IsColorImage(s.style.Face)
+		ok, clr = IsColorImage(s.style.Default.Face)
 		if ok {
 			ctx.SetColor(clr)
 			ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
@@ -42,10 +42,10 @@ func (s *nToggle) draw(frame *image.RGBA) {
 			ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 			ctx.Fill()
 		} else {
-			draw.Draw(frame.SubImage(s.bound).(*image.RGBA), s.bound.Intersect(s.style.Face.Bounds()), s.style.Face, s.style.Face.Bounds().Min, draw.Over)
+			draw.Draw(frame.SubImage(s.bound).(*image.RGBA), s.bound.Intersect(s.style.Default.Face.Bounds()), s.style.Default.Face, s.style.Default.Face.Bounds().Min, draw.Over)
 		}
 		if s.cursorEnter {
-			_, clr = IsColorImage(s.style.Line)
+			_, clr = IsColorImage(s.style.Default.Line)
 			ctx.SetColor(clr)
 			ctx.DrawLine(radius, 0, w-radius, 0)
 			ctx.Stroke()
