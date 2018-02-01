@@ -3,21 +3,24 @@ package gumi
 import (
 	"image"
 	"math"
+	"fmt"
 )
 
-type nHorizontal struct {
+type NHorizontal struct {
 	MultipleStructure
-	rule Dispensor
+	rule Distribute
 }
 
-func (s *nHorizontal) draw(frame *image.RGBA) {
+func (s *NHorizontal) String() string {
+	return fmt.Sprintf("%s(childrun:%d)", "NHorizontal", len(s.Childrun()))
+}
+func (s *NHorizontal) draw(frame *image.RGBA) {
 	for _, v := range s.child{
 		v.draw(frame)
 	}
 }
-
-func (s *nHorizontal) size() Size {
-	var min, max uint16 = 0, math.MaxUint16
+func (s *NHorizontal) size() Size {
+	var min, max, sum uint16 = 0, math.MaxUint16, 0
 	for _, v := range s.child{
 		sz := v.size()
 		if sz.Vertical.Min > min{
@@ -26,15 +29,14 @@ func (s *nHorizontal) size() Size {
 		if sz.Vertical.Max < max{
 			max = sz.Vertical.Max
 		}
+		sum += sz.Horizontal.Min
 	}
 	return Size{
 		Length{Min:min, Max:max},
-		MAXLENGTH,
+		MinLength(sum),
 	}
 }
-
-
-func (s *nHorizontal) rect(r image.Rectangle) {
+func (s *NHorizontal) rect(r image.Rectangle) {
 	//
 	var tempVert = make([]Length, len(s.child))
 	var tempHori = make([]Length, len(s.child))
@@ -61,28 +63,26 @@ func (s *nHorizontal) rect(r image.Rectangle) {
 		startat += dis[i]
 	}
 }
-
-func (s *nHorizontal) update(info *Information, style *Style) {
+func (s *NHorizontal) update(info *Information, style *Style) {
 	for _, v := range s.child{
 		v.update(info, style)
 	}
 }
-
-func (s *nHorizontal) Occur(event Event) {
+func (s *NHorizontal) Occur(event Event) {
 	for _, v := range s.child{
 		v.Occur(event)
 	}
 }
-func NHorizontal(rule Dispensor, childrun ...GUMI) *nHorizontal {
-	s := &nHorizontal{
+func NHorizontal0(rule Distribute, childrun ...GUMI) *NHorizontal {
+	s := &NHorizontal{
 		rule:rule,
 	}
 	s.Breed(childrun)
 	return s
 }
-func NHorizontal1(childrun ...GUMI) *nHorizontal{
-	s := &nHorizontal{
-		rule: DispensorMinimalize,
+func NHorizontal1(childrun ...GUMI) *NHorizontal {
+	s := &NHorizontal{
+		rule: Distribution.Minimalize,
 	}
 	s.Breed(childrun)
 	return s

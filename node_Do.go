@@ -1,8 +1,11 @@
 package gumi
 
-import "image"
+import (
+	"image"
+	"fmt"
+)
 
-type nDo struct {
+type NDo struct {
 	SingleStructure
 	fnDraw   struct{ Before, After func(frame *image.RGBA) }
 	fnRect   func(rect *image.Rectangle)
@@ -10,7 +13,31 @@ type nDo struct {
 	fnOccur  func(event Event) Event
 }
 
-func (s *nDo) draw(frame *image.RGBA) {
+func (s *NDo) String() string {
+	temp := ""
+	if s.fnDraw.Before != nil{
+		temp += "Draw.Before, "
+	}
+	if s.fnDraw.After != nil{
+		temp += "Draw.After, "
+	}
+	if s.fnOccur != nil{
+		temp += "Occur, "
+	}
+	if s.fnRect != nil{
+		temp += "Rect, "
+	}
+	if s.fnUpdate != nil{
+		temp += "Update, "
+	}
+	if len(temp) == 0{
+		return fmt.Sprintf("%s", "NDo")
+	}
+	temp = temp[:len(temp) - 2]
+	return fmt.Sprintf("%s(%s)", "NDo", temp)
+}
+
+func (s *NDo) draw(frame *image.RGBA) {
 	if s.fnDraw.Before != nil {
 		s.fnDraw.Before(frame)
 	}
@@ -20,18 +47,18 @@ func (s *nDo) draw(frame *image.RGBA) {
 	s.child.draw(frame)
 }
 
-func (s *nDo) size() Size {
+func (s *NDo) size() Size {
 	return s.child.size()
 }
 
-func (s *nDo) rect(r image.Rectangle) {
+func (s *NDo) rect(r image.Rectangle) {
 	if s.fnRect != nil {
 		s.fnRect(&r)
 	}
 	s.child.rect(r)
 }
 
-func (s *nDo) update(info *Information, style *Style) {
+func (s *NDo) update(info *Information, style *Style) {
 	if s.fnUpdate != nil {
 		temp1, temp2 := s.fnUpdate(info, style)
 		if temp1 != nil {
@@ -44,7 +71,7 @@ func (s *nDo) update(info *Information, style *Style) {
 	s.child.update(info, style)
 }
 
-func (s *nDo) Occur(event Event) {
+func (s *NDo) Occur(event Event) {
 	if s.fnOccur != nil {
 		event = s.fnOccur(event)
 		if event == nil {
@@ -54,12 +81,12 @@ func (s *nDo) Occur(event Event) {
 	s.child.Occur(event)
 }
 
-func NDo(
+func NDo0(
 	fnDraw *struct{ Before, After func(frame *image.RGBA) },
 	fnRect func(rect *image.Rectangle),
 	fnUpdate func(info *Information, style *Style) (*Information, *Style),
 	fnOccur func(event Event) Event,
-) *nDo {
+) *NDo {
 
 	if fnDraw == nil {
 		fnDraw = &struct{ Before, After func(frame *image.RGBA) }{
@@ -67,7 +94,7 @@ func NDo(
 			Before: nil,
 		}
 	}
-	return &nDo{
+	return &NDo{
 		fnRect:   fnRect,
 		fnUpdate: fnUpdate,
 		fnDraw:   *fnDraw,

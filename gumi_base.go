@@ -31,6 +31,7 @@ func (s *MultipleStructure) Born(gumi GUMI) {
 	s.parent = gumi
 }
 func (s *MultipleStructure) Breed(gumi []GUMI) {
+
 	s.child = gumi
 }
 func (s *MultipleStructure) Parent() GUMI {

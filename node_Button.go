@@ -5,9 +5,10 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"fmt"
 )
 
-type nButton struct {
+type NButton struct {
 	SingleStructure
 	BoundStore
 	StyleStore
@@ -18,10 +19,14 @@ type nButton struct {
 	onClick NButtonClick
 }
 
+func (s *NButton) String() string {
+	return fmt.Sprintf("%s", "NButton")
+}
+
 type NButtonClick func()
 type NButtonFocus func(focus bool)
 
-func (s *nButton) draw(frame *image.RGBA) {
+func (s *NButton) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	//
@@ -63,10 +68,8 @@ func (s *nButton) draw(frame *image.RGBA) {
 	//
 	s.child.draw(frame)
 }
-
 const aBUTTONPADDING = 5
-
-func (s *nButton) size() Size {
+func (s *NButton) size() Size {
 	sz := s.child.size()
 	sz.Vertical.Min += aBUTTONPADDING * 2
 	sz.Horizontal.Min += aBUTTONPADDING * 2
@@ -78,7 +81,7 @@ func (s *nButton) size() Size {
 	}
 	return sz
 }
-func (s *nButton) rect(r image.Rectangle) {
+func (s *NButton) rect(r image.Rectangle) {
 	s.bound = r
 	s.child.rect(image.Rect(
 		r.Min.X+aBUTTONPADDING-1,
@@ -87,11 +90,11 @@ func (s *nButton) rect(r image.Rectangle) {
 		r.Max.Y-aBUTTONPADDING+1,
 	))
 }
-func (s *nButton) update(info *Information, style *Style) {
+func (s *NButton) update(info *Information, style *Style) {
 	s.style = style
 	s.child.update(info, style)
 }
-func (s *nButton) Occur(event Event) {
+func (s *NButton) Occur(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
 		if ev.Key == KEY_MOUSE1 {
@@ -127,25 +130,25 @@ func (s *nButton) Occur(event Event) {
 }
 
 //
-func NButton(click func()) *nButton {
-	return &nButton{
+func NButton0(click func()) *NButton {
+	return &NButton{
 		onClick: click,
 	}
 }
-func NButtonEmpty() *nButton {
-	return &nButton{}
+func NButton1() *NButton {
+	return &NButton{}
 }
 
-func (s *nButton) OnClick(callback NButtonClick) {
+func (s *NButton) OnClick(callback NButtonClick) {
 	s.onClick = callback
 }
-func (s *nButton) ReferClick() NButtonClick {
+func (s *NButton) ReferClick() NButtonClick {
 	return s.onClick
 }
 
-func (s *nButton) OnEnter(callback NButtonFocus) {
+func (s *NButton) OnEnter(callback NButtonFocus) {
 	s.onFocus = callback
 }
-func (s *nButton) ReferEnter() NButtonFocus {
+func (s *NButton) ReferEnter() NButtonFocus {
 	return s.onFocus
 }

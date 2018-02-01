@@ -3,39 +3,44 @@ package gumi
 import (
 	"image"
 	"image/draw"
+	"fmt"
 )
 
-type aImage struct {
+type AImage struct {
 	VoidStructure
 	BoundStore
 	//
 	img image.Image
 }
 
-func (s *aImage) draw(frame *image.RGBA) {
+func (s *AImage) String() string {
+	return fmt.Sprintf("%s", "AImage")
+}
+
+func (s *AImage) draw(frame *image.RGBA) {
 	draw.Draw(frame, s.bound, s.img, s.img.Bounds().Min, draw.Over)
 }
 
-func (s aImage) size() Size {
+func (s AImage) size() Size {
 	bd := s.img.Bounds()
 	return Size{
 		Horizontal: MinLength(uint16(bd.Dx())),
 		Vertical:   MinLength(uint16(bd.Dy())),
 	}
 }
-func (s *aImage) rect(rect image.Rectangle) {
+func (s *AImage) rect(rect image.Rectangle) {
 	s.bound = rect
 }
 
-func (s *aImage) update(info *Information, style *Style) {
+func (s *AImage) update(info *Information, style *Style) {
 
 }
 
-func (s *aImage) Occur(event Event) {
+func (s *AImage) Occur(event Event) {
 }
 
-func AImage(img image.Image) *aImage {
-	return &aImage{
+func AImage0(img image.Image) *AImage {
+	return &AImage{
 		img: img,
 	}
 }

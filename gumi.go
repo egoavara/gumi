@@ -1,12 +1,16 @@
 package gumi
 
-import "image"
+import (
+	"image"
+	"fmt"
+)
 
 type GUMI interface{
 	GUMIRenderer
 	GUMIStructure
 	GUMICacher
 	GUMIEventer
+	fmt.Stringer
 }
 
 type GUMIRenderer interface{

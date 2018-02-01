@@ -2,17 +2,22 @@ package gumi
 
 import (
 	"image"
+	"fmt"
 )
 
-type nMargin struct {
+type NMargin struct {
 	SingleStructure
 	b Blank
 }
 
-func (s *nMargin) draw(frame *image.RGBA) {
+func (s *NMargin) String() string {
+	return fmt.Sprintf("%s(margin:%v)", "NMargin", s.b)
+}
+
+func (s *NMargin) draw(frame *image.RGBA) {
 	s.child.draw(frame)
 }
-func (s *nMargin) size() Size {
+func (s *NMargin) size() Size {
 	sz := s.child.size()
 
 	hmin := sz.Horizontal.Min + s.b.L.Min + s.b.R.Min
@@ -63,7 +68,7 @@ func helper(have int, l, a, b Length) (resl, resa, resb int) {
 	}
 	return
 }
-func (s *nMargin) rect(rect image.Rectangle) {
+func (s *NMargin) rect(rect image.Rectangle) {
 	sz := s.child.size()
 	//
 
@@ -76,69 +81,22 @@ func (s *nMargin) rect(rect image.Rectangle) {
 		rect.Min.Y + t + h,
 	))
 }
-func (s *nMargin) update(info *Information, style *Style) {
+func (s *NMargin) update(info *Information, style *Style) {
 	s.child.update(info, style)
 }
-func (s *nMargin) Occur(event Event) {
+func (s *NMargin) Occur(event Event) {
 	s.child.Occur(event)
 }
-func NMargin(sz Blank) *nMargin {
-	return &nMargin{
+func NMargin0(sz Blank) *NMargin {
+	return &NMargin{
 		b: sz,
 	}
 }
-func (s *nMargin) Set(sz Blank) {
+func (s *NMargin) Set(sz Blank) {
 	s.b = sz
 }
-func (s *nMargin) Get() Blank {
+func (s *NMargin) Get() Blank {
 	return s.b
 }
 
 
-type nSize struct {
-	SingleStructure
-	sz Size
-}
-
-func (s *nSize) draw(frame *image.RGBA) {
-	s.child.draw(frame)
-}
-
-func (s *nSize) size() Size {
-	temp := s.sz
-	c := s.child.size()
-	if temp.Vertical == AUTOLENGTH{
-		temp.Vertical = c.Vertical
-	}
-	if temp.Horizontal == AUTOLENGTH{
-		temp.Horizontal = c.Horizontal
-	}
-	return temp
-}
-
-func (s *nSize) rect(r image.Rectangle) {
-	s.child.rect(r)
-}
-
-func (s *nSize) update(info *Information, style *Style) {
-	s.child.update(info, style)
-}
-
-func (s *nSize) Occur(event Event) {
-	s.child.Occur(event)
-}
-
-func NSize(sz Size) *nSize {
-	return &nSize{
-		sz: sz,
-	}
-}
-
-
-//
-func (s *nSize) Set(sz Size) {
-	s.sz = sz
-}
-func (s *nSize) Get() Size {
-	return s.sz
-}

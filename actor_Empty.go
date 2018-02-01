@@ -1,31 +1,36 @@
 package gumi
 
-import "image"
+import (
+	"image"
+	"fmt"
+)
 
-type aEmpty struct {
+type AEmpty struct {
 	VoidStructure
 }
 
-func (aEmpty) draw(frame *image.RGBA) {
+func (AEmpty) draw(frame *image.RGBA) {
 }
 
-func (aEmpty) size() Size {
+func (AEmpty) size() Size {
 	return Size{
 		AUTOLENGTH,
 		AUTOLENGTH,
 	}
 }
 
-func (aEmpty) rect(image.Rectangle) {
+func (AEmpty) rect(image.Rectangle) {
 }
 
-func (aEmpty) update(info *Information, style *Style) {
+func (AEmpty) update(info *Information, style *Style) {
 }
 
-func (aEmpty) Occur(event Event) {
+func (AEmpty) Occur(event Event) {
 }
-
+func (s AEmpty) String() string {
+	return fmt.Sprintf("%s", "AEmpty")
+}
 //
-func AEmpty() *aEmpty {
-	return &aEmpty{}
+func AEmpty0() *AEmpty {
+	return &AEmpty{}
 }

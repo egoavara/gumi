@@ -3,6 +3,7 @@ package gumi
 import (
 	"github.com/fogleman/gg"
 	"image"
+	"fmt"
 )
 
 const (
@@ -11,7 +12,7 @@ const (
 	mtProgressAnimMillis = 600
 )
 
-type mtProgress struct {
+type MTProgress struct {
 	VoidStructure
 	BoundStore
 	StyleStore
@@ -27,7 +28,12 @@ type mtProgress struct {
 	cursorEnter, active bool
 }
 
-func (s *mtProgress) draw(frame *image.RGBA) {
+func (s *MTProgress) String() string {
+	return fmt.Sprintf("%s(percent:%.2f%%)", "MTProgress", s.to)
+}
+
+
+func (s *MTProgress) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	radius := h / 2
@@ -52,19 +58,16 @@ func (s *mtProgress) draw(frame *image.RGBA) {
 	ctx.DrawArc(radius+rectw, radius, radius, gg.Radians(-90), gg.Radians(90))
 	ctx.Fill()
 }
-
-func (s *mtProgress) size() Size {
+func (s *MTProgress) size() Size {
 	return Size{
 		MinLength(mtProgressMinHeight),
 		MinLength(mtProgressMinWidth),
 	}
 }
-
-func (s *mtProgress) rect(r image.Rectangle) {
+func (s *MTProgress) rect(r image.Rectangle) {
 	s.bound = r
 }
-
-func (s *mtProgress) update(info *Information, style *Style) {
+func (s *MTProgress) update(info *Information, style *Style) {
 	s.style = style
 	if s.cur != s.to {
 		if s.cur < s.to {
@@ -85,22 +88,21 @@ func (s *mtProgress) update(info *Information, style *Style) {
 
 	}
 }
-
-func (s *mtProgress) Occur(event Event) {
+func (s *MTProgress) Occur(event Event) {
 
 }
 
 //
-func MTProgress(from, to MaterialColor, percent float64) *mtProgress {
-	temp := &mtProgress{
+func MTProgress0(from, to MaterialColor, percent float64) *MTProgress {
+	temp := &MTProgress{
 		to: percent,
 	}
 	temp.SetFromMaterialColor(from)
 	temp.SetToMaterialColor(to)
 	return temp
 }
-func MTProgress1(mcl MaterialColor, percent float64) *mtProgress {
-	temp := &mtProgress{
+func MTProgress1(mcl MaterialColor, percent float64) *MTProgress {
+	temp := &MTProgress{
 		to: percent,
 	}
 	temp.SetFromMaterialColor(mcl)
@@ -109,23 +111,23 @@ func MTProgress1(mcl MaterialColor, percent float64) *mtProgress {
 }
 
 //
-func (s *mtProgress) Get() float64 {
+func (s *MTProgress) Get() float64 {
 	return s.to
 }
-func (s *mtProgress) Set(percent float64) {
+func (s *MTProgress) Set(percent float64) {
 	s.from = s.cur
 	s.to = percent
 }
 
-func (s *mtProgress) GetFromMaterialColor() MaterialColor {
+func (s *MTProgress) GetFromMaterialColor() MaterialColor {
 	return s.mcl1
 }
-func (s *mtProgress) SetFromMaterialColor(mcl MaterialColor) {
+func (s *MTProgress) SetFromMaterialColor(mcl MaterialColor) {
 	s.mcl1 = mcl
 }
-func (s *mtProgress) GetToMaterialColor() MaterialColor {
+func (s *MTProgress) GetToMaterialColor() MaterialColor {
 	return s.mcl2
 }
-func (s *mtProgress) SetToMaterialColor(mcl MaterialColor) {
+func (s *MTProgress) SetToMaterialColor(mcl MaterialColor) {
 	s.mcl2 = mcl
 }

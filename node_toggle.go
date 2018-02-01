@@ -5,9 +5,10 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"fmt"
 )
 
-type nToggle struct {
+type NToggle struct {
 	SingleStructure
 	BoundStore
 	StyleStore
@@ -16,9 +17,14 @@ type nToggle struct {
 	//
 	onActive NToggleActive
 }
+
+func (s *NToggle) String() string {
+	return fmt.Sprintf("%s(active:%v)", "NToggle", s.active)
+}
+
 type NToggleActive func(active bool)
 
-func (s *nToggle) draw(frame *image.RGBA) {
+func (s *NToggle) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	//
@@ -61,7 +67,7 @@ func (s *nToggle) draw(frame *image.RGBA) {
 	s.child.draw(frame)
 }
 
-func (s *nToggle) size() Size {
+func (s *NToggle) size() Size {
 	sz := s.child.size()
 	sz.Vertical.Min += aBUTTONPADDING * 2
 	sz.Horizontal.Min += aBUTTONPADDING * 2
@@ -73,7 +79,7 @@ func (s *nToggle) size() Size {
 	}
 	return sz
 }
-func (s *nToggle) rect(r image.Rectangle) {
+func (s *NToggle) rect(r image.Rectangle) {
 	s.bound = r
 	s.child.rect(image.Rect(
 		r.Min.X+aBUTTONPADDING-1,
@@ -82,11 +88,11 @@ func (s *nToggle) rect(r image.Rectangle) {
 		r.Max.Y-aBUTTONPADDING+1,
 	))
 }
-func (s *nToggle) update(info *Information, style *Style) {
+func (s *NToggle) update(info *Information, style *Style) {
 	s.style = style
 	s.child.update(info, style)
 }
-func (s *nToggle) Occur(event Event) {
+func (s *NToggle) Occur(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
 	case EventKeyRelease:
@@ -111,15 +117,15 @@ func (s *nToggle) Occur(event Event) {
 }
 
 //
-func NToggle(active NToggleActive) *nToggle {
-	return &nToggle{
+func NToggle0(active NToggleActive) *NToggle {
+	return &NToggle{
 		onActive: active,
 	}
 }
 
-func (s *nToggle) OnActive(callback NToggleActive) {
+func (s *NToggle) OnActive(callback NToggleActive) {
 	s.onActive = callback
 }
-func (s *nToggle) ReferActive() NToggleActive {
+func (s *NToggle) ReferActive() NToggleActive {
 	return s.onActive
 }

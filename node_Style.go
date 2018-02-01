@@ -1,43 +1,46 @@
 package gumi
 
-import "image"
+import (
+	"image"
+	"fmt"
+)
 
-type nStyle struct {
+type NStyle struct {
 	SingleStructure
 	s *Style
 }
 
-func (s *nStyle) draw(frame *image.RGBA) {
+func (s *NStyle) String() string {
+	return fmt.Sprintf("%s", "NStyle")
+}
+
+func (s *NStyle) draw(frame *image.RGBA) {
 	s.child.draw(frame)
 }
-
-func (s *nStyle) size() Size {
+func (s *NStyle) size() Size {
 	return s.child.size()
 }
-
-func (s *nStyle) rect(r image.Rectangle) {
+func (s *NStyle) rect(r image.Rectangle) {
 	s.child.rect(r)
 }
-
-func (s *nStyle) update(info *Information, style *Style) {
+func (s *NStyle) update(info *Information, style *Style) {
 	s.child.update(info, s.s)
 }
-
-func (s *nStyle) Occur(event Event) {
+func (s *NStyle) Occur(event Event) {
 	s.child.Occur(event)
 }
 
-func NStyle(s *Style) *nStyle {
+func NStyle0(s *Style) *NStyle {
 	if s == nil {
 		s = DefaultStyle()
 	}
-	return &nStyle{
+	return &NStyle{
 		s: s,
 	}
 }
-func (s *nStyle) Set(st *Style) {
+func (s *NStyle) Set(st *Style) {
 	s.s = st
 }
-func (s *nStyle) Get() *Style {
+func (s *NStyle) Get() *Style {
 	return s.s
 }

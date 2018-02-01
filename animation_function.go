@@ -1,23 +1,23 @@
 package gumi
 
-var Animation AnimFuncs
-var Material AnimFuncsMaterial
+var Animation _Animation
+
 
 type AnimFunc func(t float64) float64
-type AnimFuncs struct {
+type _Animation struct {
 	//
 	Quad  AnimFuncsQuad
 	Cubic AnimFuncsCubic
 	Quart AnimFuncsQuart
 	Quint AnimFuncsQuint
 	//
-	Material AnimFuncsMaterial
+	Material _MaterialAnimation
 }
 
-func (s AnimFuncs) Default(t float64) float64 {
+func (s _Animation) Default(t float64) float64 {
 	return s.Quad.Easing(t)
 }
-func (AnimFuncs) Linear(t float64) float64 {
+func (_Animation) Linear(t float64) float64 {
 	return t
 }
 
@@ -85,16 +85,3 @@ func (AnimFuncsQuint) Easing(t float64) float64 {
 	return 1 + 16*(t-1)*t*t*t*t
 }
 
-type AnimFuncsMaterial struct {
-}
-
-func (s AnimFuncsMaterial) Toggle(t float64) float64 {
-	return Animation.Default(t)
-}
-
-func (s AnimFuncsMaterial) Button(t float64) float64 {
-	return Animation.Default(t)
-}
-func (s AnimFuncsMaterial) Progress(t float64) float64 {
-	return Animation.Linear(t)
-}

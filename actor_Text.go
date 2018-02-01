@@ -3,9 +3,10 @@ package gumi
 import (
 	"golang.org/x/image/math/fixed"
 	"image"
+	"fmt"
 )
 
-type aText struct {
+type AText struct {
 	VoidStructure
 	BoundStore
 	StyleStore
@@ -13,7 +14,11 @@ type aText struct {
 	text  string
 }
 
-func (s *aText) draw(frame *image.RGBA) {
+func (s *AText) String() string {
+	return fmt.Sprintf("%s(text:%s)", "AText", s.text)
+}
+
+func (s *AText) draw(frame *image.RGBA) {
 	s.style.Default.Font.Use()
 	defer s.style.Default.Font.Release()
 	s.style.Default.Font.ChangeSource(s.style.Default.Line)
@@ -38,7 +43,7 @@ func (s *aText) draw(frame *image.RGBA) {
 	}
 	s.style.Default.Font.Draw(s.bound, frame, s.text, dot)
 }
-func (s *aText) size() Size {
+func (s *AText) size() Size {
 	s.style.Default.Font.Use()
 	defer s.style.Default.Font.Release()
 
@@ -51,33 +56,39 @@ func (s *aText) size() Size {
 
 	return temp
 }
-func (s *aText) rect(r image.Rectangle) {
+func (s *AText) rect(r image.Rectangle) {
 	s.bound = r
 }
-func (s *aText) update(info *Information, style *Style) {
+func (s *AText) update(info *Information, style *Style) {
 	s.style = style
 
 }
-func (s *aText) Occur(event Event) {
+func (s *AText) Occur(event Event) {
 }
 
 //
-func AText(str string, align Align) *aText {
-	return &aText{
+func AText0(str string, align Align) *AText {
+	return &AText{
 		text:  str,
 		align: align,
 	}
 }
-func (s *aText) Set(str string) {
+func AText1(str string) *AText {
+	return &AText{
+		text:  str,
+		align: Align_CENTER,
+	}
+}
+func (s *AText) Set(str string) {
 	s.text = str
 }
-func (s *aText) Get() string {
+func (s *AText) Get() string {
 	return s.text
 }
 
-func (s *aText) Align(align Align) {
+func (s *AText) SetAlign(align Align) {
 	s.align = align
 }
-func (s *aText) Alignment() Align {
+func (s *AText) GetAlign() Align {
 	return s.align
 }

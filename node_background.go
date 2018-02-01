@@ -3,36 +3,37 @@ package gumi
 import (
 	"image"
 	"image/draw"
+	"fmt"
 )
 
-type nBackground struct {
+type NBackground struct {
 	SingleStructure
 	BoundStore
 	StyleStore
 }
 
-func (s *nBackground) draw(frame *image.RGBA) {
+func (s *NBackground) String() string {
+	return fmt.Sprintf("%s", "NBackground")
+}
+func (s *NBackground) draw(frame *image.RGBA) {
 	draw.Draw(frame, s.bound, s.style.Default.Face, s.style.Default.Face.Bounds().Min, draw.Over)
 	s.child.draw(frame)
 }
-
-func (s nBackground) size() Size {
+func (s NBackground) size() Size {
 	return s.child.size()
 }
-func (s *nBackground) rect(rect image.Rectangle) {
+func (s *NBackground) rect(rect image.Rectangle) {
 	s.bound = rect
 	s.child.rect(rect)
 }
-
-func (s *nBackground) update(info *Information, style *Style) {
+func (s *NBackground) update(info *Information, style *Style) {
 	s.style = style
 	s.child.update(info, style)
 }
-
-func (s *nBackground) Occur(event Event) {
+func (s *NBackground) Occur(event Event) {
 	s.child.Occur(event)
 }
 
-func NBackground() *nBackground {
-	return &nBackground{}
+func NBackground0() *NBackground {
+	return &NBackground{}
 }

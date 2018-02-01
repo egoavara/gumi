@@ -1,7 +1,11 @@
 package gumi
 
-type Dispensor func(have int, lns []Length) []int
-func DispensorOrder(have int, lns []Length) []int {
+type Distribute func(have int, lns []Length) []int
+type Distributions struct {
+}
+
+var Distribution Distributions
+func (Distributions) Order(have int, lns []Length) []int {
 	var res = make([]int, len(lns))
 	//
 	var minsum, maxsum int
@@ -43,7 +47,7 @@ func DispensorOrder(have int, lns []Length) []int {
 	}
 	return res
 }
-func DispensorMinimalize(have int, lns []Length) []int {
+func (Distributions) Minimalize(have int, lns []Length) []int {
 	var res = make([]int, len(lns))
 	//
 	for i, v := range lns{

@@ -8,8 +8,8 @@ import (
 func RulerHelloWorld(scr *gumi.Screen, theme gumi.Theme) (result testing.BenchmarkResult) {
 	scr.Root(gumi.LinkingFrom(
 
-		gumi.NStyle(theme.ColorLine(2)),
-		gumi.NDo(func() {
+		gumi.NStyle0(theme.ColorLine(2)),
+		gumi.NDo0(func() {
 			theme.Font.Use()
 			defer theme.Font.Release()
 			theme.Font.ChangeSize(30)
@@ -28,17 +28,17 @@ func RulerHelloWorld(scr *gumi.Screen, theme gumi.Theme) (result testing.Benchma
 			//	gumi.RULER_GRIDDASH_VERTICAL | gumi.RULER_GRIDDASH_HORIZONTAL,
 			//	100),
 		)...),
-		gumi.NDo(func() {
+		gumi.NDo0(func() {
 			theme.Font.Use()
 			defer theme.Font.Release()
 			theme.Font.ChangeSize(16)
 		}),
-		gumi.NStyle(theme.BackgroundStyle()),
-		gumi.NBackground(),
-		gumi.NMargin(gumi.AUTOSIZE, gumi.RegularBlank(gumi.MinLength(10))),
-		gumi.NStyle(theme.Style(gumi.INTENSE3)),
-		gumi.NBackground(),
-		gumi.AText("Hello, world!", gumi.Align_CENTER)))
+		gumi.NStyle0(theme.BackgroundStyle()),
+		gumi.NBackground0(),
+		gumi.NMargin0(gumi.AUTOSIZE, gumi.RegularBlank(gumi.MinLength(10))),
+		gumi.NStyle0(theme.Style(gumi.INTENSE3)),
+		gumi.NBackground0(),
+		gumi.AText0("Hello, world!", gumi.Align_CENTER)))
 
 	result = testing.Benchmark(func(b *testing.B) {
 		scr.Draw(nil)

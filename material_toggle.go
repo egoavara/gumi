@@ -3,13 +3,14 @@ package gumi
 import (
 	"github.com/fogleman/gg"
 	"image"
+	"fmt"
 )
 
 const mtToggleMinWidth = 40
 const mtToggleMinHeight = 20
 const mtToggleAnimMillis = 200
 
-type mtToggle struct {
+type MTToggle struct {
 	//
 	VoidStructure
 	BoundStore
@@ -23,9 +24,14 @@ type mtToggle struct {
 	cursorEnter, active bool
 	onActive            MTToggleActive
 }
+
+func (s *MTToggle) String() string {
+	return fmt.Sprintf("%s(active:%v)", "MTToggle", s.active)
+}
+
 type MTToggleActive func(active bool)
 
-func (s *mtToggle) draw(frame *image.RGBA) {
+func (s *MTToggle) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 
@@ -49,16 +55,16 @@ func (s *mtToggle) draw(frame *image.RGBA) {
 	ctx.Fill()
 }
 
-func (s *mtToggle) size() Size {
+func (s *MTToggle) size() Size {
 	return Size{
 		Vertical:   MinLength(mtToggleMinHeight),
 		Horizontal: MinLength(mtToggleMinWidth),
 	}
 }
-func (s *mtToggle) rect(r image.Rectangle) {
+func (s *MTToggle) rect(r image.Rectangle) {
 	s.bound = r
 }
-func (s *mtToggle) update(info *Information, style *Style) {
+func (s *MTToggle) update(info *Information, style *Style) {
 	s.style = style
 	if s.active {
 		if s.handle < mtToggleAnimMillis {
@@ -78,7 +84,7 @@ func (s *mtToggle) update(info *Information, style *Style) {
 		}
 	}
 }
-func (s *mtToggle) Occur(event Event) {
+func (s *MTToggle) Occur(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
 	case EventKeyRelease:
@@ -102,22 +108,22 @@ func (s *mtToggle) Occur(event Event) {
 }
 
 //
-func MTToggle(from, to MaterialColor, active MTToggleActive) *mtToggle {
-	temp := &mtToggle{
+func MTToggle0(from, to MaterialColor, active MTToggleActive) *MTToggle {
+	temp := &MTToggle{
 		onActive: active,
 	}
 	temp.SetFromMaterialColor(from)
 	temp.SetToMaterialColor(to)
 	return temp
 }
-func MTToggle1(active MTToggleActive) *mtToggle {
-	return &mtToggle{
+func MTToggle1(active MTToggleActive) *MTToggle {
+	return &MTToggle{
 		onActive: active,
 	}
 }
-func (s *mtToggle) OnActive(callback MTToggleActive) {
+func (s *MTToggle) OnActive(callback MTToggleActive) {
 	s.onActive = callback
 }
-func (s *mtToggle) ReferActive() MTToggleActive {
+func (s *MTToggle) ReferActive() MTToggleActive {
 	return s.onActive
 }

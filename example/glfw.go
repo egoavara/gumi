@@ -21,65 +21,34 @@ func init() {
 
 func main() {
 	scr := gumi.NewScreen(windowWidth, windowHeight)
-	pro := gumi.MTProgress(gumi.White, gumi.Red, 0)
 	scr.Root(gumi.LinkingFrom(
-		gumi.NDrawing1(gumi.BuildRuler(
-			gumi.RULER_HINT_VERTICAL|gumi.RULER_HINT_HORIZONTAL,
-			100,
-		)...),
-		gumi.NBackground(),
-		gumi.NMargin(gumi.RegularBlank(gumi.MinLength(20))),
+		gumi.NBackground0(),
+		gumi.NDrawing1(
+			gumi.Drawing.Ruler.Hint.Vertical(100),
+			gumi.Drawing.Ruler.Hint.Horizontal(100),
+		),
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(20))),
 		gumi.NVertical1(
-			gumi.NHorizontal1(
-				gumi.LinkingFrom(
-					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
-					gumi.MTToggle(
-						gumi.White,
-						gumi.Red,
-						func(active bool) {
-							fmt.Printf("MTToggle %6s : %b", "Blue", active)
-						},
-					),
-				),
-				gumi.LinkingFrom(
-					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
-					gumi.MTToggle(
-						gumi.White,
-						gumi.Blue,
-						func(active bool) {
-							fmt.Printf("MTToggle %6s : %b", "Blue", active)
-						},
-					),
-				),
-				gumi.LinkingFrom(
-					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
-					gumi.MTToggle(
-						gumi.White,
-						gumi.Green,
-						func(active bool) {
-							fmt.Println(active)
-						},
-					),
-				),
-				gumi.LinkingFrom(
-					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
-					gumi.MTToggle(
-						gumi.White,
-						gumi.Yellow,
-						func(active bool) {
-							fmt.Println(active)
-						},
-					),
-				),
+			toggles,
+			radios,
+			gumi.LinkingFrom(
+				gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+				gumi.MTButton1("Reset", func() {
+					for _, v := range progresses.Childrun() {
+						v.Childrun()[0].(*gumi.MTProgress).Set(0)
+					}
+				}),
 			),
-			gumi.MTButton1("Reset", func() {
-				pro.Set(0)
-			}),
-			gumi.MTButton1("Activate", func() {
-				pro.Set(1)
-			}),
-			pro,
-			gumi.AText("Hello, World!", gumi.Align_CENTER),
+			gumi.LinkingFrom(
+				gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+				gumi.MTButton1("Activate", func() {
+					for i, v := range progresses.Childrun() {
+						v.Childrun()[0].(*gumi.MTProgress).Set(float64(i+1) / 5)
+					}
+				}),
+			),
+			progresses,
+			gumi.AText0("Hello, World!", gumi.Align_CENTER),
 		),
 	))
 	scr.Update(nil, nil)
@@ -184,6 +153,155 @@ func main() {
 		glfw.PollEvents()
 	}
 }
+
+var progresses = gumi.NVertical1(
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTProgress0(
+			gumi.White,
+			gumi.White,
+			0,
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTProgress0(
+			gumi.White,
+			gumi.Red,
+			0,
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTProgress0(
+			gumi.White,
+			gumi.Blue,
+			0,
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTProgress0(
+			gumi.White,
+			gumi.Green,
+			0,
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTProgress0(
+			gumi.White,
+			gumi.Yellow,
+			0,
+		),
+	),
+)
+var radios = gumi.NHorizontal1(
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTRadio0(
+			gumi.White,
+			gumi.White,
+			func(active bool) {
+				fmt.Printf("MTRadio %6s : %v\n", "White", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTRadio0(
+			gumi.White,
+			gumi.Red,
+			func(active bool) {
+				fmt.Printf("MTRadio %6s : %v\n", "Red", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTRadio0(
+			gumi.White,
+			gumi.Blue,
+			func(active bool) {
+				fmt.Printf("MTRadio %6s : %v\n", "Blue", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTRadio0(
+			gumi.White,
+			gumi.Green,
+			func(active bool) {
+				fmt.Printf("MTRadio %6s : %v\n", "Green", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTRadio0(
+			gumi.White,
+			gumi.Yellow,
+			func(active bool) {
+				fmt.Printf("MTRadio %6s : %v\n", "Yellow", active)
+			},
+		),
+	),
+)
+var toggles = gumi.NHorizontal1(
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTToggle0(
+			gumi.White,
+			gumi.White,
+			func(active bool) {
+				fmt.Printf("MTToggle %6s : %v\n", "White", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTToggle0(
+			gumi.White,
+			gumi.Red,
+			func(active bool) {
+				fmt.Printf("MTToggle %6s : %v\n", "Red", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTToggle0(
+			gumi.White,
+			gumi.Blue,
+			func(active bool) {
+				fmt.Printf("MTToggle %6s : %v\n", "Blue", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTToggle0(
+			gumi.White,
+			gumi.Green,
+			func(active bool) {
+				fmt.Printf("MTToggle %6s : %v\n", "Green", active)
+			},
+		),
+	),
+	gumi.LinkingFrom(
+		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+		gumi.MTToggle0(
+			gumi.White,
+			gumi.Yellow,
+			func(active bool) {
+				fmt.Printf("MTToggle %6s : %v\n", "Yellow", active)
+			},
+		),
+	),
+)
+
+//
 
 func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
 	vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)

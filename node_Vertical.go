@@ -2,28 +2,40 @@ package gumi
 
 import (
 	"image"
+	"math"
+	"fmt"
 )
 
-type nVertical struct {
+type NVertical struct {
 	MultipleStructure
-	rule Dispensor
+	rule Distribute
 }
 
-func (s *nVertical) draw(frame *image.RGBA) {
+func (s *NVertical) draw(frame *image.RGBA) {
 	for _, v := range s.child{
 		v.draw(frame)
 	}
 }
+func (s *NVertical) size() Size {
+	var min, max, sum uint16 = 0, math.MaxUint16, 0
 
-func (s *nVertical) size() Size {
+	for _, v := range s.child{
+		sz := v.size()
+		if sz.Horizontal.Min > min{
+			min = sz.Horizontal.Min
+		}
+		if sz.Horizontal.Max < max{
+			max = sz.Horizontal.Max
+		}
+		sum += sz.Vertical.Min
+	}
+	//
 	return Size{
-		AUTOLENGTH,
-		AUTOLENGTH,
+		MinLength(sum),
+		Length{Min: min, Max:max},
 	}
 }
-
-
-func (s *nVertical) rect(r image.Rectangle) {
+func (s *NVertical) rect(r image.Rectangle) {
 	//
 	var tempVert = make([]Length, len(s.child))
 	var tempHori = make([]Length, len(s.child))
@@ -50,28 +62,38 @@ func (s *nVertical) rect(r image.Rectangle) {
 		startat += dis[i]
 	}
 }
-
-func (s *nVertical) update(info *Information, style *Style) {
+func (s *NVertical) update(info *Information, style *Style) {
 	for _, v := range s.child{
 		v.update(info, style)
 	}
 }
-
-func (s *nVertical) Occur(event Event) {
+func (s *NVertical) Occur(event Event) {
 	for _, v := range s.child{
 		v.Occur(event)
 	}
 }
-func NVertical(rule Dispensor, childrun ...GUMI) *nVertical {
-	s := &nVertical{
+func (s *NVertical) String() string{
+	return fmt.Sprintf(
+		"%s(childrun:%d)", "NVertical", len(s.Childrun()),
+	)
+}
+
+func NVertical0(rule Distribute, childrun ...GUMI) *NVertical {
+	s := &NVertical{
 		rule:rule,
+	}
+	for _, v := range childrun{
+		v.Born(s)
 	}
 	s.Breed(childrun)
 	return s
 }
-func NVertical1(childrun ...GUMI) *nVertical {
-	s := &nVertical{
-		rule: DispensorMinimalize,
+func NVertical1(childrun ...GUMI) *NVertical {
+	s := &NVertical{
+		rule: Distribution.Minimalize,
+	}
+	for _, v := range childrun{
+		v.Born(s)
 	}
 	s.Breed(childrun)
 	return s

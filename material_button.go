@@ -3,6 +3,7 @@ package gumi
 import (
 	"github.com/fogleman/gg"
 	"image"
+	"fmt"
 )
 
 const (
@@ -11,7 +12,7 @@ const (
 	mtButtonAnimMillis = 100
 )
 
-type mtButton struct {
+type MTButton struct {
 	//
 	VoidStructure
 	BoundStore
@@ -28,10 +29,15 @@ type mtButton struct {
 	onClick             MTButtonClick
 	onFocus             MTButtonFocus
 }
+
+func (s *MTButton) String() string {
+	return fmt.Sprintf("%s", "MTButton")
+}
+
 type MTButtonFocus func(focus bool)
 type MTButtonClick func()
 
-func (s *mtButton) draw(frame *image.RGBA) {
+func (s *MTButton) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	radius := h / 2
@@ -66,19 +72,16 @@ func (s *mtButton) draw(frame *image.RGBA) {
 		ctx.Stroke()
 	}
 }
-
-func (s *mtButton) size() Size {
+func (s *MTButton) size() Size {
 	return Size{
 		Vertical:   MinLength(mtButtonMinHeight),
 		Horizontal: MinLength(mtButtonMinWidth),
 	}
 }
-
-func (s *mtButton) rect(r image.Rectangle) {
+func (s *MTButton) rect(r image.Rectangle) {
 	s.bound = r
 }
-
-func (s *mtButton) update(info *Information, style *Style) {
+func (s *MTButton) update(info *Information, style *Style) {
 	s.style = style
 	if s.cursorEnter {
 		if s.handle < mtButtonAnimMillis {
@@ -98,8 +101,7 @@ func (s *mtButton) update(info *Information, style *Style) {
 		}
 	}
 }
-
-func (s *mtButton) Occur(event Event) {
+func (s *MTButton) Occur(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
 		if ev.Key == KEY_MOUSE1 {
@@ -133,36 +135,36 @@ func (s *mtButton) Occur(event Event) {
 	}
 }
 
-func MTButton(mcl MaterialColor, text string, onclick MTButtonClick) *mtButton {
-	temp := &mtButton{
+func MTButton0(mcl MaterialColor, text string, onclick MTButtonClick) *MTButton {
+	temp := &MTButton{
 		text:    text,
 		onClick: onclick,
 	}
 	temp.SetMaterialColor(mcl)
 	return temp
 }
-func MTButton1(text string, onclick MTButtonClick) *mtButton {
-	return &mtButton{
+func MTButton1(text string, onclick MTButtonClick) *MTButton {
+	return &MTButton{
 		text:    text,
 		onClick: onclick,
 	}
 }
 
-func (s *mtButton) SetText(txt string) {
+func (s *MTButton) SetText(txt string) {
 	s.text = txt
 }
-func (s *mtButton) GetText() string {
+func (s *MTButton) GetText() string {
 	return s.text
 }
-func (s *mtButton) OnClick(callback MTButtonClick) {
+func (s *MTButton) OnClick(callback MTButtonClick) {
 	s.onClick = callback
 }
-func (s *mtButton) ReferClick() MTButtonClick {
+func (s *MTButton) ReferClick() MTButtonClick {
 	return s.onClick
 }
-func (s *mtButton) OnFocus(callback MTButtonClick) {
+func (s *MTButton) OnFocus(callback MTButtonClick) {
 	s.onClick = callback
 }
-func (s *mtButton) ReferFocus() MTButtonClick {
+func (s *MTButton) ReferFocus() MTButtonClick {
 	return s.onClick
 }
