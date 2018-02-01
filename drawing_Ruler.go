@@ -69,7 +69,7 @@ func BuildRuler(ruler RulerType, pivot int) []DrawFunc {
 			for f := float64(pivot); f <= float64(context.Width()); f += float64(pivot) {
 				txt := strconv.FormatInt(int64(f), 10)
 				w, _ := context.MeasureString(txt)
-				context.DrawString(txt, f-w, float64(style.Font.FontHeight().Round()))
+				context.DrawString(txt, f-w, float64(style.Default.Font.FontHeight().Round()))
 			}
 			context.Stroke()
 		})
@@ -152,7 +152,7 @@ func BuildRuler(ruler RulerType, pivot int) []DrawFunc {
 		temp = append(temp, func(context *gg.Context, style *Style) {
 			for x := 0.; x <= float64(context.Width()); x += float64(pivot) {
 				for y := 0.; y <= float64(context.Height()); y += float64(pivot) {
-					context.DrawPoint(x, y, style.LineWidth)
+					context.DrawPoint(x, y, style.Default.LineWidth)
 				}
 			}
 			context.Stroke()

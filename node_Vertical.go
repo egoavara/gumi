@@ -25,20 +25,28 @@ func (s *nVertical) size() Size {
 
 func (s *nVertical) rect(r image.Rectangle) {
 	//
-	var temp = make([]Length, len(s.child))
+	var tempVert = make([]Length, len(s.child))
+	var tempHori = make([]Length, len(s.child))
+
 	for i, v := range s.child{
-		temp[i] = v.size().Vertical
+		tempVert[i] = v.size().Vertical
+		tempHori[i] = v.size().Horizontal
 	}
-	dis := s.rule(r.Dy(), temp)
+	dis := s.rule(r.Dy(), tempVert)
 	//
 	var startat = r.Min.Y
+	dx := r.Dx()
 	for i, v := range s.child{
-		v.rect(image.Rect(
+		r := image.Rect(
 			r.Min.X,
 			startat,
 			r.Max.X,
 			startat + dis[i],
-		))
+		)
+		if int(tempHori[i].Max) < dx{
+			r.Max.X = r.Min.X + int(tempHori[i].Max)
+		}
+		v.rect(r)
 		startat += dis[i]
 	}
 }

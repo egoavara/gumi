@@ -2,7 +2,7 @@ package gumi
 
 
 type Information struct {
-	Dt uint64
+	Dt int64
 }
 
 func DefaultInformation() *Information {

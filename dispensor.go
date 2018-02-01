@@ -10,6 +10,7 @@ func DispensorOrder(have int, lns []Length) []int {
 		maxsum += int(v.Max)
 	}
 	if maxsum <= have{
+		// 모두 최대값으로 해도 가능
 		for i, v := range lns{
 			res[i] = int(v.Max)
 		}

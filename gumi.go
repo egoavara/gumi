@@ -12,7 +12,7 @@ type GUMI interface{
 type GUMIRenderer interface{
 	draw(frame *image.RGBA)
 	size() Size
-	rect(image.Rectangle)
+	rect(r image.Rectangle)
 	update(info *Information, style *Style)
 }
 type GUMIStructure interface{

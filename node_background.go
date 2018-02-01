@@ -12,7 +12,7 @@ type nBackground struct {
 }
 
 func (s *nBackground) draw(frame *image.RGBA) {
-	draw.Draw(frame, s.bound, s.style.Face, s.style.Face.Bounds().Min, draw.Over)
+	draw.Draw(frame, s.bound, s.style.Default.Face, s.style.Default.Face.Bounds().Min, draw.Over)
 	s.child.draw(frame)
 }
 

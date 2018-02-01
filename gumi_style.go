@@ -94,29 +94,29 @@ func DefaultStyle() *Style {
 		Default: StyleDefault{
 			Font:      gutl.NewFont(f, 12),
 			LineWidth: 1,
-			Line:      image.NewUniform(color.RGBA{113, 251, 254, 255}),
-			Face:      image.NewUniform(color.RGBA{28, 30, 29, 255}),
+			Line:      image.NewUniform(color.RGBA{252, 252, 252, 255}),
+			Face:      image.NewUniform(color.RGBA{64, 74, 83, 255}),
 		},
 		Material: StyleMaterial{
 			White: [2]image.Image{
-				image.NewUniform(color.RGBA{28, 30, 29, 255}),
-				image.NewUniform(color.RGBA{113, 251, 254, 255}),
+				image.NewUniform(color.RGBA{94, 97, 97, 255}),
+				image.NewUniform(color.RGBA{213, 217, 218, 255}),
 			},
 			Red: [2]image.Image{
-				image.NewUniform(color.RGBA{28, 30, 29, 255}),
-				image.NewUniform(color.RGBA{113, 251, 254, 255}),
+				image.NewUniform(color.RGBA{127, 51, 49, 255}),
+				image.NewUniform(color.RGBA{255, 84, 74, 255}),
 			},
 			Green: [2]image.Image{
-				image.NewUniform(color.RGBA{28, 80, 29, 255}),
-				image.NewUniform(color.RGBA{93, 255, 224, 255}),
+				image.NewUniform(color.RGBA{61, 127, 59, 255}),
+				image.NewUniform(color.RGBA{110, 204, 102, 255}),
 			},
 			Blue: [2]image.Image{
-				image.NewUniform(color.RGBA{28, 30, 29, 255}),
-				image.NewUniform(color.RGBA{113, 251, 254, 255}),
+				image.NewUniform(color.RGBA{59, 70, 127, 255}),
+				image.NewUniform(color.RGBA{118, 139, 255, 255}),
 			},
 			Yellow: [2]image.Image{
-				image.NewUniform(color.RGBA{28, 30, 29, 255}),
-				image.NewUniform(color.RGBA{113, 251, 254, 255}),
+				image.NewUniform(color.RGBA{122, 127, 67, 255}),
+				image.NewUniform(color.RGBA{231, 235, 118, 255}),
 			},
 		},
 	}

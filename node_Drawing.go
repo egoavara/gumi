@@ -1,7 +1,6 @@
 package gumi
 
 import (
-	"github.com/fogleman/gg"
 	"image"
 )
 
@@ -15,25 +14,22 @@ type nDrawing struct {
 }
 
 func (s *nDrawing) draw(frame *image.RGBA) {
-	var ctx = GGContextRGBASub(frame, s.bound)
-	s.style.useContext(ctx)
-	defer  s.style.releaseContext(ctx)
-	ctx.SetColor(s.style.Default.Line.At(0, 0))
-	if !s.afterdraw {
+	var fn = func(){
+		var ctx = GGContextRGBASub(frame, s.bound)
+		s.style.useContext(ctx)
+		defer s.style.releaseContext(ctx)
 		for _, f := range s.drawfuncs {
 			ctx.Push()
 			f(ctx, s.style)
 			ctx.Pop()
 		}
+	}
+	if !s.afterdraw {
+		fn()
+	}else {
+		defer fn()
 	}
 	s.child.draw(frame)
-	if s.afterdraw {
-		for _, f := range s.drawfuncs {
-			ctx.Push()
-			f(ctx, s.style)
-			ctx.Pop()
-		}
-	}
 }
 func (s *nDrawing) size() Size {
 	return s.child.size()

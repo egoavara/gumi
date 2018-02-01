@@ -30,10 +30,16 @@ type Size struct {
 type Length struct {
 	Min, Max uint16
 }
-var AUTOLENGTH = Length{
-	Min:0,
-	Max:math.MaxUint16,
-}
+var (
+	AUTOLENGTH = Length{
+		Min:0,
+		Max:math.MaxUint16,
+	}
+	MAXLENGTH = Length{
+		Min:math.MaxUint16,
+		Max:math.MaxUint16,
+	}
+)
 
 func MinLength(min uint16) Length {
 	return Length{

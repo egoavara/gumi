@@ -105,7 +105,15 @@ func (s *nSize) draw(frame *image.RGBA) {
 }
 
 func (s *nSize) size() Size {
-	return s.sz
+	temp := s.sz
+	c := s.child.size()
+	if temp.Vertical == AUTOLENGTH{
+		temp.Vertical = c.Vertical
+	}
+	if temp.Horizontal == AUTOLENGTH{
+		temp.Horizontal = c.Horizontal
+	}
+	return temp
 }
 
 func (s *nSize) rect(r image.Rectangle) {

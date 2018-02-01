@@ -21,6 +21,7 @@ func init() {
 
 func main() {
 	scr := gumi.NewScreen(windowWidth, windowHeight)
+	pro := gumi.MTProgress(gumi.White, gumi.Red, 0)
 	scr.Root(gumi.LinkingFrom(
 		gumi.NDrawing1(gumi.BuildRuler(
 			gumi.RULER_HINT_VERTICAL|gumi.RULER_HINT_HORIZONTAL,
@@ -28,24 +29,62 @@ func main() {
 		)...),
 		gumi.NBackground(),
 		gumi.NMargin(gumi.RegularBlank(gumi.MinLength(20))),
-		gumi.NStyle(gumi.DefaultDarkTheme.Style(gumi.INTENSE3)),
-		gumi.NBackground(),
 		gumi.NVertical1(
-			gumi.LinkingFrom(
-				gumi.NMargin(gumi.RegularBlank(gumi.MinLength(30))),
-				gumi.NStyle(gumi.DefaultDarkTheme.ColorFace(3, gumi.INTENSE1)),
-				//gumi.NButton(func() {
-				//	fmt.Println("Click!")
-				//}),
-				gumi.NToggle(func(active bool) {
-					fmt.Println("Click! : ", active)
-				}),
-				gumi.NStyle(gumi.DefaultDarkTheme.Style(gumi.INTENSE3)),
-				gumi.AText("Button!", gumi.Align_CENTER),
+			gumi.NHorizontal1(
+				gumi.LinkingFrom(
+					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
+					gumi.MTToggle(
+						gumi.White,
+						gumi.Red,
+						func(active bool) {
+							fmt.Printf("MTToggle %6s : %b", "Blue", active)
+						},
+					),
+				),
+				gumi.LinkingFrom(
+					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
+					gumi.MTToggle(
+						gumi.White,
+						gumi.Blue,
+						func(active bool) {
+							fmt.Printf("MTToggle %6s : %b", "Blue", active)
+						},
+					),
+				),
+				gumi.LinkingFrom(
+					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
+					gumi.MTToggle(
+						gumi.White,
+						gumi.Green,
+						func(active bool) {
+							fmt.Println(active)
+						},
+					),
+				),
+				gumi.LinkingFrom(
+					gumi.NMargin(gumi.RegularBlank(gumi.MinLength(4))),
+					gumi.MTToggle(
+						gumi.White,
+						gumi.Yellow,
+						func(active bool) {
+							fmt.Println(active)
+						},
+					),
+				),
 			),
+			gumi.MTButton1("Reset", func() {
+				pro.Set(0)
+			}),
+			gumi.MTButton1("Activate", func() {
+				pro.Set(1)
+			}),
+			pro,
 			gumi.AText("Hello, World!", gumi.Align_CENTER),
 		),
 	))
+	scr.Update(nil, nil)
+	scr.Ready()
+
 	//
 	if err := glfw.Init(); err != nil {
 		log.Fatalln("failed to initialize glfw:", err)
@@ -126,7 +165,7 @@ func main() {
 		elapsed := time - previousTime
 		previousTime = time
 		scr.Update(&gumi.Information{
-			Dt: uint64(elapsed),
+			Dt: int64(elapsed * 1000),
 		}, nil)
 		scr.Ready()
 		scr.Draw()
@@ -472,8 +511,8 @@ func ConvertGLFWKey(key glfw.Key, action glfw.Action) gumi.Event {
 		convkey = gumi.KEY_UNKNOWN
 	case glfw.KeyMenu:
 		convkey = gumi.KEY_UNKNOWN
-	//case glfw.KeyLast:
-	//	convkey = gumi.KEY_UNKNOWN
+		//case glfw.KeyLast:
+		//	convkey = gumi.KEY_UNKNOWN
 	}
 	//
 	switch action {
@@ -490,7 +529,7 @@ func ConvertGLFWKey(key glfw.Key, action glfw.Action) gumi.Event {
 
 func ConvertGLFWMouseButton(button glfw.MouseButton, action glfw.Action) gumi.Event {
 	var convkey uint8
-	switch button{
+	switch button {
 	case glfw.MouseButton1:
 		convkey = gumi.KEY_MOUSE1
 	case glfw.MouseButton2:

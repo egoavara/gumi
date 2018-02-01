@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/iamGreedy/gumi"
 	"github.com/iamGreedy/gumi/gutl"
+	"fmt"
 )
 
 func main() {
@@ -24,6 +25,9 @@ func main() {
 				gumi.NStyle(gumi.DefaultDarkTheme.Style(gumi.INTENSE3)),
 				gumi.AText("Button!", gumi.Align_CENTER),
 			),
+			gumi.MTToggle(func(active bool) {
+				fmt.Println(active)
+			}),
 			gumi.AText("Hello, World!", gumi.Align_CENTER),
 		),
 	))
