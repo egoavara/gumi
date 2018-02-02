@@ -11,7 +11,9 @@ type NDrawing struct {
 	StyleStore
 	//
 	afterdraw bool
-	drawfuncs []DrawingFn
+	drawfuncs []Drawer
+//
+	di *DrawingInfo
 }
 
 func (s *NDrawing) draw(frame *image.RGBA) {
@@ -19,7 +21,7 @@ func (s *NDrawing) draw(frame *image.RGBA) {
 		var ctx = GGContextRGBASub(frame, s.bound)
 		for _, f := range s.drawfuncs {
 			ctx.Push()
-			f(ctx, s.style)
+			f.Draw(ctx, s.style, s.di)
 			ctx.Pop()
 		}
 	}
@@ -39,6 +41,9 @@ func (s *NDrawing) rect(r image.Rectangle) {
 }
 func (s *NDrawing) update(info *Information, style *Style) {
 	s.style = style
+	s.di = &DrawingInfo{
+		info.Dt,
+	}
 	s.child.update(info, style)
 }
 func (s *NDrawing) Occur(event Event) {
@@ -58,13 +63,13 @@ func (s *NDrawing) IsAfterDraw() bool {
 }
 
 //
-func NDrawing0(beforedraw bool, drawFuncs ...DrawingFn) *NDrawing {
+func NDrawing0(beforedraw bool, drawFuncs ...Drawer) *NDrawing {
 	return &NDrawing{
 		afterdraw: !beforedraw,
 		drawfuncs: drawFuncs,
 	}
 }
-func NDrawing1(drawFuncs ...DrawingFn) *NDrawing {
+func NDrawing1(drawFuncs ...Drawer) *NDrawing {
 	return &NDrawing{
 		afterdraw: true,
 		drawfuncs: drawFuncs,

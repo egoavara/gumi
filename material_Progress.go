@@ -23,16 +23,16 @@ type MTProgress struct {
 	cur  float64
 	to   float64
 	anim float64
-
+	//
+	onChange MTProgressChange
 	//
 	cursorEnter, active bool
 }
+type MTProgressChange func(self *MTProgress, percent float64)
 
 func (s *MTProgress) String() string {
 	return fmt.Sprintf("%s(percent:%.2f%%)", "MTProgress", s.to)
 }
-
-
 func (s *MTProgress) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
@@ -112,22 +112,25 @@ func MTProgress1(mcl MaterialColor, percent float64) *MTProgress {
 
 //
 func (s *MTProgress) Get() float64 {
-	return s.to
+	return s.GetPercent()
 }
 func (s *MTProgress) Set(percent float64) {
+	s.SetPercent(percent)
+}
+func (s *MTProgress) GetPercent() float64 {
+	return s.to
+}
+func (s *MTProgress) SetPercent(percent float64) {
 	s.from = s.cur
 	s.to = percent
+	if s.onChange != nil{
+		s.onChange(s, s.to)
+	}
 }
 
-func (s *MTProgress) GetFromMaterialColor() MaterialColor {
-	return s.mcl1
+func (s *MTProgress) OnChange(callback MTProgressChange) {
+	s.onChange = callback
 }
-func (s *MTProgress) SetFromMaterialColor(mcl MaterialColor) {
-	s.mcl1 = mcl
-}
-func (s *MTProgress) GetToMaterialColor() MaterialColor {
-	return s.mcl2
-}
-func (s *MTProgress) SetToMaterialColor(mcl MaterialColor) {
-	s.mcl2 = mcl
+func (s *MTProgress) ReferChange() MTProgressChange {
+	return s.onChange
 }

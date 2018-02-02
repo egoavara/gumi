@@ -1,8 +1,8 @@
 package gumi
 
 import (
-	"image"
 	"fmt"
+	"image"
 )
 
 const mtRadioMinWidth = 20
@@ -18,18 +18,16 @@ type MTRadio struct {
 	mtColorFromTo
 	//
 	handle float64
-	anim float64
+	anim   float64
 	//
 	cursorEnter, active bool
 	onActive            MTRadioActive
 }
+type MTRadioActive func(self *MTRadio, active bool)
 
 func (s *MTRadio) String() string {
 	return fmt.Sprintf("%s(active:%v)", "MTRadio", s.active)
 }
-
-type MTRadioActive func(active bool)
-
 func (s *MTRadio) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
@@ -64,7 +62,7 @@ func (s *MTRadio) update(info *Information, style *Style) {
 	if s.active {
 		if s.handle < mtRadioAnimMillis {
 			s.handle = s.handle + float64(info.Dt)
-			if s.handle > mtRadioAnimMillis{
+			if s.handle > mtRadioAnimMillis {
 				s.handle = mtRadioAnimMillis
 			}
 			s.anim = Animation.Material.Toggle(s.handle / mtRadioAnimMillis)
@@ -72,10 +70,10 @@ func (s *MTRadio) update(info *Information, style *Style) {
 	} else {
 		if s.handle > 0 {
 			s.handle = s.handle - float64(info.Dt)
-			if s.handle < 0{
+			if s.handle < 0 {
 				s.handle = 0
 			}
-			s.anim = 1 - Animation.Material.Toggle((mtRadioAnimMillis - s.handle) / mtRadioAnimMillis)
+			s.anim = 1 - Animation.Material.Toggle((mtRadioAnimMillis-s.handle)/mtRadioAnimMillis)
 		}
 	}
 }
@@ -87,7 +85,7 @@ func (s *MTRadio) Occur(event Event) {
 			if s.cursorEnter {
 				s.active = !s.active
 				if s.onActive != nil {
-					s.onActive(s.active)
+					s.onActive(s, s.active)
 				}
 			}
 		}
@@ -115,6 +113,19 @@ func MTRadio1(active MTRadioActive) *MTRadio {
 	return &MTRadio{
 		onActive: active,
 	}
+}
+
+func (s *MTRadio) Get() bool {
+	return s.GetActive()
+}
+func (s *MTRadio) Set(active bool) {
+	s.SetActive(active)
+}
+func (s *MTRadio) GetActive() bool {
+	return s.active
+}
+func (s *MTRadio) SetActive(active bool) {
+	s.active = active
 }
 func (s *MTRadio) OnActive(callback MTRadioActive) {
 	s.onActive = callback

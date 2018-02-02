@@ -1,9 +1,9 @@
 package gumi
 
 import (
+	"fmt"
 	"github.com/fogleman/gg"
 	"image"
-	"fmt"
 )
 
 const mtToggleMinWidth = 40
@@ -19,18 +19,19 @@ type MTToggle struct {
 	mtColorFromTo
 	//
 	handle float64
-	anim float64
+	anim   float64
 	//
 	cursorEnter, active bool
 	onActive            MTToggleActive
 }
 
+// Event Callbacks
+type MTToggleActive func(self *MTToggle, active bool)
+
+// GUMI Structure
 func (s *MTToggle) String() string {
 	return fmt.Sprintf("%s(active:%v)", "MTToggle", s.active)
 }
-
-type MTToggleActive func(active bool)
-
 func (s *MTToggle) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
@@ -51,10 +52,9 @@ func (s *MTToggle) draw(frame *image.RGBA) {
 	ctx.Fill()
 	ctx.SetColor(mcl1[1])
 	//ctx.SetColor(color.RGBA{213, 217, 255, 255})
-	ctx.DrawCircle(radius + phasePos(w - 2 * radius , s.anim), radius, miniradius)
+	ctx.DrawCircle(radius+phasePos(w-2*radius, s.anim), radius, miniradius)
 	ctx.Fill()
 }
-
 func (s *MTToggle) size() Size {
 	return Size{
 		Vertical:   MinLength(mtToggleMinHeight),
@@ -69,7 +69,7 @@ func (s *MTToggle) update(info *Information, style *Style) {
 	if s.active {
 		if s.handle < mtToggleAnimMillis {
 			s.handle = s.handle + float64(info.Dt)
-			if s.handle > mtToggleAnimMillis{
+			if s.handle > mtToggleAnimMillis {
 				s.handle = mtToggleAnimMillis
 			}
 			s.anim = Animation.Material.Toggle(s.handle / mtToggleAnimMillis)
@@ -77,10 +77,10 @@ func (s *MTToggle) update(info *Information, style *Style) {
 	} else {
 		if s.handle > 0 {
 			s.handle = s.handle - float64(info.Dt)
-			if s.handle < 0{
+			if s.handle < 0 {
 				s.handle = 0
 			}
-			s.anim = 1 - Animation.Material.Toggle((mtToggleAnimMillis - s.handle) / mtToggleAnimMillis)
+			s.anim = 1 - Animation.Material.Toggle((mtToggleAnimMillis-s.handle)/mtToggleAnimMillis)
 		}
 	}
 }
@@ -92,7 +92,7 @@ func (s *MTToggle) Occur(event Event) {
 			if s.cursorEnter {
 				s.active = !s.active
 				if s.onActive != nil {
-					s.onActive(s.active)
+					s.onActive(s, s.active)
 				}
 			}
 		}
@@ -107,7 +107,7 @@ func (s *MTToggle) Occur(event Event) {
 	}
 }
 
-//
+// Constructors
 func MTToggle0(from, to MaterialColor, active MTToggleActive) *MTToggle {
 	temp := &MTToggle{
 		onActive: active,
@@ -120,6 +120,20 @@ func MTToggle1(active MTToggleActive) *MTToggle {
 	return &MTToggle{
 		onActive: active,
 	}
+}
+
+// Element Property
+func (s *MTToggle) Get() bool {
+	return s.GetActive()
+}
+func (s *MTToggle) Set(active bool) {
+	s.SetActive(active)
+}
+func (s *MTToggle) GetActive() bool {
+	return s.active
+}
+func (s *MTToggle) SetActive(active bool) {
+	s.active = active
 }
 func (s *MTToggle) OnActive(callback MTToggleActive) {
 	s.onActive = callback

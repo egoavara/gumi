@@ -19,8 +19,8 @@ type _Ruler struct {
 }
 type Graduation struct{}
 
-func (Graduation) Vertical(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (Graduation) Vertical(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -28,10 +28,10 @@ func (Graduation) Vertical(pivot float64) DrawingFn {
 			context.DrawLine(0, f, RulerWidth, f)
 		}
 		context.Stroke()
-	}
+	}}
 }
-func (Graduation) Horizontal(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (Graduation) Horizontal(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -39,13 +39,13 @@ func (Graduation) Horizontal(pivot float64) DrawingFn {
 			context.DrawLine(f, 0, f, RulerWidth)
 		}
 		context.Stroke()
-	}
+	}}
 }
 
 type Grid struct{}
 
-func (Grid) Vertical(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (Grid) Vertical(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -53,10 +53,10 @@ func (Grid) Vertical(pivot float64) DrawingFn {
 			context.DrawLine(f, 0, f, float64(context.Height()))
 		}
 		context.Stroke()
-	}
+	}}
 }
-func (Grid) Horizontal(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (Grid) Horizontal(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -64,13 +64,13 @@ func (Grid) Horizontal(pivot float64) DrawingFn {
 			context.DrawLine(0, f, float64(context.Width()), f)
 		}
 		context.Stroke()
-	}
+	}}
 }
 
 type Hint struct{}
 
-func (Hint) Vertical(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (Hint) Vertical(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -80,11 +80,11 @@ func (Hint) Vertical(pivot float64) DrawingFn {
 			context.DrawString(txt, f-w, float64(style.Default.Font.FontHeight().Round()))
 		}
 		context.Stroke()
-	}
+	}}
 }
-func (Hint) Horizontal(pivot float64) DrawingFn {
+func (Hint) Horizontal(pivot float64) Drawer {
 
-	return func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -93,13 +93,13 @@ func (Hint) Horizontal(pivot float64) DrawingFn {
 		}
 
 		context.Stroke()
-	}
+	}}
 }
 
 type Dashgrid struct{}
 
-func (Dashgrid) Vertical(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (Dashgrid) Vertical(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -109,10 +109,10 @@ func (Dashgrid) Vertical(pivot float64) DrawingFn {
 			context.DrawLine(f, 0, f, float64(context.Height()))
 		}
 		context.Stroke()
-	}
+	}}
 }
-func (Dashgrid) Horizontal(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (Dashgrid) Horizontal(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -121,11 +121,11 @@ func (Dashgrid) Horizontal(pivot float64) DrawingFn {
 			context.DrawLine(0, f, float64(context.Width()), f)
 		}
 		context.Stroke()
-	}
+	}}
 }
 
-func (_Ruler) Size() DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (_Ruler) Size() Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -148,10 +148,10 @@ func (_Ruler) Size() DrawingFn {
 		context.DrawString(strconv.FormatInt(int64(context.Height()), 10), RulerWidth, float64(context.Height()/2)+h/4)
 		//
 		context.Stroke()
-	}
+	}}
 }
-func (_Ruler) Proportion() DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (_Ruler) Proportion() Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -159,17 +159,17 @@ func (_Ruler) Proportion() DrawingFn {
 		w := context.Width()
 		h := context.Height()
 		//
-		gcd := GCD(w, h)
+		gcd := int(GCD(int64(w), int64(h)))
 		txt := fmt.Sprintf("%d : %d", w/gcd, h/gcd)
 		//
 		context.DrawLine(0, 0, float64(w), float64(h))
 		bdw, bdh := context.MeasureString(txt)
 		context.DrawString(txt, float64(w)/2-bdw/2, float64(h)/2+bdh/4)
 		context.Stroke()
-	}
+	}}
 }
-func (_Ruler) Screen() DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (_Ruler) Screen() Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -179,10 +179,10 @@ func (_Ruler) Screen() DrawingFn {
 			context.DrawString(v.Name, float64(v.Width)-w-5, float64(v.Height)-5)
 		}
 		context.Stroke()
-	}
+	}}
 }
-func (_Ruler) Dots(pivot float64) DrawingFn {
-	return func(context *gg.Context, style *Style) {
+func (_Ruler) Dots(pivot float64) Drawer {
+	return FunctionDrawer{func(context *gg.Context, style *Style, di *DrawingInfo) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(style.Default.Line.At(0, 0))
@@ -192,5 +192,5 @@ func (_Ruler) Dots(pivot float64) DrawingFn {
 			}
 		}
 		context.Stroke()
-	}
+	}}
 }

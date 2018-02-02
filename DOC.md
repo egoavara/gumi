@@ -6,11 +6,21 @@
 1. `node_` is kind of Elements
 1. `material_` is kind of Elements
 # Kinds
+## Length
+* Always horizontal first, vertical follow
+## Size
+## Blank
 ## Elements
-* Every variable getter, setter start with `get.+` `set.+`
-* Every callback getter, setter start with `on.+` `refer.+`
+* Every variable getter, setter start with `Get.+` `Set.+`
+* Every callback getter, setter start with `On.+` `Refer.+`
+* Every call for make happen event start with `Make.+`
 * Do not using **public** variable
-* One `.go` file, One GUMI elements
+* One `.go` file, One GUMI elements GUMI element file
+    1. Type definition
+    2. Callback definition
+    3. GUMI interface implements
+    4. Constructors
+    5. Method
 * GUMI Elememnt name rule follow ...
     1. Prefix mean category which mean same category have similar role
     2. Suffix mean element name 

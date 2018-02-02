@@ -18,11 +18,6 @@ type NButton struct {
 	onFocus NButtonFocus
 	onClick NButtonClick
 }
-
-func (s *NButton) String() string {
-	return fmt.Sprintf("%s", "NButton")
-}
-
 type NButtonClick func()
 type NButtonFocus func(focus bool)
 
@@ -127,6 +122,9 @@ func (s *NButton) Occur(event Event) {
 		}
 	}
 	s.child.Occur(event)
+}
+func (s *NButton) String() string {
+	return fmt.Sprintf("%s", "NButton")
 }
 
 //

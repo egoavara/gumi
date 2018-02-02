@@ -33,9 +33,8 @@ type MTButton struct {
 func (s *MTButton) String() string {
 	return fmt.Sprintf("%s", "MTButton")
 }
-
-type MTButtonFocus func(focus bool)
-type MTButtonClick func()
+type MTButtonFocus func(self *MTButton, focus bool)
+type MTButtonClick func(self *MTButton)
 
 func (s *MTButton) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
@@ -113,7 +112,7 @@ func (s *MTButton) Occur(event Event) {
 		if ev.Key == KEY_MOUSE1 {
 			if s.active {
 				if s.onClick != nil {
-					s.onClick()
+					s.onClick(s)
 				}
 				s.active = false
 			}
@@ -123,12 +122,12 @@ func (s *MTButton) Occur(event Event) {
 		y := int(ev.Y)
 		if (s.bound.Min.X <= x && x < s.bound.Max.X) && (s.bound.Min.Y <= y && y < s.bound.Max.Y) {
 			if s.onFocus != nil {
-				s.onFocus(true)
+				s.onFocus(s,true)
 			}
 			s.cursorEnter = true
 		} else {
 			if s.onFocus != nil {
-				s.onFocus(false)
+				s.onFocus(s, false)
 			}
 			s.cursorEnter = false
 		}

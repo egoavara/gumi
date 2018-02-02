@@ -12,6 +12,7 @@ import (
 type Style struct {
 	Default  StyleDefault
 	Material StyleMaterial
+	Map      map[string]interface{}
 }
 type StyleDefault struct {
 	Font *gutl.Font
@@ -30,6 +31,23 @@ type StyleMaterial struct {
 }
 type MaterialColor uint8
 
+func (s MaterialColor) String() string {
+	switch s {
+	case White:
+		return "White"
+	case Red:
+		return "Red"
+	case Green:
+		return "Green"
+	case Blue:
+		return "Blue"
+	case Yellow:
+		return "Yellow"
+	default:
+		return "Unknown"
+	}
+}
+
 const (
 	White  MaterialColor = iota
 	Red    MaterialColor = iota
@@ -38,7 +56,7 @@ const (
 	Yellow MaterialColor = iota
 )
 
-func (s *StyleMaterial) PalletteImage(c MaterialColor) [2]image.Image{
+func (s *StyleMaterial) PalletteImage(c MaterialColor) [2]image.Image {
 	switch c {
 	default:
 		fallthrough
@@ -55,34 +73,34 @@ func (s *StyleMaterial) PalletteImage(c MaterialColor) [2]image.Image{
 
 	}
 }
-func (s *StyleMaterial) PalletteColor(c MaterialColor) [2]color.Color{
+func (s *StyleMaterial) PalletteColor(c MaterialColor) [2]color.Color {
 	switch c {
 	default:
 		fallthrough
 	case White:
 		return [2]color.Color{
-			s.White[0].At(0,0),
-			s.White[1].At(0,0),
+			s.White[0].At(0, 0),
+			s.White[1].At(0, 0),
 		}
 	case Red:
 		return [2]color.Color{
-			s.Red[0].At(0,0),
-			s.Red[1].At(0,0),
+			s.Red[0].At(0, 0),
+			s.Red[1].At(0, 0),
 		}
 	case Green:
 		return [2]color.Color{
-			s.Green[0].At(0,0),
-			s.Green[1].At(0,0),
+			s.Green[0].At(0, 0),
+			s.Green[1].At(0, 0),
 		}
 	case Blue:
 		return [2]color.Color{
-			s.Blue[0].At(0,0),
-			s.Blue[1].At(0,0),
+			s.Blue[0].At(0, 0),
+			s.Blue[1].At(0, 0),
 		}
 	case Yellow:
 		return [2]color.Color{
-			s.Yellow[0].At(0,0),
-			s.Yellow[1].At(0,0),
+			s.Yellow[0].At(0, 0),
+			s.Yellow[1].At(0, 0),
 		}
 
 	}
@@ -118,6 +136,9 @@ func DefaultStyle() *Style {
 				image.NewUniform(color.RGBA{122, 127, 67, 255}),
 				image.NewUniform(color.RGBA{231, 235, 118, 255}),
 			},
+		},
+		Map: map[string]interface{}{
+			"dummy": nil,
 		},
 	}
 	return temp
