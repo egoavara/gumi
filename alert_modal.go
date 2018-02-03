@@ -10,12 +10,13 @@ type ALModal struct {
 	BoundStore
 	StyleStore
 	//
+	lastCursorEvent EventCursor
+	//
 	modal GUMI
 	show bool
 }
 
 func (s *ALModal) draw(frame *image.RGBA) {
-
 	s.child.draw(frame)
 	if s.show{
 		s.modal.draw(frame)
@@ -26,8 +27,11 @@ func (s *ALModal) size() Size {
 }
 func (s *ALModal) rect(r image.Rectangle) {
 	s.bound = r
-	s.child.rect(r)
-	s.modal.rect(r)
+	if s.show{
+		s.modal.rect(r)
+	}else {
+		s.child.rect(r)
+	}
 }
 func (s *ALModal) update(info *Information, style *Style) {
 	s.style = style
@@ -38,6 +42,9 @@ func (s *ALModal) Occur(event Event) {
 	if s.show{
 		s.modal.Occur(event)
 	}else {
+		if event.Kind() == CURSOR{
+			s.lastCursorEvent = event.(EventCursor)
+		}
 		s.child.Occur(event)
 	}
 }
@@ -62,6 +69,7 @@ func (s *ALModal ) GetModal() GUMI {
 }
 func (s *ALModal ) SetShow(show bool)  {
 	s.show = show
+	s.modal.Occur(s.lastCursorEvent)
 }
 func (s *ALModal ) GetShow() bool {
 	return s.show

@@ -6,25 +6,25 @@ import (
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/iamGreedy/gumi"
 	"github.com/iamGreedy/gumi/glumi"
+	"github.com/iamGreedy/gumi/gutl"
 	"log"
 	"runtime"
-	"github.com/iamGreedy/gumi/gutl"
+	"time"
 )
 
-
-func init() {
-	// GLFW event handling must run on the main OS thread
-	runtime.LockOSThread()
-}
-
 func main() {
-	var width, height = gutl.DefinedResolutions.Get("VGA")
+	var width, height = gutl.DefinedResolutions.Get("qVGA")
 	var err error
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	// Init GLFW
 	if err = glfw.Init(); err != nil {
 		log.Fatalln("failed to initialize glfw:", err)
 	}
 	defer glfw.Terminate()
+	//
 	var vidmod = glfw.GetPrimaryMonitor().GetVideoMode()
 	GLFWHint()
 	window, err := glfw.CreateWindow(width, height, "Cube", nil, nil)
@@ -47,10 +47,7 @@ func main() {
 	}
 	// GLumi Object allocate
 	glm := glumi.NewGLUMI(nil)
-	err = glm.Init()
-	if err != nil {
-		panic(err)
-	}
+
 	// window build
 
 	window.SetKeyCallback(glm.Event.DirectKey)
@@ -77,7 +74,7 @@ func main() {
 		gumi.NVertical1(
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton0(gumi.Red, "Close", func(self *gumi.MTButton) {
 				window.SetShouldClose(true)
-			}),),
+			})),
 			gumi.NHorizontal1(toggles...),
 			gumi.NHorizontal1(radios...),
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton1("Modal", func(self *gumi.MTButton) {
@@ -105,6 +102,11 @@ func main() {
 	))
 	// GLumi Screen Setup
 	glm.SetScreen(scr)
+	err = glm.Init()
+	if err != nil {
+		panic(err)
+	}
+	glfw.SwapInterval(0)
 	// Configure global settings
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
@@ -113,21 +115,28 @@ func main() {
 	for !window.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 		// Update
-		time := glfw.GetTime()
-		elapsed := time - previousTime
-		previousTime = time
+		t := glfw.GetTime()
+		elapsed := t - previousTime
+		previousTime = t
 		//
+		r1 := time.Now()
 		scr.Update(&gumi.Information{
 			Dt: int64(elapsed * 1000),
 		}, nil)
+		r2 := time.Now()
 		scr.Ready()
+		r3 := time.Now()
 		scr.Draw()
+		r4 := time.Now()
 		//
+		start2 := time.Now()
 		glm.Render.Upload()
 		glm.Render.Draw()
+		end2 := time.Now()
 		// Maintenance
 		window.SwapBuffers()
 		glfw.PollEvents()
+		fmt.Printf("Render - %10v, %10v, %10v - Draw :%10v\n", r2.Sub(r1), r3.Sub(r2),r4.Sub(r3),end2.Sub(start2))
 	}
 }
 

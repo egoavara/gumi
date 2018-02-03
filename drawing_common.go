@@ -43,7 +43,8 @@ func (s *fpsDrawer ) Draw(context *gg.Context, style *Style, di *DrawingInfo)  {
 	s.i = (s.i + 1) % fpsDrawerHistory
 	//
 	context.SetColor(style.Default.Line.At(0, 0))
-	txt := fmt.Sprintf("%.2f", 1000 / float64(ifZeroBelowToOne(Average(s.dts[:]))))
+	avg := ifZeroBelowToOne(Average(s.dts[:]))
+	txt := fmt.Sprintf("FPS : %.2f - AVG : %2.0f", 1000 / float64(avg), avg)
 	w := float64(context.Width())
 	mw, mh := context.MeasureString(txt)
 	context.DrawString(txt, w - FPSPos - mw, FPSPos + mh)

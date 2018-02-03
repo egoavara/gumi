@@ -36,6 +36,8 @@ func (s *NVertical) size() Size {
 	}
 }
 func (s *NVertical) rect(r image.Rectangle) {
+	//sch := newSynchronizer(len(s.child))
+	//defer sch.Close()
 	//
 	var tempVert = make([]Length, len(s.child))
 	var tempHori = make([]Length, len(s.child))
@@ -49,16 +51,16 @@ func (s *NVertical) rect(r image.Rectangle) {
 	var startat = r.Min.Y
 	dx := r.Dx()
 	for i, v := range s.child{
-		r := image.Rect(
+		inrect := image.Rect(
 			r.Min.X,
 			startat,
 			r.Max.X,
 			startat + dis[i],
 		)
 		if int(tempHori[i].Max) < dx{
-			r.Max.X = r.Min.X + int(tempHori[i].Max)
+			inrect.Max.X = r.Min.X + int(tempHori[i].Max)
 		}
-		v.rect(r)
+		v.rect(inrect)
 		startat += dis[i]
 	}
 }
@@ -69,7 +71,7 @@ func (s *NVertical) update(info *Information, style *Style) {
 }
 func (s *NVertical) Occur(event Event) {
 	for _, v := range s.child{
-		v.Occur(event)
+		go v.Occur(event)
 	}
 }
 func (s *NVertical) String() string{

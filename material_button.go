@@ -118,6 +118,8 @@ func (s *MTButton) Occur(event Event) {
 			}
 		}
 	case EventCursor:
+
+
 		x := int(ev.X)
 		y := int(ev.Y)
 		if (s.bound.Min.X <= x && x < s.bound.Max.X) && (s.bound.Min.Y <= y && y < s.bound.Max.Y) {

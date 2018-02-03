@@ -22,9 +22,5 @@ func main() {
 			gumi.AText1("Test4"),
 		),
 	))
-	//
-	scr.Update(nil, nil)
-	scr.Ready()
-	scr.Draw()
 	gumi.Capture("out", scr.Frame())
 }
