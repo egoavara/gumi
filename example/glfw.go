@@ -12,8 +12,52 @@ import (
 	"time"
 )
 
+const HISTORY = 16
+
+type GLumiTest struct {
+	updateSum   float64
+	updateCount float64
+	readySum    float64
+	readyCount  float64
+	drawSum     float64
+	drawCount   float64
+}
+
+func (s *GLumiTest) Update(cb func()) {
+	start := time.Now()
+	cb()
+	end := time.Now()
+	//
+	s.updateSum += end.Sub(start).Seconds()
+	s.updateCount += 1
+}
+func (s *GLumiTest) Ready(cb func()) {
+	start := time.Now()
+	cb()
+	end := time.Now()
+	//
+	s.readySum += end.Sub(start).Seconds()
+	s.readyCount += 1
+}
+func (s *GLumiTest) Draw(cb func()) {
+	start := time.Now()
+	cb()
+	end := time.Now()
+	//
+	s.drawSum += end.Sub(start).Seconds()
+	s.drawCount += 1
+}
+
+func (s *GLumiTest) Print() {
+	fmt.Printf(
+		"Update : %10.3fms, Ready : %10.3fms, Draw : %10.3fms",
+		s.updateSum/s.updateCount*1000,
+		s.readySum/s.readyCount*1000,
+		s.drawSum/s.drawCount*1000,
+	)
+}
 func main() {
-	var width, height = gutl.DefinedResolutions.Get("qVGA")
+	var width, height = gutl.DefinedResolutions.Get("QHD")
 	var err error
 
 	runtime.LockOSThread()
@@ -27,11 +71,12 @@ func main() {
 	//
 	var vidmod = glfw.GetPrimaryMonitor().GetVideoMode()
 	GLFWHint()
-	window, err := glfw.CreateWindow(width, height, "Cube", nil, nil)
+	window, err := glfw.CreateWindow(vidmod.Width, vidmod.Height, "Cube", nil, nil)
 	if err != nil {
 		panic(err)
 	}
-	window.SetPos((vidmod.Width-width)/2, (vidmod.Height-height)/2)
+	tempw, temph := window.GetSize()
+	window.SetPos((vidmod.Width-tempw)/2, (vidmod.Height-temph)/2)
 	window.MakeContextCurrent()
 	// Init GL
 	if err := gl.Init(); err != nil {
@@ -49,9 +94,10 @@ func main() {
 	glm := glumi.NewGLUMI(nil)
 
 	// window build
-
 	window.SetKeyCallback(glm.Event.DirectKey)
-	window.SetCursorPosCallback(glm.Event.DirectCursor)
+	window.SetCursorPosCallback(func(w *glfw.Window, xpos float64, ypos float64) {
+		glm.Event.Cursor(xpos/float64(tempw) * float64(width), ypos/float64(temph) * float64(height))
+	})
 	window.SetMouseButtonCallback(glm.Event.DirectMouseButton)
 	window.SetCharCallback(glm.Event.DirectRune)
 	window.SetScrollCallback(glm.Event.DirectScroll)
@@ -112,6 +158,9 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 	previousTime := glfw.GetTime()
+	//
+	test := GLumiTest{}
+	c := make(chan int)
 	for !window.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 		// Update
@@ -119,25 +168,29 @@ func main() {
 		elapsed := t - previousTime
 		previousTime = t
 		//
-		r1 := time.Now()
-		scr.Update(&gumi.Information{
-			Dt: int64(elapsed * 1000),
-		}, nil)
-		r2 := time.Now()
-		scr.Ready()
-		r3 := time.Now()
-		scr.Draw()
-		r4 := time.Now()
-		//
-		start2 := time.Now()
+		go func() {
+			test.Update(func() {
+				scr.Update(&gumi.Information{
+					Dt: int64(elapsed * 1000),
+				}, nil)
+			})
+			test.Ready(func() {
+				scr.Ready()
+			})
+			test.Draw(func() {
+				scr.Draw()
+			})
+			c <- 1
+		}()
+
+		<-c
+
 		glm.Render.Upload()
 		glm.Render.Draw()
-		end2 := time.Now()
-		// Maintenance
 		window.SwapBuffers()
 		glfw.PollEvents()
-		fmt.Printf("Render - %10v, %10v, %10v - Draw :%10v\n", r2.Sub(r1), r3.Sub(r2),r4.Sub(r3),end2.Sub(start2))
 	}
+	test.Print()
 }
 
 var progresses = []gumi.GUMI{

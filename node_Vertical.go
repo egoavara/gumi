@@ -4,6 +4,7 @@ import (
 	"image"
 	"math"
 	"fmt"
+	"sync"
 )
 
 type NVertical struct {
@@ -12,8 +13,14 @@ type NVertical struct {
 }
 
 func (s *NVertical) draw(frame *image.RGBA) {
+	wg := new(sync.WaitGroup)
+	wg.Add(len(s.child))
+	defer wg.Wait()
 	for _, v := range s.child{
-		v.draw(frame)
+		go func(elem GUMI) {
+			elem.draw(frame)
+			wg.Done()
+		}(v)
 	}
 }
 func (s *NVertical) size() Size {
@@ -36,9 +43,6 @@ func (s *NVertical) size() Size {
 	}
 }
 func (s *NVertical) rect(r image.Rectangle) {
-	//sch := newSynchronizer(len(s.child))
-	//defer sch.Close()
-	//
 	var tempVert = make([]Length, len(s.child))
 	var tempHori = make([]Length, len(s.child))
 

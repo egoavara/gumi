@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	scr := gumi.NewScreen(gutl.DefinedResolutions.Get("VGA"))
+	scr := gumi.NewScreen(gutl.DefinedResolutions.Get("HVGA"))
 	scr.Root(gumi.LinkingFrom(
 		gumi.NDrawing1(
 			gumi.Drawing.Ruler.Hint.Vertical(100),
@@ -22,5 +22,8 @@ func main() {
 			gumi.AText1("Test4"),
 		),
 	))
+	scr.Update(nil, nil)
+	scr.Ready()
+	scr.Draw()
 	gumi.Capture("out", scr.Frame())
 }

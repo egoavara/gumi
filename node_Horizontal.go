@@ -4,6 +4,7 @@ import (
 	"image"
 	"math"
 	"fmt"
+	"sync"
 )
 
 type NHorizontal struct {
@@ -15,8 +16,14 @@ func (s *NHorizontal) String() string {
 	return fmt.Sprintf("%s(childrun:%d)", "NHorizontal", len(s.Childrun()))
 }
 func (s *NHorizontal) draw(frame *image.RGBA) {
+	wg := new(sync.WaitGroup)
+	wg.Add(len(s.child))
+	defer wg.Wait()
 	for _, v := range s.child{
-		v.draw(frame)
+		go func(elem GUMI) {
+			elem.draw(frame)
+			wg.Done()
+		}(v)
 	}
 }
 func (s *NHorizontal) size() Size {
