@@ -24,6 +24,7 @@ type MTEdit struct {
 	//
 	align Align
 	text  string
+	inactive bool
 	//
 	onChange MTEditChange
 	//
@@ -44,7 +45,7 @@ func (s *MTEdit) draw(frame *image.RGBA) {
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var radius = h / 2
 	s.style.useContext(ctx)
-	s.style.releaseContext(ctx)
+	defer s.style.releaseContext(ctx)
 	// string position make
 	var drawtext = s.text
 	if s.active && s.textCursorShow {
@@ -158,10 +159,12 @@ func (s *MTEdit) Occur(event Event) {
 				s.deleteContinue = 0
 				s.deleteAccum = 0
 			}
-
 		case KEY_MOUSE1:
 			if s.cursorEnter {
-				s.active = true
+				if !s.inactive{
+					s.active = true
+				}
+
 			} else {
 				s.active = false
 			}
@@ -234,9 +237,17 @@ func (s *MTEdit) SetAlign(align Align) {
 func (s *MTEdit) GetAlign() Align {
 	return s.align
 }
+func (s *MTEdit) GetActive() bool{
+	return !s.inactive
+}
+func (s *MTEdit) SetActive(active bool) {
+	s.inactive = !active
+}
+
 func (s *MTEdit) OnChange(callback MTEditChange) {
 	s.onChange = callback
 }
 func (s *MTEdit) ReferChange() MTEditChange {
 	return s.onChange
 }
+

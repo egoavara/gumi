@@ -1,7 +1,6 @@
 package gumi
 
 import (
-	"golang.org/x/image/math/fixed"
 	"image"
 	"fmt"
 )
@@ -19,29 +18,31 @@ func (s *AText) String() string {
 }
 
 func (s *AText) draw(frame *image.RGBA) {
-	s.style.Default.Font.Use()
-	defer s.style.Default.Font.Release()
-	s.style.Default.Font.ChangeSource(s.style.Default.Line)
-	expectw, expecth := s.style.Default.Font.CalculateSize(s.text)
+	ctx := GGContextRGBASub(frame, s.bound)
+	s.style.useContext(ctx)
+	defer s.style.releaseContext(ctx)
+	ctx.SetColor(s.style.Default.Line.At(0,0))
+
+	expectw, expecth := ctx.MeasureString(s.text)
 	v, h := ParseAlign(s.align)
-	var dot fixed.Point26_6
+	var drawX, drawY float64
 	switch v {
 	case Align_BOTTOM:
-		dot.Y = fixed.I(s.bound.Max.Y)
+		drawY = float64(s.bound.Dy())
 	case Align_VCENTER:
-		dot.Y = fixed.I(s.bound.Min.Y + (s.bound.Dy()/2) + (expecth)/2)
+		drawY = float64(s.bound.Dy())/2 + expecth/2
 	case Align_TOP:
-		dot.Y = fixed.I(0 + expecth)
+		drawY = expecth
 	}
 	switch h {
 	case Align_RIGHT:
-		dot.X = fixed.I(s.bound.Max.X - expectw)
+		drawX = float64(s.bound.Dx()) - expectw
 	case Align_HCENTER:
-		dot.X = fixed.I(s.bound.Min.X + (s.bound.Dx()/2) - expectw/2)
+		drawX = float64(s.bound.Dx())/2 - expectw/2
 	case Align_LEFT:
-		dot.X = fixed.I(0)
+		drawX = 0
 	}
-	s.style.Default.Font.Draw(s.bound, frame, s.text, dot)
+	ctx.DrawString(s.text, drawX, drawY - 2)
 }
 func (s *AText) size() Size {
 	s.style.Default.Font.Use()

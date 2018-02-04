@@ -57,7 +57,7 @@ func (s *GLumiTest) Print() {
 	)
 }
 func main() {
-	var width, height = gutl.DefinedResolutions.Get("QHD")
+	var width, height = gutl.DefinedResolutions.Get("HD")
 	var err error
 
 	runtime.LockOSThread()
@@ -71,12 +71,22 @@ func main() {
 	//
 	var vidmod = glfw.GetPrimaryMonitor().GetVideoMode()
 	GLFWHint()
-	window, err := glfw.CreateWindow(vidmod.Width, vidmod.Height, "Cube", nil, nil)
+	var windW, windH int
+	if width > vidmod.Width{
+		windW = vidmod.Width
+	}else {
+		windW = width
+	}
+	if height > vidmod.Height{
+		windH = vidmod.Height
+	}else {
+		windH = height
+	}
+	window, err := glfw.CreateWindow(windW, windH, "Cube", nil, nil)
 	if err != nil {
 		panic(err)
 	}
-	tempw, temph := window.GetSize()
-	window.SetPos((vidmod.Width-tempw)/2, (vidmod.Height-temph)/2)
+	window.SetPos((vidmod.Width-windW)/2, (vidmod.Height-windH)/2)
 	window.MakeContextCurrent()
 	// Init GL
 	if err := gl.Init(); err != nil {
@@ -96,7 +106,7 @@ func main() {
 	// window build
 	window.SetKeyCallback(glm.Event.DirectKey)
 	window.SetCursorPosCallback(func(w *glfw.Window, xpos float64, ypos float64) {
-		glm.Event.Cursor(xpos/float64(tempw) * float64(width), ypos/float64(temph) * float64(height))
+		glm.Event.Cursor(xpos/float64(windW) * float64(width), ypos/float64(windH) * float64(height))
 	})
 	window.SetMouseButtonCallback(glm.Event.DirectMouseButton)
 	window.SetCharCallback(glm.Event.DirectRune)
