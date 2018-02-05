@@ -2,15 +2,15 @@ package gumi
 
 import (
 	"fmt"
+	"github.com/fogleman/gg"
 	"image"
 )
 
 const (
 	MTDropboxMinWidth             = 80
+	MTDropboxScroolWidth          = 10
 	MTDropboxMinHeight            = 20
-	MTDropboxAnimMillis           = 400
-	MTDropboxDeleteMaxMillisReach = 1000
-	MTDropboxDeleteMaxPerSecond   = 100
+	MTDropboxAnimStretchPerSecond = 300
 )
 
 type MTDropbox struct {
@@ -20,27 +20,55 @@ type MTDropbox struct {
 	//
 	mtColorSingle
 	//
-	align    Align
-	elems    []GUMI
+	elems    []mtDropboxElem
 	selected int
 	inactive bool
 	//
 	onChange MTDropboxChange
 	//
 	cursorEnter, active bool
+	box, boxTo          uint16
+	scrool, scroolTo    uint16
 }
-type MTDropboxChange func(self *MTDropbox, selected GUMI)
+type mtDropboxElem struct {
+	elem          string
+	width, height int
+}
+
+type MTDropboxChange func(self *MTDropbox, selected string)
 
 func (s *MTDropbox) String() string {
-	return fmt.Sprintf("%s(select:%v)", "MTDropbox", s.elems[s.selected])
+	return fmt.Sprintf("%s(select:%s)", "MTDropbox", s.elems[s.selected])
 }
 func (s *MTDropbox) draw(frame *image.RGBA) {
+	bd := s.bound
+	//
 	var ctx = GGContextRGBASub(frame, s.bound)
-	var w, h = float64(ctx.Width()), float64(ctx.Height())
-	var radius = h / 2
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
-	// string position make
+	//
+	ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0])
+	var w, h = float64(ctx.Width()), float64(ctx.Height())
+	var radius = float64(s.bound.Dy()) / 2
+	//
+	if s.active{
+		ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(270))
+		ctx.DrawRectangle(radius, 0, w - radius * 2, h)
+		ctx.DrawArc(w-radius, radius, radius, gg.Radians(270), gg.Radians(360))
+	}else{
+		var elemsum = 0
+		var elemcut = 0
+		for _, v := range s.elems {
+			elemsum += v.height
+		}
+		bd.Max.Y += elemsum
+		if bd.Max.Y > frame.Rect.Max.Y {
+			elemcut = bd.Max.Y - frame.Rect.Max.Y
+			bd.Max.Y = frame.Rect.Max.Y
+		}
+	}
+
+
 }
 func (s *MTDropbox) size() Size {
 	return Size{
@@ -52,9 +80,45 @@ func (s *MTDropbox) rect(r image.Rectangle) {
 	s.bound = r
 }
 func (s *MTDropbox) update(info *Information, style *Style) {
+	if s.style != style {
+		style.Default.Font.Use()
+		defer style.Default.Font.Release()
+		for _, v := range s.elems {
+			v.width, v.height = style.Default.Font.CalculateSize(v.elem)
+		}
+	}
 	s.style = style
 	//
-	if s.active {
+	delta := float64(MTDropboxAnimStretchPerSecond) / 1000 * float64(info.Dt)
+	if s.box != s.boxTo {
+		fbox := float64(s.box)
+		if s.box > s.boxTo {
+			fbox = fbox - delta
+			if fbox < float64(s.boxTo) {
+				fbox = float64(s.boxTo)
+			}
+		} else {
+			fbox = fbox + delta
+			if fbox > float64(s.boxTo) {
+				fbox = float64(s.boxTo)
+			}
+		}
+		s.box = uint16(fbox)
+	}
+	if s.scrool != s.scroolTo {
+		fscrool := float64(s.scrool)
+		if s.scrool > s.scroolTo {
+			fscrool = fscrool - delta
+			if fscrool < float64(s.scroolTo) {
+				fscrool = float64(s.scroolTo)
+			}
+		} else {
+			fscrool = fscrool + delta
+			if fscrool > float64(s.scroolTo) {
+				fscrool = float64(s.scroolTo)
+			}
+		}
+		s.scrool = uint16(fscrool)
 	}
 }
 func (s *MTDropbox) Occur(event Event) {
@@ -82,43 +146,23 @@ func (s *MTDropbox) Occur(event Event) {
 	}
 
 }
-func (s *MTDropbox) elemsVLength() Length{
-	l := AUTOLENGTH
-	for _, v := range s.elems{
-		sz := v.size()
-		l.Min += sz.Vertical.Min
+func (s *MTDropbox) IndexElem(idx int) string {
+	if idx < 0 {
+		return ""
+	}else if idx >= len(s.elems){
+		return ""
 	}
-	return l
+	return s.elems[idx].elem
 }
-
+func (s *MTDropbox) ExistElem(idx int) bool{
+	if idx < 0 {
+		return ""
+	}else if idx >= len(s.elems){
+		return ""
+	}
+	return s.elems[idx].elem
+}
 //
-func MTDropbox0(mcl MaterialColor, str string, align Align) *MTDropbox {
-	tem := &MTDropbox{
-		text:  str,
-		align: align,
-	}
-	tem.SetMaterialColor(mcl)
-	return tem
-}
-func MTDropbox1(str string, align Align) *MTDropbox {
-	return &MTDropbox{
-		text:  str,
-		align: align,
-	}
-}
-func MTDropbox2(str string) *MTDropbox {
-	return &MTDropbox{
-		text:  str,
-		align: Align_LEFT | Align_VCENTER,
-	}
-}
-func MTDropbox3() *MTDropbox {
-	return &MTDropbox{
-		text:  "",
-		align: Align_LEFT | Align_VCENTER,
-	}
-}
-
 func (s *MTDropbox) OnChange(callback MTDropboxChange) {
 	s.onChange = callback
 }
