@@ -6,25 +6,24 @@ import (
 )
 type NMinimum struct {
 	SingleStructure
-	sz Size
+	axis Axis
 }
 
 func (s *NMinimum) String() string {
-	return fmt.Sprintf("%s(size:%v)", "NMinimum", s.sz)
+	return fmt.Sprintf("%s", "NMinimum")
 }
 func (s *NMinimum) draw(frame *image.RGBA) {
 	s.child.draw(frame)
 }
 func (s *NMinimum) size() Size {
-	temp := s.sz
-	c := s.child.size()
-	if temp.Vertical == AUTOLENGTH{
-		temp.Vertical = c.Vertical
+	sz := s.child.size()
+	if AxisVertical == AxisVertical & s.axis{
+		sz.Vertical.Max = sz.Vertical.Min
 	}
-	if temp.Horizontal == AUTOLENGTH{
-		temp.Horizontal = c.Horizontal
+	if AxisHorizontal == AxisHorizontal & s.axis{
+		sz.Horizontal.Max = sz.Horizontal.Min
 	}
-	return temp
+	return sz
 }
 func (s *NMinimum) rect(r image.Rectangle) {
 	s.child.rect(r)
@@ -36,17 +35,11 @@ func (s *NMinimum) Occur(event Event) {
 	s.child.Occur(event)
 }
 
-func NMinimum0(sz Size) *NMinimum {
-	return &NMinimum{
-		sz: sz,
+func NMinimum0(axis Axis, elem GUMI) *NMinimum {
+	temp := &NMinimum{
+		axis:axis,
 	}
-}
-
-
-//
-func (s *NMinimum) Set(sz Size) {
-	s.sz = sz
-}
-func (s *NMinimum) Get() Size {
-	return s.sz
+	elem.Born(temp)
+	temp.Breed([]GUMI{elem})
+	return temp
 }

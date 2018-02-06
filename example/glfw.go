@@ -72,14 +72,14 @@ func main() {
 	var vidmod = glfw.GetPrimaryMonitor().GetVideoMode()
 	GLFWHint()
 	var windW, windH int
-	if width > vidmod.Width{
+	if width > vidmod.Width {
 		windW = vidmod.Width
-	}else {
+	} else {
 		windW = width
 	}
-	if height > vidmod.Height{
+	if height > vidmod.Height {
 		windH = vidmod.Height
-	}else {
+	} else {
 		windH = height
 	}
 	window, err := glfw.CreateWindow(windW, windH, "Cube", nil, nil)
@@ -106,7 +106,7 @@ func main() {
 	// window build
 	window.SetKeyCallback(glm.Event.DirectKey)
 	window.SetCursorPosCallback(func(w *glfw.Window, xpos float64, ypos float64) {
-		glm.Event.Cursor(xpos/float64(windW) * float64(width), ypos/float64(windH) * float64(height))
+		glm.Event.Cursor(xpos/float64(windW)*float64(width), ypos/float64(windH)*float64(height))
 	})
 	window.SetMouseButtonCallback(glm.Event.DirectMouseButton)
 	window.SetCharCallback(glm.Event.DirectRune)
@@ -114,10 +114,12 @@ func main() {
 	//
 	modal := gumi.ALModal0(
 		gumi.LCenter0(
-
-			gumi.MTButton1("Modal, Hello!", func(self *gumi.MTButton) {
-				self.Parent().(*gumi.ALModal).SetShow(!self.Parent().(*gumi.ALModal).GetShow())
-			}),
+			gumi.NMinimum0(gumi.AxisAll,
+				gumi.MTButton1("Modal, Hello!", func(self *gumi.MTButton) {
+					p := self.Parent().Parent().Parent()
+					p.(*gumi.ALModal).SetShow(!p.(*gumi.ALModal).GetShow())
+				}),
+			),
 		),
 	)
 	scr := gumi.NewScreen(width, height)
