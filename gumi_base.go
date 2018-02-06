@@ -6,7 +6,9 @@ type SingleStructure struct {
 	parent GUMI
 	child  GUMI
 }
-
+func (s *SingleStructure) init() {
+	s.child.init()
+}
 func (s *SingleStructure) Born(gumi GUMI) {
 	s.parent = gumi
 }
@@ -27,6 +29,11 @@ type MultipleStructure struct {
 	child  []GUMI
 }
 
+func (s *MultipleStructure) init() {
+	for _ , v := range s.child{
+		v.init()
+	}
+}
 func (s *MultipleStructure) Born(gumi GUMI) {
 	s.parent = gumi
 }
@@ -48,7 +55,8 @@ func (s *MultipleStructure) Childrun() []GUMI {
 type VoidStructure struct {
 	parent GUMI
 }
-
+func (s *VoidStructure) init() {
+}
 func (s *VoidStructure) Born(gumi GUMI) {
 	s.parent = gumi
 }
@@ -61,8 +69,14 @@ func (s *VoidStructure) Childrun() []GUMI {
 	return nil
 }
 
+type Boundable interface {
+	Rect() image.Rectangle
+}
 type BoundStore struct {
 	bound image.Rectangle
+}
+func (s BoundStore ) Rect() image.Rectangle {
+	return s.bound
 }
 type StyleStore struct {
 	style *Style

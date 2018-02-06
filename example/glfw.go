@@ -113,9 +113,12 @@ func main() {
 	window.SetScrollCallback(glm.Event.DirectScroll)
 	//
 	modal := gumi.ALModal0(
-		gumi.MTButton1("Tets", func(self *gumi.MTButton) {
-			self.Parent().(*gumi.ALModal).SetShow(!self.Parent().(*gumi.ALModal).GetShow())
-		}),
+		gumi.LCenter0(
+
+			gumi.MTButton1("Modal, Hello!", func(self *gumi.MTButton) {
+				self.Parent().(*gumi.ALModal).SetShow(!self.Parent().(*gumi.ALModal).GetShow())
+			}),
+		),
 	)
 	scr := gumi.NewScreen(width, height)
 	scr.Root(gumi.LinkingFrom(
@@ -127,15 +130,19 @@ func main() {
 			gumi.Drawing.Ruler.Hint.Horizontal(100),
 		),
 		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(20))),
-		gumi.NVertical1(
+		gumi.LVertical1(
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton0(gumi.Red, "Close", func(self *gumi.MTButton) {
 				window.SetShouldClose(true)
 			})),
-			gumi.NHorizontal1(toggles...),
-			gumi.NHorizontal1(radios...),
+			gumi.LHorizontal1(toggles...),
+			gumi.LHorizontal1(radios...),
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton1("Modal", func(self *gumi.MTButton) {
 				modal.SetShow(!modal.GetShow())
 			})),
+			gumi.Tool.MarginMinRegular(4, gumi.MTDropbox3(func(self *gumi.MTDropbox, selected string) {
+				fmt.Printf("MTDropbox %6s : %s\n", self.GetMaterialColor(), selected)
+			}, "Hello 0", "Hello 1", "Hello 2", "Hello 3", "Hello 4")),
+			//gumi.ASpacer2(gumi.MinLength(50)),
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton1("Reset", func(self *gumi.MTButton) {
 				for _, v := range progresses {
 					v.Childrun()[0].(*gumi.MTProgress).Set(0)
@@ -147,7 +154,7 @@ func main() {
 				}
 			})),
 			gumi.ASpacer2(gumi.MinLength(12)),
-			gumi.NVertical1(progresses...),
+			gumi.LVertical1(progresses...),
 			gumi.ASpacer2(gumi.MinLength(12)),
 			gumi.LinkingFrom(
 				gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
@@ -156,6 +163,7 @@ func main() {
 			gumi.AText0("Hello, World!", gumi.Align_CENTER),
 		),
 	))
+	scr.Init()
 	// GLumi Screen Setup
 	glm.SetScreen(scr)
 	err = glm.Init()

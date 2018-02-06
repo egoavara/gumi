@@ -6,6 +6,7 @@ const (
 	CURSOR     EventKind = iota
 	SCROLL     EventKind = iota
 	RUNE       EventKind = iota
+	// RESIZE     EventKind = iota
 )
 
 type EventKind uint8
@@ -22,7 +23,7 @@ func (EventCursor) Kind() EventKind {
 }
 
 type EventScroll struct {
-	X, Y uint16
+	X, Y int32
 }
 
 func (EventScroll) Kind() EventKind {

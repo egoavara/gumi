@@ -7,15 +7,15 @@ import (
 	"sync"
 )
 
-type NHorizontal struct {
+type LHorizontal struct {
 	MultipleStructure
 	rule Distribute
 }
 
-func (s *NHorizontal) String() string {
-	return fmt.Sprintf("%s(childrun:%d)", "NHorizontal", len(s.Childrun()))
+func (s *LHorizontal) String() string {
+	return fmt.Sprintf("%s(childrun:%d)", "LHorizontal", len(s.Childrun()))
 }
-func (s *NHorizontal) draw(frame *image.RGBA) {
+func (s *LHorizontal) draw(frame *image.RGBA) {
 	wg := new(sync.WaitGroup)
 	wg.Add(len(s.child))
 	defer wg.Wait()
@@ -26,7 +26,7 @@ func (s *NHorizontal) draw(frame *image.RGBA) {
 		}(v)
 	}
 }
-func (s *NHorizontal) size() Size {
+func (s *LHorizontal) size() Size {
 	var min, max, sum uint16 = 0, math.MaxUint16, 0
 	for _, v := range s.child{
 		sz := v.size()
@@ -43,7 +43,7 @@ func (s *NHorizontal) size() Size {
 		MinLength(sum),
 	}
 }
-func (s *NHorizontal) rect(r image.Rectangle) {
+func (s *LHorizontal) rect(r image.Rectangle) {
 	//
 	var tempVert = make([]Length, len(s.child))
 	var tempHori = make([]Length, len(s.child))
@@ -70,25 +70,25 @@ func (s *NHorizontal) rect(r image.Rectangle) {
 		startat += dis[i]
 	}
 }
-func (s *NHorizontal) update(info *Information, style *Style) {
+func (s *LHorizontal) update(info *Information, style *Style) {
 	for _, v := range s.child{
 		v.update(info, style)
 	}
 }
-func (s *NHorizontal) Occur(event Event) {
+func (s *LHorizontal) Occur(event Event) {
 	for _, v := range s.child{
 		v.Occur(event)
 	}
 }
-func NHorizontal0(rule Distribute, childrun ...GUMI) *NHorizontal {
-	s := &NHorizontal{
+func LHorizontal0(rule Distribute, childrun ...GUMI) *LHorizontal {
+	s := &LHorizontal{
 		rule:rule,
 	}
 	s.Breed(childrun)
 	return s
 }
-func NHorizontal1(childrun ...GUMI) *NHorizontal {
-	s := &NHorizontal{
+func LHorizontal1(childrun ...GUMI) *LHorizontal {
+	s := &LHorizontal{
 		rule: Distribution.Minimalize,
 	}
 	s.Breed(childrun)

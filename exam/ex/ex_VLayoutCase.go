@@ -11,7 +11,7 @@ func VLayoutCase(scr *gumi.Screen, theme gumi.Theme) (result testing.BenchmarkRe
 			gumi.NStyle0(theme.BackgroundStyle()),
 			gumi.NBackground0(),
 			gumi.NMargin0(gumi.AUTOSIZE, gumi.RegularBlank(gumi.Length{5, gumi.LENGTHMAX})),
-			gumi.NVertical0(
+			gumi.LVertical0(
 				gumi.LinkingFrom(
 					gumi.NStyle0(theme.ColorLine(0)),
 					gumi.NBackground0(),

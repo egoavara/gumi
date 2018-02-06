@@ -11,7 +11,7 @@ func HLayoutCase(scr *gumi.Screen, theme gumi.Theme) (result testing.BenchmarkRe
 	bgd1 := gumi.NBackground0()
 	spc := gumi.NMargin0(gumi.AUTOSIZE, gumi.RegularBlank(gumi.Length{5, gumi.LENGTHMAX}))
 	txt := gumi.AText0("Hello, world!", gumi.Align_CENTER)
-	lay := gumi.NHorizontal0(
+	lay := gumi.LHorizontal0(
 		gumi.LinkingFrom(
 			gumi.NStyle0(theme.Style(gumi.INTENSE3)),
 			gumi.NBackground0(),

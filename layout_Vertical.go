@@ -7,12 +7,12 @@ import (
 	"sync"
 )
 
-type NVertical struct {
+type LVertical struct {
 	MultipleStructure
 	rule Distribute
 }
 
-func (s *NVertical) draw(frame *image.RGBA) {
+func (s *LVertical) draw(frame *image.RGBA) {
 	wg := new(sync.WaitGroup)
 	wg.Add(len(s.child))
 	defer wg.Wait()
@@ -23,7 +23,7 @@ func (s *NVertical) draw(frame *image.RGBA) {
 		}(v)
 	}
 }
-func (s *NVertical) size() Size {
+func (s *LVertical) size() Size {
 	var min, max, sum uint16 = 0, math.MaxUint16, 0
 
 	for _, v := range s.child{
@@ -42,7 +42,7 @@ func (s *NVertical) size() Size {
 		Length{Min: min, Max:max},
 	}
 }
-func (s *NVertical) rect(r image.Rectangle) {
+func (s *LVertical) rect(r image.Rectangle) {
 	var tempVert = make([]Length, len(s.child))
 	var tempHori = make([]Length, len(s.child))
 
@@ -68,24 +68,24 @@ func (s *NVertical) rect(r image.Rectangle) {
 		startat += dis[i]
 	}
 }
-func (s *NVertical) update(info *Information, style *Style) {
+func (s *LVertical) update(info *Information, style *Style) {
 	for _, v := range s.child{
 		v.update(info, style)
 	}
 }
-func (s *NVertical) Occur(event Event) {
+func (s *LVertical) Occur(event Event) {
 	for _, v := range s.child{
 		go v.Occur(event)
 	}
 }
-func (s *NVertical) String() string{
+func (s *LVertical) String() string{
 	return fmt.Sprintf(
-		"%s(childrun:%d)", "NVertical", len(s.Childrun()),
+		"%s(childrun:%d)", "LVertical", len(s.Childrun()),
 	)
 }
 
-func NVertical0(rule Distribute, childrun ...GUMI) *NVertical {
-	s := &NVertical{
+func LVertical0(rule Distribute, childrun ...GUMI) *LVertical {
+	s := &LVertical{
 		rule:rule,
 	}
 	for _, v := range childrun{
@@ -94,8 +94,8 @@ func NVertical0(rule Distribute, childrun ...GUMI) *NVertical {
 	s.Breed(childrun)
 	return s
 }
-func NVertical1(childrun ...GUMI) *NVertical {
-	s := &NVertical{
+func LVertical1(childrun ...GUMI) *LVertical {
+	s := &LVertical{
 		rule: Distribution.Minimalize,
 	}
 	for _, v := range childrun{

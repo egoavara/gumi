@@ -303,8 +303,8 @@ func (s *GLFWEvent) Rune(r rune) {
 }
 func (s *GLFWEvent) Scroll(xoff, yoff float64) {
 	s.glumi.screen.Event(gumi.EventScroll{
-		X: uint16(xoff),
-		Y: uint16(yoff),
+		X: int32(xoff),
+		Y: -int32(yoff),
 	})
 }
 

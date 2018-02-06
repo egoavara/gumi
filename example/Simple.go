@@ -13,11 +13,11 @@ func main() {
 			gumi.Drawing.Ruler.Hint.Horizontal(100),
 		),
 		gumi.NBackground0(),
-		gumi.NVertical1(
-			gumi.NVertical1(
+		gumi.LVertical1(
+			gumi.LVertical1(
 				gumi.AText1("Test1"),
 				gumi.AText1("Test2"),
-				gumi.AText1("Test3"),
+				gumi.Tool.MarginMinRegular(4, gumi.AText1("Test3")),
 			),
 			gumi.AText1("Test4"),
 		),

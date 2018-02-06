@@ -13,11 +13,9 @@ type NSize struct {
 func (s *NSize) String() string {
 	return fmt.Sprintf("%s(size:%v)", "NSize", s.sz)
 }
-
 func (s *NSize) draw(frame *image.RGBA) {
 	s.child.draw(frame)
 }
-
 func (s *NSize) size() Size {
 	temp := s.sz
 	c := s.child.size()
@@ -29,15 +27,12 @@ func (s *NSize) size() Size {
 	}
 	return temp
 }
-
 func (s *NSize) rect(r image.Rectangle) {
 	s.child.rect(r)
 }
-
 func (s *NSize) update(info *Information, style *Style) {
 	s.child.update(info, style)
 }
-
 func (s *NSize) Occur(event Event) {
 	s.child.Occur(event)
 }

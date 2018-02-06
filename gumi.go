@@ -18,6 +18,7 @@ type GUMIRenderer interface{
 	size() Size
 	rect(r image.Rectangle)
 	update(info *Information, style *Style)
+	init()
 }
 type GUMIStructure interface{
 	Born(gumi GUMI)
