@@ -7,8 +7,8 @@ import (
 
 type ACanvas struct {
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	w, h uint16
 	fn   Drawer

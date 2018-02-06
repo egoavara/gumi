@@ -69,15 +69,9 @@ func (s *VoidStructure) Childrun() []GUMI {
 	return nil
 }
 
-type Boundable interface {
-	Rect() image.Rectangle
-}
-type BoundStore struct {
+type boundStore struct {
 	bound image.Rectangle
 }
-func (s BoundStore ) Rect() image.Rectangle {
-	return s.bound
-}
-type StyleStore struct {
+type styleStore struct {
 	style *Style
 }

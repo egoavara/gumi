@@ -11,7 +11,7 @@ import (
 )
 
 type GLRender struct {
-	glumi *GLUMI
+	glumi *GLUMIFullScreen
 	//
 	program    uint32
 	frameimage uint32

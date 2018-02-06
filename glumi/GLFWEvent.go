@@ -6,7 +6,7 @@ import (
 )
 
 type GLFWEvent struct {
-	glumi *GLUMI
+	glumi *GLUMIFullScreen
 }
 
 func (s *GLFWEvent) Key(key glfw.Key, action glfw.Action) {

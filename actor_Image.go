@@ -8,7 +8,7 @@ import (
 
 type AImage struct {
 	VoidStructure
-	BoundStore
+	boundStore
 	//
 	img image.Image
 }

@@ -5,20 +5,26 @@ import (
 	"image"
 )
 
-const mtRadioMinWidth = 20
-const mtRadioMinHeight = 20
-const mtRadioAnimMillis = 200
+const (
+	mtRadioMinWidth                  = 20
+	mtRadioMinHeight                 = 20
+	mtRadioAnimationOnOffDeltaMillis = 200
+	mtRadioInnerRadiusDifference = 3
+)
+
+const (
+	mtRadioAnimationOnOff  = iota
+	mtRadioAnimationLength = iota
+)
 
 type MTRadio struct {
 	//
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	mtColorFromTo
-	//
-	handle float64
-	anim   float64
+	studio *AnimationStudio
 	//
 	cursorEnter, active bool
 	onActive            MTRadioActive
@@ -28,24 +34,28 @@ type MTRadioActive func(self *MTRadio, active bool)
 func (s *MTRadio) String() string {
 	return fmt.Sprintf("%s(active:%v)", "MTRadio", s.active)
 }
+func (s *MTRadio) init() {
+	s.studio = NewAnimationStudio(mtRadioAnimationLength)
+	s.studio.Set(mtRadioAnimationOnOff, &AnimationPercent{
+		Delta: Animation.DeltaByMillis(mtRadioAnimationOnOffDeltaMillis),
+		Fn:    Material.DefaultAnimation.Radio,
+	})
+}
 func (s *MTRadio) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
-
-	radius := h / 2
-	miniradius := radius - 3
+	var baseColor0 = s.GetFromMaterialColor().BaseColor()
+	var mainColor1 = s.GetToMaterialColor().MainColor()
+	var onoff = s.studio.Get(mtRadioAnimationOnOff).(*AnimationPercent)
+	var radius = h / 2
+	var innerRadius = radius - mtRadioInnerRadiusDifference
 	//
-	mcl1 := s.style.Material.PalletteColor(s.mcl1)
-	mcl2 := s.style.Material.PalletteColor(s.mcl2)
-	//
-	ctx.SetColor(mcl1[0])
+	ctx.SetColor(baseColor0)
 	ctx.DrawCircle(w/2, h/2, radius)
 	ctx.Fill()
 	//
-	ctx.SetColor(
-		phaseColor(mcl1[0], mcl2[1], s.anim),
-	)
-	ctx.DrawCircle(w/2, h/2, miniradius)
+	ctx.SetColor(Scale.Color(baseColor0, mainColor1, onoff.Current))
+	ctx.DrawCircle(w/2, h/2, innerRadius)
 	ctx.Fill()
 }
 func (s *MTRadio) size() Size {
@@ -60,22 +70,11 @@ func (s *MTRadio) rect(r image.Rectangle) {
 func (s *MTRadio) update(info *Information, style *Style) {
 	s.style = style
 	if s.active {
-		if s.handle < mtRadioAnimMillis {
-			s.handle = s.handle + float64(info.Dt)
-			if s.handle > mtRadioAnimMillis {
-				s.handle = mtRadioAnimMillis
-			}
-			s.anim = Animation.Material.Toggle(s.handle / mtRadioAnimMillis)
-		}
+		s.studio.Get(mtRadioAnimationOnOff).(*AnimationPercent).Request(1)
 	} else {
-		if s.handle > 0 {
-			s.handle = s.handle - float64(info.Dt)
-			if s.handle < 0 {
-				s.handle = 0
-			}
-			s.anim = 1 - Animation.Material.Toggle((mtRadioAnimMillis-s.handle)/mtRadioAnimMillis)
-		}
+		s.studio.Get(mtRadioAnimationOnOff).(*AnimationPercent).Request(0)
 	}
+	s.studio.Animate(info)
 }
 func (s *MTRadio) Occur(event Event) {
 	switch ev := event.(type) {
@@ -101,18 +100,21 @@ func (s *MTRadio) Occur(event Event) {
 }
 
 //
-func MTRadio0(from, to MaterialColor, active MTRadioActive) *MTRadio {
+func MTRadio0(active MTRadioActive) *MTRadio {
+	temp := &MTRadio{
+		onActive: active,
+	}
+	temp.SetFromMaterialColor(Material.Pallette.White)
+	temp.SetToMaterialColor(Material.Pallette.White)
+	return temp
+}
+func MTRadio1(from, to *MaterialColor, active MTRadioActive) *MTRadio {
 	temp := &MTRadio{
 		onActive: active,
 	}
 	temp.SetFromMaterialColor(from)
 	temp.SetToMaterialColor(to)
 	return temp
-}
-func MTRadio1(active MTRadioActive) *MTRadio {
-	return &MTRadio{
-		onActive: active,
-	}
 }
 
 func (s *MTRadio) Get() bool {

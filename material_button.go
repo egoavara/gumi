@@ -1,27 +1,29 @@
 package gumi
 
 import (
+	"fmt"
 	"github.com/fogleman/gg"
 	"image"
-	"fmt"
 )
 
 const (
-	mtButtonMinWidth   = 40
-	mtButtonMinHeight  = 20
-	mtButtonAnimMillis = 100
+	mtButtonMinPadding = 5
+)
+const (
+	mtButtonAnimationHover = iota
+	//
+	mtButtonAnimationLength = iota
 )
 
 type MTButton struct {
 	//
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	mtColorSingle
-	//
-	handle float64
-	anim   float64
+	studio *AnimationStudio
+	hover *AnimationPercent
 	//
 	text string
 	//
@@ -29,52 +31,64 @@ type MTButton struct {
 	onClick             MTButtonClick
 	onFocus             MTButtonFocus
 }
+type MTButtonFocus func(self *MTButton, focus bool)
+type MTButtonClick func(self *MTButton)
 
 func (s *MTButton) String() string {
 	return fmt.Sprintf("%s", "MTButton")
 }
-type MTButtonFocus func(self *MTButton, focus bool)
-type MTButtonClick func(self *MTButton)
-
+func (s *MTButton) init() {
+	s.studio = NewAnimationStudio(mtButtonAnimationLength)
+	s.hover = s.studio.Set(mtButtonAnimationHover, &AnimationPercent{
+		Delta:Animation.DeltaByMillis(250),
+		Fn: Material.DefaultAnimation.Button,
+	}).(*AnimationPercent)
+}
 func (s *MTButton) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
+	var baseColor, mainColor = s.GetMaterialColor().Color()
 	radius := h / 2
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
 	//
-	if s.active{
-		ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0])
+
+	if s.active {
+		ctx.SetColor(baseColor)
+		// background
 		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 		ctx.DrawRectangle(radius, 0, w-radius*2, h)
 		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 		ctx.Fill()
-		//
-		ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1])
+		// text
+		ctx.SetColor(mainColor)
 		txtw, txth := ctx.MeasureString(s.text)
-		ctx.DrawString(s.text, (w-txtw)/2, (h+txth)/2)
+		ctx.DrawString(s.text, (w-txtw)/2, (h+txth)/2-1)
 		ctx.Stroke()
-	}else {
-		ctx.SetColor(
-			phaseColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0], s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1], s.anim),
-		)
+	} else {
+
+		ctx.SetColor(Scale.Color(baseColor, mainColor, s.hover.Current))
+		// background
 		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 		ctx.DrawRectangle(radius, 0, w-radius*2, h)
 		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 		ctx.Fill()
-		//
-		ctx.SetColor(
-			phaseColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1], s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0], s.anim),
-		)
+		// text
+		ctx.SetColor(Scale.Color(mainColor, baseColor, s.hover.Current))
 		txtw, txth := ctx.MeasureString(s.text)
-		ctx.DrawString(s.text, (w-txtw)/2, (h+txth)/2)
+		ctx.DrawString(s.text, (w-txtw)/2, (h+txth)/2-1)
 		ctx.Stroke()
 	}
 }
 func (s *MTButton) size() Size {
+
+	s.style.Default.Font.Use()
+	defer s.style.Default.Font.Release()
+	var hori, vert = s.style.Default.Font.CalculateSize(s.text)
+	//
 	return Size{
-		Vertical:   MinLength(mtButtonMinHeight),
-		Horizontal: MinLength(mtButtonMinWidth),
+		Vertical:   MinLength(uint16(vert + mtButtonMinPadding*2)),
+		Horizontal: MinLength(uint16(hori + mtButtonMinPadding*2)),
 	}
 }
 func (s *MTButton) rect(r image.Rectangle) {
@@ -83,22 +97,11 @@ func (s *MTButton) rect(r image.Rectangle) {
 func (s *MTButton) update(info *Information, style *Style) {
 	s.style = style
 	if s.cursorEnter {
-		if s.handle < mtButtonAnimMillis {
-			s.handle = s.handle + float64(info.Dt)
-			if s.handle > mtButtonAnimMillis {
-				s.handle = mtButtonAnimMillis
-			}
-			s.anim = Animation.Material.Button(s.handle / mtButtonAnimMillis)
-		}
+		s.hover.Request(1)
 	} else {
-		if s.handle > 0 {
-			s.handle = s.handle - float64(info.Dt)
-			if s.handle < 0 {
-				s.handle = 0
-			}
-			s.anim = 1 - Animation.Material.Button((mtButtonAnimMillis-s.handle)/mtButtonAnimMillis)
-		}
+		s.hover.Request(0)
 	}
+	s.studio.Animate(info)
 }
 func (s *MTButton) Occur(event Event) {
 	switch ev := event.(type) {
@@ -119,12 +122,11 @@ func (s *MTButton) Occur(event Event) {
 		}
 	case EventCursor:
 
-
 		x := int(ev.X)
 		y := int(ev.Y)
 		if (s.bound.Min.X <= x && x < s.bound.Max.X) && (s.bound.Min.Y <= y && y < s.bound.Max.Y) {
 			if s.onFocus != nil {
-				s.onFocus(s,true)
+				s.onFocus(s, true)
 			}
 			s.cursorEnter = true
 		} else {
@@ -136,7 +138,15 @@ func (s *MTButton) Occur(event Event) {
 	}
 }
 
-func MTButton0(mcl MaterialColor, text string, onclick MTButtonClick) *MTButton {
+func MTButton0(text string, onclick MTButtonClick) *MTButton {
+	temp := &MTButton{
+		text:    text,
+		onClick: onclick,
+	}
+	temp.SetMaterialColor(Material.Pallette.White)
+	return temp
+}
+func MTButton1(mcl *MaterialColor, text string, onclick MTButtonClick) *MTButton {
 	temp := &MTButton{
 		text:    text,
 		onClick: onclick,
@@ -144,12 +154,7 @@ func MTButton0(mcl MaterialColor, text string, onclick MTButtonClick) *MTButton 
 	temp.SetMaterialColor(mcl)
 	return temp
 }
-func MTButton1(text string, onclick MTButtonClick) *MTButton {
-	return &MTButton{
-		text:    text,
-		onClick: onclick,
-	}
-}
+
 
 func (s *MTButton) SetText(txt string) {
 	s.text = txt

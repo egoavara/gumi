@@ -7,8 +7,8 @@ import (
 
 type NDrawing struct {
 	SingleStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	afterdraw bool
 	drawfuncs []Drawer

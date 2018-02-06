@@ -4,35 +4,35 @@ import (
 	"fmt"
 	"github.com/fogleman/gg"
 	"image"
-	"math"
 )
 
 const (
-	mtEditMinWidth             = 80
-	mtEditMinHeight            = 20
-	mtEditAnimMillis           = 400
-	mtEditDeleteMaxMillisReach = 1000
-	mtEditDeleteMaxPerSecond   = 100
+	mtEditMinWidth                    = 80
+	mtEditMinHeight                   = 20
+	mtEditAnimationTextCursorInterval = 400
+	mtEditDeleteMaxMillisReach        = 5000
+	mtEditDeleteMaxPerSecond          = 32
+)
+const (
+	mtEditAnimationTextCursor = iota
+	mtEditAnimationDelete     = iota
+	//
+	mtEditAnimationLength = iota
 )
 
 type MTEdit struct {
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	mtColorSingle
+	studio *AnimationStudio
 	//
-	align Align
-	text  string
+	align    Align
+	text     string
 	inactive bool
 	//
-	onChange MTEditChange
-	//
-	deleteContinue      int64
-	deleteAccum         float64
-	deleteMode          bool
-	textCursorHandle    int64
-	textCursorShow      bool
+	onChange            MTEditChange
 	cursorEnter, active bool
 }
 type MTEditChange func(self *MTEdit, text string)
@@ -40,15 +40,32 @@ type MTEditChange func(self *MTEdit, text string)
 func (s *MTEdit) String() string {
 	return fmt.Sprintf("%s(text:%s)", "MTEdit", s.text)
 }
+func (s *MTEdit) init() {
+	s.studio = NewAnimationStudio(mtEditAnimationLength)
+	s.studio.Set(mtEditAnimationTextCursor, &AnimationSwitch{
+		Interval: mtEditAnimationTextCursorInterval,
+	})
+	s.studio.Set(mtEditAnimationDelete, &AnimationReaching{
+		Current: 0,
+		Delta:   Animation.DeltaByMillis(mtEditDeleteMaxMillisReach),
+		To:      mtEditDeleteMaxPerSecond,
+		Fn:      Material.DefaultAnimation.EditDelete,
+	})
+}
 func (s *MTEdit) draw(frame *image.RGBA) {
+	var baseColor, mainColor = s.GetMaterialColor().Color()
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var radius = h / 2
+	var textCursor = s.studio.Get(mtEditAnimationTextCursor).(*AnimationSwitch)
+	var animdelete = s.studio.Get(mtEditAnimationDelete).(*AnimationReaching)
+	s.text = stringDeleteBack(s.text, int(animdelete.Current))
+	//
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
 	// string position make
 	var drawtext = s.text
-	if s.active && s.textCursorShow {
+	if s.active && textCursor.Switch {
 		drawtext += "_"
 	}
 	var expectw, expecth = ctx.MeasureString(drawtext)
@@ -72,13 +89,13 @@ func (s *MTEdit) draw(frame *image.RGBA) {
 		stringposX = radius
 	}
 	//
-	ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0])
+	ctx.SetColor(baseColor)
 	ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 	ctx.DrawRectangle(radius, 0, w-radius*2, h)
 	ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 	ctx.Fill()
 	//
-	ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1])
+	ctx.SetColor(mainColor)
 	if s.active {
 		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 		ctx.DrawLine(radius, 0, w-radius, 0)
@@ -103,31 +120,12 @@ func (s *MTEdit) update(info *Information, style *Style) {
 	s.style = style
 	//
 	if s.active {
-		s.textCursorHandle += info.Dt
-		if s.textCursorHandle/mtEditAnimMillis > 0 {
-			s.textCursorShow = !s.textCursorShow
-			s.textCursorHandle = s.textCursorHandle % mtEditAnimMillis
-		}
-		if s.deleteMode {
-			if s.deleteContinue != mtEditDeleteMaxMillisReach {
-				s.deleteContinue += info.Dt
-				if s.deleteContinue > mtEditDeleteMaxMillisReach {
-					s.deleteContinue = mtEditDeleteMaxMillisReach
-				}
-			}
-			s.deleteAccum += (mtEditDeleteMaxPerSecond * float64(s.deleteContinue) / mtEditDeleteMaxMillisReach) * (float64(info.Dt) / 1000)
-			delaccumfloor := math.Floor(s.deleteAccum)
-			if delaccumfloor >= 1 {
-				s.deleteAccum -= delaccumfloor
-				s.text = StringDeleteBack(s.text, int(delaccumfloor))
-				if s.onChange != nil {
-					s.onChange(s, s.text)
-				}
-			}
-		}
+		s.studio.Animate(info)
+	} else {
+		s.studio.Reset()
 	}
 }
-func StringDeleteBack(str string, count int) string {
+func stringDeleteBack(str string, count int) string {
 	temp := []rune(str)
 	templen := len(temp)
 	if count > templen {
@@ -142,26 +140,18 @@ func (s *MTEdit) Occur(event Event) {
 		switch ev.Key {
 		case KEY_BACKSPACE:
 			if s.active {
-				if !s.deleteMode {
-					s.text = StringDeleteBack(s.text, 1)
-					if s.onChange != nil {
-						s.onChange(s, s.text)
-					}
-				}
-				s.deleteMode = true
+				s.studio.Get(mtEditAnimationDelete).(*AnimationReaching).Start()
 			}
 		}
 	case EventKeyRelease:
 		switch ev.Key {
 		case KEY_BACKSPACE:
 			if s.active {
-				s.deleteMode = false
-				s.deleteContinue = 0
-				s.deleteAccum = 0
+				s.studio.Get(mtEditAnimationDelete).(*AnimationReaching).Stop()
 			}
 		case KEY_MOUSE1:
 			if s.cursorEnter {
-				if !s.inactive{
+				if !s.inactive {
 					s.active = true
 				}
 
@@ -169,7 +159,6 @@ func (s *MTEdit) Occur(event Event) {
 				s.active = false
 			}
 		}
-
 	case EventCursor:
 		x := int(ev.X)
 		y := int(ev.Y)
@@ -188,34 +177,48 @@ func (s *MTEdit) Occur(event Event) {
 	}
 
 }
-//
-func MTEdit0(mcl MaterialColor, str string, align Align) *MTEdit {
-	tem := &MTEdit{
-		text:  str,
-		align: align,
-	}
-	tem.SetMaterialColor(mcl)
-	return tem
-}
-func MTEdit1(str string, align Align) *MTEdit {
-	return &MTEdit{
-		text:  str,
-		align: align,
-	}
-}
-func MTEdit2(str string) *MTEdit {
-	return &MTEdit{
-		text:  str,
-		align: Align_LEFT | Align_VCENTER,
-	}
-}
-func MTEdit3() *MTEdit {
-	return &MTEdit{
+
+// Constructors for MTEdit
+func MTEdit0() *MTEdit {
+	temp := &MTEdit{
 		text:  "",
 		align: Align_LEFT | Align_VCENTER,
 	}
+	temp.SetMaterialColor(Material.Pallette.White)
+	return temp
 }
 
+// Constructors for MTEdit
+func MTEdit1(str string) *MTEdit {
+	temp := &MTEdit{
+		text:  str,
+		align: Align_LEFT | Align_VCENTER,
+	}
+	temp.SetMaterialColor(Material.Pallette.White)
+	return temp
+}
+
+// Constructors for MTEdit
+func MTEdit2(str string, align Align) *MTEdit {
+	temp := &MTEdit{
+		text:  str,
+		align: align,
+	}
+	temp.SetMaterialColor(Material.Pallette.White)
+	return temp
+}
+
+// Constructors for MTEdit
+func MTEdit3(mcl *MaterialColor, str string, align Align) *MTEdit {
+	temp := &MTEdit{
+		text:  str,
+		align: align,
+	}
+	temp.SetMaterialColor(mcl)
+	return temp
+}
+
+// ===============================================================================================
 func (s *MTEdit) Set(str string) {
 	s.SetText(str)
 }
@@ -237,17 +240,15 @@ func (s *MTEdit) SetAlign(align Align) {
 func (s *MTEdit) GetAlign() Align {
 	return s.align
 }
-func (s *MTEdit) GetActive() bool{
+func (s *MTEdit) GetActive() bool {
 	return !s.inactive
 }
 func (s *MTEdit) SetActive(active bool) {
 	s.inactive = !active
 }
-
 func (s *MTEdit) OnChange(callback MTEditChange) {
 	s.onChange = callback
 }
 func (s *MTEdit) ReferChange() MTEditChange {
 	return s.onChange
 }
-

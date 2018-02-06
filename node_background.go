@@ -8,8 +8,8 @@ import (
 
 type NBackground struct {
 	SingleStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 }
 
 func (s *NBackground) String() string {

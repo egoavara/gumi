@@ -13,13 +13,13 @@ const (
 	MTDropboxElemUnderline        = 2
 	MTDropboxMinHeight            = 20
 	MTDropboxAnimStretchPerSecond = 400
-	MTDropboxScroolModify        = 16
+	MTDropboxScroolModify         = 16
 )
 
 type MTDropbox struct {
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	mtColorSingle
 	//
@@ -27,8 +27,8 @@ type MTDropbox struct {
 	selected int
 
 	inactive bool
-	maxbox int
-	cutbox int
+	maxbox   int
+	cutbox   int
 	//
 	scr     *Screen
 	deferid uint64
@@ -36,7 +36,7 @@ type MTDropbox struct {
 	//
 	onChange MTDropboxChange
 	//
-	hover    int
+	hover               int
 	cursorEnter, active bool
 	box, boxTo          int
 	scrool, scroolTo    int
@@ -53,28 +53,29 @@ func (s *MTDropbox) String() string {
 	return fmt.Sprintf("%s(select:%s)", "MTDropbox", s.Elems[s.selected])
 }
 func (s *MTDropbox) draw(frame *image.RGBA) {
+	var baseColor, mainColor = s.GetMaterialColor().Color()
 	if s.box > 0 && s.Elems.Length() > 0 {
 		s.scr.deferRequest(s.deferid, func(rgba *image.RGBA) {
 			var radius = float64(s.bound.Dy()) / 2
 			var box int
-			if s.maxbox > 0 && s.box > s.maxbox{
+			if s.maxbox > 0 && s.box > s.maxbox {
 				s.cutbox = s.box - s.maxbox
 				box = s.maxbox
-			}else {
+			} else {
 				box = s.box
 			}
-			if s.cutbox < s.scroolTo{
+			if s.cutbox < s.scroolTo {
 				s.scroolTo = s.cutbox
 				s.scrool = s.cutbox
 			}
-			if s.bound.Max.Y + box + int(radius) > frame.Rect.Max.Y {
+			if s.bound.Max.Y+box+int(radius) > frame.Rect.Max.Y {
 				diff := s.bound.Max.Y + box + int(radius) - frame.Rect.Max.Y
 				box -= diff
 				s.cutbox += diff
 			}
 
 			// selecte, background, scrool
-			func(){
+			func() {
 				bd := s.bound
 				bd.Max.Y += box + int(radius)
 				var ctx = GGContextRGBASub(rgba, bd)
@@ -83,7 +84,7 @@ func (s *MTDropbox) draw(frame *image.RGBA) {
 				//
 				var w, h = float64(ctx.Width()), float64(ctx.Height())
 				// background
-				ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0])
+				ctx.SetColor(baseColor)
 				ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(270))
 				ctx.DrawArc(radius, h-radius, radius, gg.Radians(90), gg.Radians(180))
 				ctx.DrawRectangle(radius-1, 0, w-radius*2+1, h)
@@ -91,7 +92,7 @@ func (s *MTDropbox) draw(frame *image.RGBA) {
 				ctx.DrawArc(w-radius, h-radius, radius, gg.Radians(0), gg.Radians(90))
 				ctx.Fill()
 				// outline
-				ctx.SetColor(phaseColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0], s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1], float64(s.box) / float64(s.boxTo)))
+				ctx.SetColor(Scale.Color(baseColor, mainColor, float64(s.box)/float64(s.boxTo)))
 				ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(270))
 				ctx.DrawLine(radius, 0, w-radius, 0)
 				ctx.DrawArc(w-radius, radius, radius, gg.Radians(270), gg.Radians(360))
@@ -102,7 +103,7 @@ func (s *MTDropbox) draw(frame *image.RGBA) {
 				ctx.DrawLine(0, h-radius, 0, radius)
 				ctx.Stroke()
 				// selected underline
-				ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1])
+				ctx.SetColor(mainColor)
 				ctx.Push()
 				ctx.SetLineWidth(.25)
 				ctx.DrawLine(radius, float64(s.bound.Dy()), w-2*radius, float64(s.bound.Dy()))
@@ -117,36 +118,36 @@ func (s *MTDropbox) draw(frame *image.RGBA) {
 					ctx.Stroke()
 				}
 				// scroll
-				percent := float64(box) / float64(s.Elems.heightSum() + MTDropboxElemMargin * s.Elems.Length())
-				scroolPercent :=  float64(s.scrool)/ float64(box + s.cutbox)
-				if percent< 0{
+				percent := float64(box) / float64(s.Elems.heightSum()+MTDropboxElemMargin*s.Elems.Length())
+				scroolPercent := float64(s.scrool) / float64(box+s.cutbox)
+				if percent < 0 {
 					percent = 0
 				}
-				if percent > 1{
+				if percent > 1 {
 					percent = 1
 				}
 
-				ctx.DrawArc(w-radius, radius +  (scroolPercent) * (h-radius*2), MTDropboxScroolWidth/2, gg.Radians(180), gg.Radians(360))
-				ctx.DrawRectangle(w-radius-MTDropboxScroolWidth/2, radius +  (scroolPercent) * (h-radius*2), MTDropboxScroolWidth, percent * (h-radius*2))
-				ctx.DrawArc(w-radius, radius +  (scroolPercent) * (h-radius*2) + percent * (h-radius*2), MTDropboxScroolWidth/2, gg.Radians(0), gg.Radians(180))
+				ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2), MTDropboxScroolWidth/2, gg.Radians(180), gg.Radians(360))
+				ctx.DrawRectangle(w-radius-MTDropboxScroolWidth/2, radius+(scroolPercent)*(h-radius*2), MTDropboxScroolWidth, percent*(h-radius*2))
+				ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2)+percent*(h-radius*2), MTDropboxScroolWidth/2, gg.Radians(0), gg.Radians(180))
 				ctx.Fill()
 			}()
 			// elems, hover
-			func(){
+			func() {
 				bd := s.bound
 				bd.Min.Y = s.bound.Max.Y
 				bd.Max.Y = s.bound.Max.Y + box + int(radius)
 				var ctx = GGContextRGBASub(rgba, bd)
 				s.style.useContext(ctx)
 				defer s.style.releaseContext(ctx)
-				sum :=  MTDropboxElemMargin
-				ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1])
-				for i, v := range s.Elems.refer(){
-					drawY := float64(sum + v.h) - float64(s.scrool)
+				sum := MTDropboxElemMargin
+				ctx.SetColor(mainColor)
+				for i, v := range s.Elems.refer() {
+					drawY := float64(sum+v.h) - float64(s.scrool)
 					ctx.DrawString(v.content, radius, drawY)
 					ctx.Stroke()
-					if i == s.hover{
-						ctx.DrawLine(radius, drawY+ MTDropboxElemUnderline, radius + float64(v.w), drawY+ MTDropboxElemUnderline)
+					if i == s.hover {
+						ctx.DrawLine(radius, drawY+MTDropboxElemUnderline, radius+float64(v.w), drawY+MTDropboxElemUnderline)
 						ctx.Stroke()
 					}
 					sum += v.h + MTDropboxElemMargin
@@ -162,13 +163,13 @@ func (s *MTDropbox) draw(frame *image.RGBA) {
 		var w, h = float64(ctx.Width()), float64(ctx.Height())
 		var radius = float64(s.bound.Dy()) / 2
 		//
-		ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[0])
+		ctx.SetColor(baseColor)
 		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 		ctx.DrawRectangle(radius, 0, w-radius*2, h)
 		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 		ctx.Fill()
 		//
-		ctx.SetColor(s.style.Material.PalletteColor(s.mtColorSingle.mcl1)[1])
+		ctx.SetColor(mainColor)
 		elem := s.Elems.getForDraw(s.selected)
 		if len(elem.content) > 0 {
 			ctx.DrawString(elem.content, radius, (h-float64(elem.h))/2+float64(elem.h))
@@ -259,7 +260,7 @@ func (s *MTDropbox) Occur(event Event) {
 						s.active = false
 						s.boxTo = 0
 						s.scr.hookRequest(s.hookid, nil)
-						if s.onChange != nil{
+						if s.onChange != nil {
 							s.onChange(s, s.Elems.Get(s.selected))
 						}
 					}
@@ -282,7 +283,7 @@ func (s *MTDropbox) Occur(event Event) {
 			sum := s.bound.Max.Y + MTDropboxElemMargin
 			if y >= s.bound.Max.Y {
 				for i, elem := range s.Elems.refer() {
-					if sum <= y + s.scrool && y + s.scrool < sum+elem.h+MTDropboxElemMargin {
+					if sum <= y+s.scrool && y+s.scrool < sum+elem.h+MTDropboxElemMargin {
 						s.hover = i
 						break
 					}
@@ -297,7 +298,7 @@ func (s *MTDropbox) Occur(event Event) {
 		}
 	case EventScroll:
 		s.scroolTo += MTDropboxScroolModify * int(ev.Y)
-		if s.scroolTo < 0{
+		if s.scroolTo < 0 {
 			s.scroolTo = 0
 		}
 	}
@@ -310,6 +311,7 @@ func MTDropbox0() *MTDropbox {
 		selected: 0,
 		hover:    -1,
 	}
+	res.SetMaterialColor(Material.Pallette.White)
 	return res
 }
 func MTDropbox1(maxboxlen uint16) *MTDropbox {
@@ -317,8 +319,9 @@ func MTDropbox1(maxboxlen uint16) *MTDropbox {
 		Elems:    mtDropboxElemList{},
 		selected: 0,
 		hover:    -1,
-		maxbox: int(maxboxlen),
+		maxbox:   int(maxboxlen),
 	}
+	res.SetMaterialColor(Material.Pallette.White)
 	return res
 }
 func MTDropbox2(change MTDropboxChange) *MTDropbox {
@@ -327,6 +330,7 @@ func MTDropbox2(change MTDropboxChange) *MTDropbox {
 		selected: 0,
 		hover:    -1,
 	}
+	res.SetMaterialColor(Material.Pallette.White)
 	res.OnChange(change)
 	return res
 }
@@ -336,8 +340,9 @@ func MTDropbox3(change MTDropboxChange, elems ...string) *MTDropbox {
 		selected: 0,
 		hover:    -1,
 	}
+	res.SetMaterialColor(Material.Pallette.White)
 	res.OnChange(change)
-	for i, v := range elems{
+	for i, v := range elems {
 		res.Elems.Set(i, v)
 	}
 	return res

@@ -7,8 +7,8 @@ import (
 
 type ALModal struct {
 	SingleStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	lastCursorEvent EventCursor
 	//
@@ -16,6 +16,10 @@ type ALModal struct {
 	show bool
 }
 
+func (s *ALModal) init() {
+	s.modal.init()
+	s.child.init()
+}
 func (s *ALModal) draw(frame *image.RGBA) {
 	s.child.draw(frame)
 	if s.show{

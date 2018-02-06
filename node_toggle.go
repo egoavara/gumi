@@ -10,8 +10,8 @@ import (
 
 type NToggle struct {
 	SingleStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	cursorEnter, active bool
 	//

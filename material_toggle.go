@@ -6,20 +6,25 @@ import (
 	"image"
 )
 
-const mtToggleMinWidth = 40
-const mtToggleMinHeight = 20
-const mtToggleAnimMillis = 200
+const (
+	mtToggleMinWidth                  = 40
+	mtToggleMinHeight                 = 20
+	mtToggleAnimationOnOffDeltaMillis = 200
+	mtToggleInnerRadiusDifference = 3
+)
 
+const (
+	mtToggleAnimationOnOff  = iota
+	mtToggleAnimationLength = iota
+)
 type MTToggle struct {
 	//
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	mtColorFromTo
-	//
-	handle float64
-	anim   float64
+	studio *AnimationStudio
 	//
 	cursorEnter, active bool
 	onActive            MTToggleActive
@@ -32,27 +37,35 @@ type MTToggleActive func(self *MTToggle, active bool)
 func (s *MTToggle) String() string {
 	return fmt.Sprintf("%s(active:%v)", "MTToggle", s.active)
 }
+func (s *MTToggle) init() {
+	s.studio = NewAnimationStudio(mtToggleAnimationLength)
+	s.studio.Set(mtToggleAnimationOnOff, &AnimationPercent{
+		Delta: Animation.DeltaByMillis(mtToggleAnimationOnOffDeltaMillis),
+		Fn:    Material.DefaultAnimation.Toggle,
+	})
+}
 func (s *MTToggle) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
-
-	radius := h / 2
-	miniradius := radius - 3
+	var baseColor0, mainColor0 = s.GetFromMaterialColor().Color()
+	var mainColor1 = s.GetToMaterialColor().MainColor()
+	var onoff = s.studio.Get(mtToggleAnimationOnOff).(*AnimationPercent)
+	var radius = h / 2
+	var innerRadius = radius - mtToggleInnerRadiusDifference
 	//
-	mcl1 := s.style.Material.PalletteColor(s.mcl1)
-	mcl2 := s.style.Material.PalletteColor(s.mcl2)
+
 	//
 	ctx.SetColor(
-		phaseColor(mcl1[0], mcl2[1], s.anim),
+		Scale.Color(baseColor0, mainColor1, onoff.Current),
 	)
 	//ctx.SetColor(color.RGBA{94, 97, 97, 255})
 	ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 	ctx.DrawRectangle(radius, 0, w-radius*2, h)
 	ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 	ctx.Fill()
-	ctx.SetColor(mcl1[1])
+	ctx.SetColor(mainColor0)
 	//ctx.SetColor(color.RGBA{213, 217, 255, 255})
-	ctx.DrawCircle(radius+phasePos(w-2*radius, s.anim), radius, miniradius)
+	ctx.DrawCircle(radius+Scale.Length(w-2*radius, onoff.Current), radius, innerRadius)
 	ctx.Fill()
 }
 func (s *MTToggle) size() Size {
@@ -67,22 +80,11 @@ func (s *MTToggle) rect(r image.Rectangle) {
 func (s *MTToggle) update(info *Information, style *Style) {
 	s.style = style
 	if s.active {
-		if s.handle < mtToggleAnimMillis {
-			s.handle = s.handle + float64(info.Dt)
-			if s.handle > mtToggleAnimMillis {
-				s.handle = mtToggleAnimMillis
-			}
-			s.anim = Animation.Material.Toggle(s.handle / mtToggleAnimMillis)
-		}
+		s.studio.Get(mtToggleAnimationOnOff).(*AnimationPercent).Request(1)
 	} else {
-		if s.handle > 0 {
-			s.handle = s.handle - float64(info.Dt)
-			if s.handle < 0 {
-				s.handle = 0
-			}
-			s.anim = 1 - Animation.Material.Toggle((mtToggleAnimMillis-s.handle)/mtToggleAnimMillis)
-		}
+		s.studio.Get(mtToggleAnimationOnOff).(*AnimationPercent).Request(0)
 	}
+	s.studio.Animate(info)
 }
 func (s *MTToggle) Occur(event Event) {
 	switch ev := event.(type) {
@@ -108,7 +110,15 @@ func (s *MTToggle) Occur(event Event) {
 }
 
 // Constructors
-func MTToggle0(from, to MaterialColor, active MTToggleActive) *MTToggle {
+func MTToggle0(active MTToggleActive) *MTToggle {
+	temp := &MTToggle{
+		onActive: active,
+	}
+	temp.SetFromMaterialColor(Material.Pallette.White)
+	temp.SetToMaterialColor(Material.Pallette.White)
+	return temp
+}
+func MTToggle1(from, to *MaterialColor, active MTToggleActive) *MTToggle {
 	temp := &MTToggle{
 		onActive: active,
 	}
@@ -116,11 +126,7 @@ func MTToggle0(from, to MaterialColor, active MTToggleActive) *MTToggle {
 	temp.SetToMaterialColor(to)
 	return temp
 }
-func MTToggle1(active MTToggleActive) *MTToggle {
-	return &MTToggle{
-		onActive: active,
-	}
-}
+
 
 // Element Property
 func (s *MTToggle) Get() bool {

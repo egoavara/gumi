@@ -1,28 +1,29 @@
 package gumi
 
 import (
+	"fmt"
 	"github.com/fogleman/gg"
 	"image"
-	"fmt"
 )
 
 const (
-	mtProgressMinWidth   = 40
-	mtProgressMinHeight  = 8
-	mtProgressAnimMillis = 600
+	mtProgressMinWidth        = 40
+	mtProgressMinHeight       = 8
+	mtProgressZeroToOneMillis = 600
+)
+const (
+	mtProgressAnimationProgress = iota
+	//
+	mtProgressAnimationLength
 )
 
 type MTProgress struct {
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	mtColorFromTo
-	//
-	from float64
-	cur  float64
-	to   float64
-	anim float64
+	studio *AnimationStudio
 	//
 	onChange MTProgressChange
 	//
@@ -31,31 +32,37 @@ type MTProgress struct {
 type MTProgressChange func(self *MTProgress, percent float64)
 
 func (s *MTProgress) String() string {
-	return fmt.Sprintf("%s(percent:%.2f%%)", "MTProgress", s.to)
+	return fmt.Sprintf("%s(percent:%.2f%%)", "MTProgress", s.GetPercent()*100)
+}
+func (s *MTProgress) init() {
+	s.studio = NewAnimationStudio(mtProgressAnimationLength)
+	s.studio.Set(mtProgressAnimationProgress, &AnimationPercent{
+		Delta:Animation.DeltaByMillis(mtProgressZeroToOneMillis),
+		Fn: Material.DefaultAnimation.Progress,
+	})
+
 }
 func (s *MTProgress) draw(frame *image.RGBA) {
+	var baseColor0, mainColor0 = s.GetFromMaterialColor().Color()
+	var baseColor1, mainColor1 = s.GetToMaterialColor().Color()
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
+	var percent = s.studio.Get(mtProgressAnimationProgress).(*AnimationPercent)
 	radius := h / 2
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
-	//
-	mcl1 := s.style.Material.PalletteColor(s.mcl1)
-	mcl2 := s.style.Material.PalletteColor(s.mcl2)
-	//
-	ctx.SetColor(phaseColor(mcl1[0], mcl2[0], s.anim))
+	// background
+	ctx.SetColor(Scale.Color(baseColor0, baseColor1, percent.Current))
 	ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 	ctx.DrawRectangle(radius, 0, w-radius*2, h)
 	ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 	ctx.Fill()
-
-	//
-	rectw := (w - radius*2) * s.anim
-	//
-	ctx.SetColor(phaseColor(mcl1[1], mcl2[1], s.anim))
+	// progress bar
+	percentLength := Scale.Length(w-radius*2, percent.Current)
+	ctx.SetColor(Scale.Color(mainColor0, mainColor1, percent.Current))
 	ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
-	ctx.DrawRectangle(radius, 0, rectw, h)
-	ctx.DrawArc(radius+rectw, radius, radius, gg.Radians(-90), gg.Radians(90))
+	ctx.DrawRectangle(radius, 0, percentLength, h)
+	ctx.DrawArc(radius+percentLength, radius, radius, gg.Radians(-90), gg.Radians(90))
 	ctx.Fill()
 }
 func (s *MTProgress) size() Size {
@@ -69,47 +76,24 @@ func (s *MTProgress) rect(r image.Rectangle) {
 }
 func (s *MTProgress) update(info *Information, style *Style) {
 	s.style = style
-	if s.cur != s.to {
-		if s.cur < s.to {
-			s.cur += float64(info.Dt) / mtProgressAnimMillis
-			if s.cur > s.to {
-				s.cur = s.to
-			}
-
-			//
-			s.anim = Material.Progress(s.cur)
-		} else {
-			s.cur -= float64(info.Dt) / mtProgressAnimMillis
-			if s.cur < s.to {
-				s.cur = s.to
-			}
-			s.anim = Material.Progress(s.cur)
-		}
-
-	}
+	s.studio.Animate(info)
 }
 func (s *MTProgress) Occur(event Event) {
 
 }
-
 //
-func MTProgress0(from, to MaterialColor, percent float64) *MTProgress {
-	temp := &MTProgress{
-		to: percent,
-	}
+func MTProgress0(from, to *MaterialColor) *MTProgress {
+	temp := &MTProgress{}
 	temp.SetFromMaterialColor(from)
 	temp.SetToMaterialColor(to)
 	return temp
 }
-func MTProgress1(mcl MaterialColor, percent float64) *MTProgress {
-	temp := &MTProgress{
-		to: percent,
-	}
+func MTProgress1(mcl *MaterialColor) *MTProgress {
+	temp := &MTProgress{}
 	temp.SetFromMaterialColor(mcl)
 	temp.SetToMaterialColor(mcl)
 	return temp
 }
-
 //
 func (s *MTProgress) Get() float64 {
 	return s.GetPercent()
@@ -118,16 +102,14 @@ func (s *MTProgress) Set(percent float64) {
 	s.SetPercent(percent)
 }
 func (s *MTProgress) GetPercent() float64 {
-	return s.to
+	return s.studio.Get(mtProgressAnimationProgress).(*AnimationPercent).To
 }
 func (s *MTProgress) SetPercent(percent float64) {
-	s.from = s.cur
-	s.to = percent
-	if s.onChange != nil{
-		s.onChange(s, s.to)
+	s.studio.Get(mtProgressAnimationProgress).(*AnimationPercent).Request(percent)
+	if s.onChange != nil {
+		s.onChange(s, percent)
 	}
 }
-
 func (s *MTProgress) OnChange(callback MTProgressChange) {
 	s.onChange = callback
 }

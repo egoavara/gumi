@@ -1,23 +1,12 @@
 package gumi
 
-var Animation _Animation
+type AnimationFunction func(t float64) float64
 
 
-type AnimFunc func(t float64) float64
-type _Animation struct {
-	//
-	Quad  AnimFuncsQuad
-	Cubic AnimFuncsCubic
-	Quart AnimFuncsQuart
-	Quint AnimFuncsQuint
-	//
-	Material _MaterialAnimation
-}
-
-func (s _Animation) Default(t float64) float64 {
+func (s _AnimationFunctions) Default(t float64) float64 {
 	return s.Quad.Easing(t)
 }
-func (_Animation) Linear(t float64) float64 {
+func (_AnimationFunctions) Linear(t float64) float64 {
 	return t
 }
 

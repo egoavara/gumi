@@ -7,8 +7,8 @@ import (
 
 type AText struct {
 	VoidStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	align Align
 	text  string
 }

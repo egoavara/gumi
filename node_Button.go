@@ -10,8 +10,8 @@ import (
 
 type NButton struct {
 	SingleStructure
-	BoundStore
-	StyleStore
+	boundStore
+	styleStore
 	//
 	cursorEnter, active bool
 	//
