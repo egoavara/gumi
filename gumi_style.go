@@ -5,8 +5,6 @@ import (
 	"github.com/golang/freetype"
 	"github.com/iamGreedy/gumi/gutl"
 	"golang.org/x/image/font/gofont/goregular"
-	"image"
-	"image/color"
 	"sync"
 )
 
@@ -28,9 +26,6 @@ type StyleDefault struct {
 	Font *gutl.Font
 	//
 	LineWidth float64
-	//
-	Line image.Image
-	Face image.Image
 }
 
 var (
@@ -47,8 +42,6 @@ func DefaultStyle() *Style {
 			Default: StyleDefault{
 				Font:      gutl.NewFont(f, 12),
 				LineWidth: 1,
-				Line:      image.NewUniform(color.RGBA{252, 252, 252, 255}),
-				Face:      image.NewUniform(color.RGBA{64, 74, 83, 255}),
 			},
 			Map: map[string]interface{}{
 				"dummy": nil,

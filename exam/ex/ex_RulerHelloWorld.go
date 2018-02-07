@@ -38,7 +38,7 @@ func RulerHelloWorld(scr *gumi.Screen, theme gumi.Theme) (result testing.Benchma
 		gumi.NMargin0(gumi.AUTOSIZE, gumi.RegularBlank(gumi.MinLength(10))),
 		gumi.NStyle0(theme.Style(gumi.INTENSE3)),
 		gumi.NBackground0(),
-		gumi.AText0("Hello, world!", gumi.Align_CENTER)))
+		gumi.AText1("Hello, world!", gumi.Align_CENTER)))
 
 	result = testing.Benchmark(func(b *testing.B) {
 		scr.Draw(nil)

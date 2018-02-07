@@ -15,19 +15,19 @@ func Grid(scr *gumi.Screen, theme gumi.Theme) (result testing.BenchmarkResult) {
 				gumi.NStyle0(theme.ColorLine(0)),
 				gumi.NMargin0(gumi.AUTOSIZE, gumi.RegularBlank(gumi.MinLength(5))),
 				gumi.NBackground0(),
-				gumi.AText0("Hello, 0 world!", gumi.Align_CENTER),
+				gumi.AText1("Hello, 0 world!", gumi.Align_CENTER),
 			),
 			gumi.LinkingFrom(
 				gumi.NStyle0(theme.ColorLine(1)),
 				gumi.NMargin0(gumi.AUTOSIZE, gumi.RegularBlank(gumi.MinLength(5))),
 				gumi.NBackground0(),
-				gumi.AText0("Hello, 1 world!", gumi.Align_CENTER),
+				gumi.AText1("Hello, 1 world!", gumi.Align_CENTER),
 			),
 			gumi.LinkingFrom(
 				gumi.NStyle0(theme.ColorLine(1)),
 				gumi.NMargin0(gumi.AUTOSIZE, gumi.RegularBlank(gumi.MinLength(5))),
 				gumi.NBackground0(),
-				gumi.AText0("Hello, 2 world!", gumi.Align_CENTER),
+				gumi.AText1("Hello, 2 world!", gumi.Align_CENTER),
 			),
 		),
 	))

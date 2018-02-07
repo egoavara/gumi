@@ -16,7 +16,7 @@ func Boundary(scr *gumi.Screen, theme gumi.Theme) (result testing.BenchmarkResul
 		gumi.NStyle0(theme.ColorLine(0)),
 		gumi.NBoundary(gumi.BOUNDARY_ALL),
 		gumi.NStyle0(theme.Style(gumi.INTENSE3)),
-		gumi.AText0("Hello, world!", gumi.Align_CENTER)))
+		gumi.AText1("Hello, world!", gumi.Align_CENTER)))
 
 	result = testing.Benchmark(func(b *testing.B) {
 		scr.Draw(nil)

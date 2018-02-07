@@ -1,4 +1,4 @@
-package gumi
+package deprecate
 
 import (
 	"github.com/fogleman/gg"

@@ -10,78 +10,47 @@ import (
 	"log"
 	"runtime"
 )
+
 func main() {
 	var width, height = gutl.DefinedResolutions.Get("HD")
 	var err error
-
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-	runtime.GOMAXPROCS(runtime.NumCPU())
+	// init go:runtime
+	GoRuntimeInit()
 	// Init GLFW
-	if err = glfw.Init(); err != nil {
-		log.Fatalln("failed to initialize glfw:", err)
-	}
-	defer glfw.Terminate()
-	//
-	var vidmod = glfw.GetPrimaryMonitor().GetVideoMode()
-	GLFWHint()
-	var windW, windH int
-	if width > vidmod.Width {
-		windW = vidmod.Width
-	} else {
-		windW = width
-	}
-	if height > vidmod.Height {
-		windH = vidmod.Height
-	} else {
-		windH = height
-	}
-	window, err := glfw.CreateWindow(windW, windH, "Cube", nil, nil)
-	if err != nil {
-		panic(err)
-	}
-	window.SetPos((vidmod.Width-windW)/2, (vidmod.Height-windH)/2)
-	window.MakeContextCurrent()
+	GLFWInit()
+	window := GLFWWindow(width, height)
 	// Init GL
-	if err := gl.Init(); err != nil {
-		panic(err)
-	}
-	version := gl.GoStr(gl.GetString(gl.VERSION))
-	fmt.Println("OpenGL version : ", version)
-
+	GLInit()
+	fmt.Println("OpenGL version : ", gl.GoStr(gl.GetString(gl.VERSION)))
+	glfw.SwapInterval(0)
 	// Init GLumi
-	err = glumi.DefaultShader.Load()
-	if err != nil {
-		panic(err)
-	}
+	GLUMIInit()
 	// GLumi Object allocate
 	lumi := glumi.NewGLUMI()
-
 	// window build
 	window.SetKeyCallback(lumi.Event.DirectKey)
 	window.SetCursorPosCallback(func(w *glfw.Window, xpos float64, ypos float64) {
-		lumi.Event.Cursor(xpos/float64(windW)*float64(width), ypos/float64(windH)*float64(height))
+		wsw, wsh := w.GetSize()
+		lumi.Event.Cursor(xpos/float64(wsw)*float64(width), ypos/float64(wsh)*float64(height))
 	})
 	window.SetMouseButtonCallback(lumi.Event.DirectMouseButton)
 	window.SetCharCallback(lumi.Event.DirectRune)
 	window.SetScrollCallback(lumi.Event.DirectScroll)
 	//
-	modal := gumi.ALModal0(
-		gumi.LCenter0(
-			gumi.NMinimum0(gumi.AxisAll,
-				gumi.MTButton0("Modal, Hello!", func(self *gumi.MTButton) {
-					p := self.Parent().Parent().Parent()
-					p.(*gumi.ALModal).SetShow(!p.(*gumi.ALModal).GetShow())
-				}),
-			),
-		),
-	)
+	modal := gumi.ALModal0()
+	modal.SetModal(gumi.LinkingFrom(
+		gumi.NBackground0(gumi.Material.Pallette.SilluetImage()),
+		gumi.LCenter0(gumi.NMinimum0(gumi.AxisBoth, gumi.MTButton0("Modal, Hello!", func(self *gumi.MTButton) {
+			modal.SetShow(!modal.GetShow())
+		}))),
+	))
 	scr := gumi.NewScreen(width, height)
 	scr.Root(gumi.LinkingFrom(
 		modal,
-		gumi.NBackground0(),
+		gumi.NBackground0(gumi.Material.Pallette.BackgroundImage()),
 		gumi.NDrawing1(
 			gumi.Drawing.FPS(),
+			//gumi.Drawing.Ruler.Screen(),
 			gumi.Drawing.Ruler.Hint.Vertical(100),
 			gumi.Drawing.Ruler.Hint.Horizontal(100),
 		),
@@ -97,7 +66,10 @@ func main() {
 			})),
 			gumi.Tool.MarginMinRegular(4, gumi.MTDropbox3(func(self *gumi.MTDropbox, selected string) {
 				fmt.Printf("MTDropbox %6s : %s\n", self.GetMaterialColor(), selected)
-			}, "Hello 0", "Hello 1", "Hello 2", "Hello 3", "Hello 4")),
+			},
+				"Hello 0", "Hello 1", "Hello 2", "Hello 3", "Hello 4", "Hello 5", "Hello 6", "Hello 7", "Hello 8", "Hello 9",
+				"Hello 10", "Hello 11", "Hello 12", "Hello 13", "Hello 14", "Hello 15", "Hello 16", "Hello 17", "Hello 18", "Hello 19",
+			)),
 			//gumi.ASpacer2(gumi.MinLength(50)),
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Reset", func(self *gumi.MTButton) {
 				for _, v := range progresses {
@@ -116,21 +88,19 @@ func main() {
 				gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
 				gumi.MTEdit0(),
 			),
-			gumi.AText0("Hello, World!", gumi.Align_CENTER),
+			gumi.AText1("Hello, World!", gumi.Align_CENTER),
 		),
 	))
-	scr.Init()
+
 	// GLumi Screen Setup
 	lumi.SetScreen(scr)
 	err = lumi.Init(60)
 	if err != nil {
 		panic(err)
 	}
-	// Configure global settings
-	glfw.SwapInterval(0)
-	GLInit()
+
 	lumi.Loop(func(lumi *glumi.GLUMIFullScreen) error {
-		if window.ShouldClose(){
+		if window.ShouldClose() {
 			return glumi.Stop
 		}
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -143,25 +113,52 @@ func main() {
 }
 
 var progresses = []gumi.GUMI{
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress0(
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
 		gumi.Material.Pallette.White,
 		gumi.Material.Pallette.White,
 	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress0(
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
 		gumi.Material.Pallette.White,
 		gumi.Material.Pallette.Red,
 	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress0(
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
 		gumi.Material.Pallette.White,
 		gumi.Material.Pallette.Green,
 	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress0(
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
 		gumi.Material.Pallette.White,
 		gumi.Material.Pallette.Blue,
 	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress0(
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
 		gumi.Material.Pallette.White,
 		gumi.Material.Pallette.Yellow,
+	)),
+}
+var Vprogresses = []gumi.GUMI{
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
+		gumi.Material.Pallette.White,
+		gumi.Material.Pallette.White,
+		gumi.AxisVertical,
+	)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
+		gumi.Material.Pallette.White,
+		gumi.Material.Pallette.Red,
+		gumi.AxisVertical,
+	)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
+		gumi.Material.Pallette.White,
+		gumi.Material.Pallette.Green,
+		gumi.AxisVertical,
+	)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
+		gumi.Material.Pallette.White,
+		gumi.Material.Pallette.Blue,
+		gumi.AxisVertical,
+	)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
+		gumi.Material.Pallette.White,
+		gumi.Material.Pallette.Yellow,
+		gumi.AxisVertical,
 	)),
 }
 var radios = []gumi.GUMI{
@@ -239,18 +236,53 @@ var toggles = []gumi.GUMI{
 	)),
 }
 
-func GLInit()  {
+func GoRuntimeInit() {
+	runtime.LockOSThread()
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
+func GLInit() {
+	if err := gl.Init(); err != nil {
+		panic(err)
+	}
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 }
-func GLFWHint() {
-
+func GLFWInit() {
+	if err := glfw.Init(); err != nil {
+		log.Fatalln("failed to initialize glfw:", err)
+	}
 	glfw.WindowHint(glfw.ContextVersionMajor, 4)
 	glfw.WindowHint(glfw.ContextVersionMinor, 1)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.Decorated, glfw.False)
-
+}
+func GLFWWindow(width, height int) *glfw.Window {
+	var vidmod = glfw.GetPrimaryMonitor().GetVideoMode()
+	var windW, windH int
+	if width > vidmod.Width {
+		windW = vidmod.Width
+	} else {
+		windW = width
+	}
+	if height > vidmod.Height {
+		windH = vidmod.Height
+	} else {
+		windH = height
+	}
+	window, err := glfw.CreateWindow(windW, windH, "Cube", nil, nil)
+	if err != nil {
+		panic(err)
+	}
+	window.SetPos((vidmod.Width-windW)/2, (vidmod.Height-windH)/2)
+	window.MakeContextCurrent()
+	return window
+}
+func GLUMIInit() {
+	err := glumi.Init()
+	if err != nil {
+		panic(err)
+	}
 }

@@ -25,6 +25,7 @@ type MTToggle struct {
 	//
 	mtColorFromTo
 	studio *AnimationStudio
+	onoff *AnimationPercent
 	//
 	cursorEnter, active bool
 	onActive            MTToggleActive
@@ -39,25 +40,20 @@ func (s *MTToggle) String() string {
 }
 func (s *MTToggle) init() {
 	s.studio = NewAnimationStudio(mtToggleAnimationLength)
-	s.studio.Set(mtToggleAnimationOnOff, &AnimationPercent{
+	s.onoff = s.studio.Set(mtToggleAnimationOnOff, &AnimationPercent{
 		Delta: Animation.DeltaByMillis(mtToggleAnimationOnOffDeltaMillis),
 		Fn:    Material.DefaultAnimation.Toggle,
-	})
+	}).(*AnimationPercent)
 }
 func (s *MTToggle) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var baseColor0, mainColor0 = s.GetFromMaterialColor().Color()
 	var mainColor1 = s.GetToMaterialColor().MainColor()
-	var onoff = s.studio.Get(mtToggleAnimationOnOff).(*AnimationPercent)
 	var radius = h / 2
 	var innerRadius = radius - mtToggleInnerRadiusDifference
 	//
-
-	//
-	ctx.SetColor(
-		Scale.Color(baseColor0, mainColor1, onoff.Current),
-	)
+	ctx.SetColor(Scale.Color(baseColor0, mainColor1, s.onoff.Value()), )
 	//ctx.SetColor(color.RGBA{94, 97, 97, 255})
 	ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 	ctx.DrawRectangle(radius, 0, w-radius*2, h)
@@ -65,7 +61,7 @@ func (s *MTToggle) draw(frame *image.RGBA) {
 	ctx.Fill()
 	ctx.SetColor(mainColor0)
 	//ctx.SetColor(color.RGBA{213, 217, 255, 255})
-	ctx.DrawCircle(radius+Scale.Length(w-2*radius, onoff.Current), radius, innerRadius)
+	ctx.DrawCircle(radius+Scale.Length(w-2*radius, s.onoff.Value()), radius, innerRadius)
 	ctx.Fill()
 }
 func (s *MTToggle) size() Size {
@@ -80,9 +76,9 @@ func (s *MTToggle) rect(r image.Rectangle) {
 func (s *MTToggle) update(info *Information, style *Style) {
 	s.style = style
 	if s.active {
-		s.studio.Get(mtToggleAnimationOnOff).(*AnimationPercent).Request(1)
+		s.onoff.Request(1)
 	} else {
-		s.studio.Get(mtToggleAnimationOnOff).(*AnimationPercent).Request(0)
+		s.onoff.Request(0)
 	}
 	s.studio.Animate(info)
 }

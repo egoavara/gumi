@@ -15,11 +15,11 @@ func main() {
 		gumi.NBackground0(),
 		gumi.LVertical1(
 			gumi.LVertical1(
-				gumi.AText1("Test1"),
-				gumi.AText1("Test2"),
-				gumi.Tool.MarginMinRegular(4, gumi.AText1("Test3")),
+				gumi.AText0("Test1"),
+				gumi.AText0("Test2"),
+				gumi.Tool.MarginMinRegular(4, gumi.AText0("Test3")),
 			),
-			gumi.AText1("Test4"),
+			gumi.AText0("Test4"),
 		),
 	))
 	scr.Update(nil, nil)

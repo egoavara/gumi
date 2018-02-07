@@ -8,44 +8,37 @@ func init() {
 
 var DefinedResolutions = STDResolutions([]STDResolution{
 	// CIF
-	STDResolution{"Sub-QCIF", 128, 96},
-	STDResolution{"QCIF", 220, 176},
-	STDResolution{"CIF", 352, 288},
+	{[]string{"Sub-QCIF"}, 128, 96},
+	{[]string{"QCIF"}, 220, 176},
+	{[]string{"CIF"}, 352, 288},
 	// CGA
-	STDResolution{"CGA", 320, 200},
+	{[]string{"CGA"}, 320, 200},
 	// VGA
-	STDResolution{"qVGA", 320, 240},
-	STDResolution{"HVGA", 480, 320},
-	STDResolution{"VGA", 640, 480},
-	STDResolution{"SVGA", 800, 600},
-	STDResolution{"WSVGA", 1024, 576},
+	{[]string{"qVGA"}, 320, 240},
+	{[]string{"HVGA"}, 480, 320},
+	{[]string{"VGA"}, 640, 480},
+	{[]string{"SVGA"}, 800, 600},
+	{[]string{"WSVGA"}, 1024, 576},
 	// XGA
-	STDResolution{"XGA", 1024, 768},
-	STDResolution{"FWXGA", 1366, 768},
-	STDResolution{"SXGA", 1280, 1024},
-	STDResolution{"UXGA", 1600, 1200},
+	{[]string{"XGA"}, 1024, 768},
+	{[]string{"FWXGA"}, 1366, 768},
+	{[]string{"SXGA"}, 1280, 1024},
+	{[]string{"UXGA"}, 1600, 1200},
 	// HD
-	STDResolution{"nHD", 640, 360},
-	STDResolution{"qHD", 960, 540},
-	STDResolution{"HD", 1280, 720},
-	STDResolution{"720p", 1280, 720},
-	STDResolution{"HD+", 1600, 900},
-	STDResolution{"FHD", 1920, 1080},
-	STDResolution{"1080p", 1920, 1080},
-	STDResolution{"1080i", 1920, 1080},
-	STDResolution{"QHD", 2560, 1440},
-	STDResolution{"2K", 2560, 1440},
-	STDResolution{"UHD", 3840, 2160},
-	STDResolution{"4K", 3840, 2160},
-	STDResolution{"UHD+", 5120, 2880},
-	STDResolution{"5K", 5120, 2880},
-	STDResolution{"QUHD", 7680, 4320},
-	STDResolution{"8K", 7680, 4320},
+	{[]string{"nHD"}, 640, 360},
+	{[]string{"qHD"}, 960, 540},
+	{[]string{"HD", "720p"}, 1280, 720},
+	{[]string{"HD+"}, 1600, 900},
+	{[]string{"FHD", "1080p", "1080i"}, 1920, 1080},
+	{[]string{"QHD", "2K"}, 2560, 1440},
+	{[]string{"UHD", "4K"}, 3840, 2160},
+	{[]string{"UHD+", "5K"}, 5120, 2880},
+	{[]string{"QUHD", "8K"}, 7680, 4320},
 })
 
 // sorting util
 type STDResolution struct {
-	Name   string
+	Name   []string
 	Width  int
 	Height int
 }
@@ -63,8 +56,8 @@ func (s STDResolutions) Less(i, j int) bool {
 	return temp[i].Width*temp[i].Height < temp[j].Width*temp[j].Height
 }
 func (s STDResolutions) Smaller(w, h int) (res []STDResolution) {
-	for _, v := range s{
-		if v.Width <= w && v.Height <= h{
+	for _, v := range s {
+		if v.Width <= w && v.Height <= h {
 			res = append(res, v)
 		}
 	}
@@ -72,7 +65,7 @@ func (s STDResolutions) Smaller(w, h int) (res []STDResolution) {
 }
 func (s STDResolutions) Get(name string) (w, h int) {
 	for _, v := range ([]STDResolution)(s) {
-		if v.Name == name {
+		if exist(v.Name, name) {
 			return v.Width, v.Height
 		}
 	}
@@ -82,7 +75,7 @@ func (s STDResolutions) Kinds() []string {
 	tmp := ([]STDResolution)(s)
 	temp := make([]string, len(tmp))
 	for i, v := range tmp {
-		temp[i] = v.Name
+		temp[i] = v.Name[0]
 	}
 	return temp
 }
@@ -90,8 +83,17 @@ func (s STDResolutions) Under(w, h int) []string {
 	var temp []string
 	for _, v := range ([]STDResolution)(s) {
 		if v.Width <= w && v.Height < h {
-			temp = append(temp, v.Name)
+			temp = append(temp, v.Name[0])
 		}
 	}
 	return temp
+}
+
+func exist(testset []string, val string) bool {
+	for _, v := range testset {
+		if v == val {
+			return true
+		}
+	}
+	return false
 }

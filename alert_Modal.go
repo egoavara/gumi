@@ -56,13 +56,18 @@ func (s *ALModal) String() string {
 	return fmt.Sprintf("%s", "ALModal")
 }
 //
-func ALModal0(modal GUMI) *ALModal {
+func ALModal0() *ALModal {
+	temp := &ALModal{}
+	return temp
+}
+func ALModal1(modal GUMI) *ALModal {
 	temp := &ALModal{
 		modal:modal,
 	}
 	temp.modal.Born(temp)
 	return temp
 }
+
 //
 func (s *ALModal ) SetModal(modal GUMI)  {
 	s.modal = modal

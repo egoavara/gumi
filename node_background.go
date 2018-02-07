@@ -10,13 +10,18 @@ type NBackground struct {
 	SingleStructure
 	boundStore
 	styleStore
+	//
+	img image.Image
 }
 
 func (s *NBackground) String() string {
 	return fmt.Sprintf("%s", "NBackground")
 }
 func (s *NBackground) draw(frame *image.RGBA) {
-	draw.Draw(frame, s.bound, s.style.Default.Face, s.style.Default.Face.Bounds().Min, draw.Over)
+	rect := s.img.Bounds()
+	rect.Add(s.bound.Min)
+
+	draw.Draw(frame, s.bound.Intersect(rect), s.img, rect.Min, draw.Over)
 	s.child.draw(frame)
 }
 func (s NBackground) size() Size {
@@ -34,6 +39,8 @@ func (s *NBackground) Occur(event Event) {
 	s.child.Occur(event)
 }
 
-func NBackground0() *NBackground {
-	return &NBackground{}
+func NBackground0(img image.Image) *NBackground {
+	return &NBackground{
+		img:img,
+	}
 }

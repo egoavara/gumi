@@ -10,12 +10,11 @@ const (
 	mtEditMinWidth                    = 80
 	mtEditMinHeight                   = 20
 	mtEditAnimationTextCursorInterval = 400
-	mtEditDeleteMaxMillisReach        = 5000
-	mtEditDeleteMaxPerSecond          = 32
+	mtEditDeleteInterval              = 50
+	mtEditDeleteThereshold            = 200
 )
 const (
 	mtEditAnimationTextCursor = iota
-	mtEditAnimationDelete     = iota
 	//
 	mtEditAnimationLength = iota
 )
@@ -26,7 +25,13 @@ type MTEdit struct {
 	styleStore
 	//
 	mtColorSingle
-	studio *AnimationStudio
+	studio                *AnimationStudio
+	textCursor            *AnimationSwitch
+	deleteSum             int64
+	deleteOn              bool
+	deleteCount           int
+	deleteTheresholdStack int64
+	ketCTRL               bool
 	//
 	align    Align
 	text     string
@@ -42,30 +47,21 @@ func (s *MTEdit) String() string {
 }
 func (s *MTEdit) init() {
 	s.studio = NewAnimationStudio(mtEditAnimationLength)
-	s.studio.Set(mtEditAnimationTextCursor, &AnimationSwitch{
+	s.textCursor = s.studio.Set(mtEditAnimationTextCursor, &AnimationSwitch{
 		Interval: mtEditAnimationTextCursorInterval,
-	})
-	s.studio.Set(mtEditAnimationDelete, &AnimationReaching{
-		Current: 0,
-		Delta:   Animation.DeltaByMillis(mtEditDeleteMaxMillisReach),
-		To:      mtEditDeleteMaxPerSecond,
-		Fn:      Material.DefaultAnimation.EditDelete,
-	})
+	}).(*AnimationSwitch)
 }
 func (s *MTEdit) draw(frame *image.RGBA) {
 	var baseColor, mainColor = s.GetMaterialColor().Color()
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var radius = h / 2
-	var textCursor = s.studio.Get(mtEditAnimationTextCursor).(*AnimationSwitch)
-	var animdelete = s.studio.Get(mtEditAnimationDelete).(*AnimationReaching)
-	s.text = stringDeleteBack(s.text, int(animdelete.Current))
 	//
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
 	// string position make
 	var drawtext = s.text
-	if s.active && textCursor.Switch {
+	if s.active && s.textCursor.Switch {
 		drawtext += "_"
 	}
 	var expectw, expecth = ctx.MeasureString(drawtext)
@@ -119,35 +115,54 @@ func (s *MTEdit) rect(r image.Rectangle) {
 func (s *MTEdit) update(info *Information, style *Style) {
 	s.style = style
 	//
-	if s.active {
-		s.studio.Animate(info)
-	} else {
-		s.studio.Reset()
+	s.studio.Animate(info)
+	s.deleteSum += info.Dt
+	s.deleteTheresholdStack += info.Dt
+	temp := s.deleteSum / mtEditDeleteInterval
+	if temp >= 1 {
+		s.deleteSum -= temp * mtEditDeleteInterval
+		if s.deleteOn && s.deleteTheresholdStack > mtEditDeleteThereshold {
+			for i := int64(0); i < temp; i++ {
+				s.deleteCount += 1
+				if s.ketCTRL {
+					s.text = StringControlBackSpace(s.text)
+				} else {
+					s.text = StringBackSpace(s.text, 1)
+				}
+			}
+		}
 	}
 }
-func stringDeleteBack(str string, count int) string {
-	temp := []rune(str)
-	templen := len(temp)
-	if count > templen {
-		count = templen
-	}
-	return string(temp[:templen-count])
 
-}
 func (s *MTEdit) Occur(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
 		switch ev.Key {
+		case KEY_CONTROL:
+			s.ketCTRL = true
 		case KEY_BACKSPACE:
 			if s.active {
-				s.studio.Get(mtEditAnimationDelete).(*AnimationReaching).Start()
+				s.deleteOn = true
+				s.deleteCount = 0
+				s.deleteTheresholdStack = 0
 			}
 		}
 	case EventKeyRelease:
 		switch ev.Key {
+		case KEY_CONTROL:
+			s.ketCTRL = false
 		case KEY_BACKSPACE:
 			if s.active {
-				s.studio.Get(mtEditAnimationDelete).(*AnimationReaching).Stop()
+				if s.deleteCount == 0 {
+					if s.ketCTRL {
+						s.text = StringControlBackSpace(s.text)
+					} else {
+						s.text = StringBackSpace(s.text, 1)
+					}
+				}
+				s.deleteOn = false
+				s.deleteCount = 0
+				s.deleteTheresholdStack = 0
 			}
 		case KEY_MOUSE1:
 			if s.cursorEnter {
@@ -157,6 +172,8 @@ func (s *MTEdit) Occur(event Event) {
 
 			} else {
 				s.active = false
+				s.deleteOn = false
+				s.deleteCount = 0
 			}
 		}
 	case EventCursor:

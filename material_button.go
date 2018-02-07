@@ -67,14 +67,14 @@ func (s *MTButton) draw(frame *image.RGBA) {
 		ctx.Stroke()
 	} else {
 
-		ctx.SetColor(Scale.Color(baseColor, mainColor, s.hover.Current))
+		ctx.SetColor(Scale.Color(baseColor, mainColor, s.hover.Value()))
 		// background
 		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
 		ctx.DrawRectangle(radius, 0, w-radius*2, h)
 		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
 		ctx.Fill()
 		// text
-		ctx.SetColor(Scale.Color(mainColor, baseColor, s.hover.Current))
+		ctx.SetColor(Scale.Color(mainColor, baseColor, s.hover.Value()))
 		txtw, txth := ctx.MeasureString(s.text)
 		ctx.DrawString(s.text, (w-txtw)/2, (h+txth)/2-1)
 		ctx.Stroke()

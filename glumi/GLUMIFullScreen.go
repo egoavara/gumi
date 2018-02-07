@@ -27,6 +27,7 @@ func (s *GLUMIFullScreen) Init(fps int) error {
 	if err != nil {
 		return err
 	}
+	s.screen.Init()
 	s.fps.SetInterval((1000 * time.Millisecond) / time.Duration(fps) / 8)
 	return nil
 }

@@ -54,7 +54,7 @@ func helper(have int, l, a, b Length) (resl, resa, resb int) {
 		resa = (temp)/(int(a.Min) + int(b.Min)) * int(a.Min)
 		resb = temp - resa
 	}else if int(l.Min) + int(a.Min) + int(b.Min) <= have{
-		// 최저길이만 만족가능\
+		// 최저길이만 만족가능
 		resa = int(a.Min)
 		resb = int(b.Min)
 		resl = have - resa - resb

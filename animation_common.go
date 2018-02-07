@@ -17,3 +17,6 @@ type _AnimationFunctions struct {
 func (_Animation) DeltaByMillis(millis float64) (delta float64) {
 	return 1000 / millis
 }
+func (_Animation) DeltaBySpeed(width, speedPerSecond float64) (delta float64) {
+	return 1 / (width / speedPerSecond)
+}

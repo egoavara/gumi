@@ -25,6 +25,7 @@ type MTRadio struct {
 	//
 	mtColorFromTo
 	studio *AnimationStudio
+	onoff *AnimationPercent
 	//
 	cursorEnter, active bool
 	onActive            MTRadioActive
@@ -36,17 +37,16 @@ func (s *MTRadio) String() string {
 }
 func (s *MTRadio) init() {
 	s.studio = NewAnimationStudio(mtRadioAnimationLength)
-	s.studio.Set(mtRadioAnimationOnOff, &AnimationPercent{
+	s.onoff = s.studio.Set(mtRadioAnimationOnOff, &AnimationPercent{
 		Delta: Animation.DeltaByMillis(mtRadioAnimationOnOffDeltaMillis),
 		Fn:    Material.DefaultAnimation.Radio,
-	})
+	}).(*AnimationPercent)
 }
 func (s *MTRadio) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var baseColor0 = s.GetFromMaterialColor().BaseColor()
 	var mainColor1 = s.GetToMaterialColor().MainColor()
-	var onoff = s.studio.Get(mtRadioAnimationOnOff).(*AnimationPercent)
 	var radius = h / 2
 	var innerRadius = radius - mtRadioInnerRadiusDifference
 	//
@@ -54,7 +54,7 @@ func (s *MTRadio) draw(frame *image.RGBA) {
 	ctx.DrawCircle(w/2, h/2, radius)
 	ctx.Fill()
 	//
-	ctx.SetColor(Scale.Color(baseColor0, mainColor1, onoff.Current))
+	ctx.SetColor(Scale.Color(baseColor0, mainColor1, s.onoff.Value()))
 	ctx.DrawCircle(w/2, h/2, innerRadius)
 	ctx.Fill()
 }
@@ -70,9 +70,9 @@ func (s *MTRadio) rect(r image.Rectangle) {
 func (s *MTRadio) update(info *Information, style *Style) {
 	s.style = style
 	if s.active {
-		s.studio.Get(mtRadioAnimationOnOff).(*AnimationPercent).Request(1)
+		s.onoff.Request(1)
 	} else {
-		s.studio.Get(mtRadioAnimationOnOff).(*AnimationPercent).Request(0)
+		s.onoff.Request(0)
 	}
 	s.studio.Animate(info)
 }
