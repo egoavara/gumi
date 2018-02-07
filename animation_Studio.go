@@ -74,9 +74,7 @@ func (s *AnimationPercent) Value() float64 {
 	if s.From == s.To {
 		return s.To
 	}
-	pr := (s.Current - s.From) / (s.To - s.From)
-	fnpr := s.Fn(pr)
-	return s.From + fnpr*(s.To-s.From)
+	return s.Fn(s.Current)
 }
 
 type AnimationSwitch struct {

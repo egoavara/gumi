@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	mtToggleMinWidth                  = 40
+	mtToggleMinWidth                  = 45
 	mtToggleMinHeight                 = 20
 	mtToggleAnimationOnOffDeltaMillis = 200
 	mtToggleInnerRadiusDifference = 3

@@ -19,11 +19,23 @@ func (s *NSize) draw(frame *image.RGBA) {
 func (s *NSize) size() Size {
 	temp := s.sz
 	c := s.child.size()
-	if temp.Vertical == AUTOLENGTH{
+	if temp.Vertical == AUTOLENGTH {
 		temp.Vertical = c.Vertical
+	} else if temp.Vertical == MINLENGTH {
+		temp.Vertical = c.Vertical
+		temp.Vertical.Max = c.Vertical.Min
+	} else if temp.Vertical == MAXLENGTH {
+		temp.Vertical = c.Vertical
+		temp.Vertical.Min = c.Vertical.Max
 	}
-	if temp.Horizontal == AUTOLENGTH{
+	if temp.Horizontal == AUTOLENGTH {
 		temp.Horizontal = c.Horizontal
+	} else if temp.Horizontal == MINLENGTH {
+		temp.Horizontal = c.Horizontal
+		temp.Horizontal.Max = c.Horizontal.Min
+	} else if temp.Horizontal == MINLENGTH {
+		temp.Horizontal = c.Horizontal
+		temp.Horizontal.Min = c.Horizontal.Max
 	}
 	return temp
 }
@@ -42,7 +54,6 @@ func NSize0(sz Size) *NSize {
 		sz: sz,
 	}
 }
-
 
 //
 func (s *NSize) Set(sz Size) {

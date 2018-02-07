@@ -2,7 +2,6 @@ package gumi
 
 import (
 	"image"
-	"math"
 	"fmt"
 	"sync"
 )
@@ -24,22 +23,17 @@ func (s *LVertical) draw(frame *image.RGBA) {
 	}
 }
 func (s *LVertical) size() Size {
-	var min, max, sum uint16 = 0, math.MaxUint16, 0
-
+	var minMax, sum uint16 = 0, 0
 	for _, v := range s.child{
 		sz := v.size()
-		if sz.Horizontal.Min > min{
-			min = sz.Horizontal.Min
-		}
-		if sz.Horizontal.Max < max{
-			max = sz.Horizontal.Max
+		if sz.Horizontal.Min > minMax{
+			minMax = sz.Horizontal.Min
 		}
 		sum += sz.Vertical.Min
 	}
-	//
 	return Size{
 		MinLength(sum),
-		Length{Min: min, Max:max},
+		MinLength(minMax),
 	}
 }
 func (s *LVertical) rect(r image.Rectangle) {
@@ -53,7 +47,6 @@ func (s *LVertical) rect(r image.Rectangle) {
 	dis := s.rule(r.Dy(), tempVert)
 	//
 	var startat = r.Min.Y
-	dx := r.Dx()
 	for i, v := range s.child{
 		inrect := image.Rect(
 			r.Min.X,
@@ -61,9 +54,6 @@ func (s *LVertical) rect(r image.Rectangle) {
 			r.Max.X,
 			startat + dis[i],
 		)
-		if int(tempHori[i].Max) < dx{
-			inrect.Max.X = r.Min.X + int(tempHori[i].Max)
-		}
 		v.rect(inrect)
 		startat += dis[i]
 	}

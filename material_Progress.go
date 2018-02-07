@@ -113,13 +113,17 @@ func (s *MTProgress) Occur(event Event) {
 
 //
 func MTProgress0(mcl *MaterialColor) *MTProgress {
-	temp := &MTProgress{}
+	temp := &MTProgress{
+		axis:AxisHorizontal,
+	}
 	temp.SetFromMaterialColor(mcl)
 	temp.SetToMaterialColor(mcl)
 	return temp
 }
 func MTProgress1(from, to *MaterialColor) *MTProgress {
-	temp := &MTProgress{}
+	temp := &MTProgress{
+		axis:AxisHorizontal,
+	}
 	temp.SetFromMaterialColor(from)
 	temp.SetToMaterialColor(to)
 	return temp

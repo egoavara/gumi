@@ -57,9 +57,7 @@ func (s *GLUMIFullScreen) Loop(fnBefore, fnAfter func(lumi *GLUMIFullScreen) err
 		if loopcount % 8 == 0{
 			s.screen.Ready()
 		}
-		if loopcount % 4 == 0{
-			s.screen.Draw()
-		}
+		s.screen.Draw()
 		// GLFW
 		s.Render.Upload()
 		s.Render.Draw()

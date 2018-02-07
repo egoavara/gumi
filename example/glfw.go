@@ -22,7 +22,7 @@ func main() {
 	// Init GL
 	GLInit()
 	fmt.Println("OpenGL version : ", gl.GoStr(gl.GetString(gl.VERSION)))
-	glfw.SwapInterval(0)
+	//glfw.SwapInterval(0)
 	// Init GLumi
 	GLUMIInit()
 	// GLumi Object allocate
@@ -59,6 +59,8 @@ func main() {
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton1(gumi.Material.Pallette.Red, "Close", func(self *gumi.MTButton) {
 				window.SetShouldClose(true)
 			})),
+			gumi.ASpacer2(gumi.MinLength(20)),
+			gumi.LVertical1(ToggleProgress...),
 			gumi.LHorizontal1(toggles...),
 			gumi.LHorizontal1(radios...),
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Modal", func(self *gumi.MTButton) {
@@ -70,20 +72,6 @@ func main() {
 				"Hello 0", "Hello 1", "Hello 2", "Hello 3", "Hello 4", "Hello 5", "Hello 6", "Hello 7", "Hello 8", "Hello 9",
 				"Hello 10", "Hello 11", "Hello 12", "Hello 13", "Hello 14", "Hello 15", "Hello 16", "Hello 17", "Hello 18", "Hello 19",
 			)),
-			//gumi.ASpacer2(gumi.MinLength(50)),
-			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Reset", func(self *gumi.MTButton) {
-				for _, v := range progresses {
-					v.Childrun()[0].(*gumi.MTProgress).Set(0)
-				}
-			})),
-			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Activate", func(self *gumi.MTButton) {
-				for i, v := range progresses {
-					v.Childrun()[0].(*gumi.MTProgress).Set(float64(i+1) / 5)
-				}
-			})),
-			gumi.ASpacer2(gumi.MinLength(12)),
-			gumi.LVertical1(progresses...),
-			gumi.ASpacer2(gumi.MinLength(12)),
 			gumi.LinkingFrom(
 				gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
 				gumi.MTEdit0(),
@@ -112,54 +100,117 @@ func main() {
 	})
 }
 
-var progresses = []gumi.GUMI{
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.White,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Red,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Green,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Blue,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Yellow,
-	)),
-}
-var Vprogresses = []gumi.GUMI{
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.White,
-		gumi.AxisVertical,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Red,
-		gumi.AxisVertical,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Green,
-		gumi.AxisVertical,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Blue,
-		gumi.AxisVertical,
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Yellow,
-		gumi.AxisVertical,
-	)),
+var ToggleProgress = []gumi.GUMI{
+	gumi.Tool.MarginMinRegular(4,
+		gumi.LHorizontal1(
+			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.White, func(self *gumi.MTToggle, active bool) {
+				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+				if active{
+					pbar.Set(1)
+				}else {
+					pbar.Set(0)
+				}
+			}),
+			gumi.LCenter0(
+				gumi.LinkingFrom(
+					gumi.NSize0(gumi.Size{
+						Vertical:gumi.MINLENGTH,
+						Horizontal:gumi.MAXLENGTH,
+					}),
+					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.White),
+				),
+			),
+		),
+	),
+	gumi.Tool.MarginMinRegular(4,
+		gumi.LHorizontal1(
+			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Red, func(self *gumi.MTToggle, active bool) {
+				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+				if active{
+					pbar.Set(1)
+				}else {
+					pbar.Set(0)
+				}
+			}),
+			gumi.LCenter0(
+				gumi.LinkingFrom(
+					gumi.NSize0(gumi.Size{
+						Vertical:gumi.MINLENGTH,
+						Horizontal:gumi.MAXLENGTH,
+					}),
+					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Red),
+				),
+			),
+		),
+	),
+	gumi.Tool.MarginMinRegular(4,
+		gumi.LHorizontal1(
+			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Green, func(self *gumi.MTToggle, active bool) {
+				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+				if active{
+					pbar.Set(1)
+				}else {
+					pbar.Set(0)
+				}
+			}),
+			gumi.LCenter0(
+				gumi.LinkingFrom(
+					gumi.NSize0(gumi.Size{
+						Vertical:gumi.MINLENGTH,
+						Horizontal:gumi.MAXLENGTH,
+					}),
+					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Green),
+				),
+			),
+		),
+	),
+	gumi.Tool.MarginMinRegular(4,
+		gumi.LHorizontal1(
+			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue, func(self *gumi.MTToggle, active bool) {
+				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+				if active{
+					pbar.Set(1)
+				}else {
+					pbar.Set(0)
+				}
+			}),
+			gumi.LCenter0(
+				gumi.LinkingFrom(
+					gumi.NSize0(gumi.Size{
+						Vertical:gumi.MINLENGTH,
+						Horizontal:gumi.MAXLENGTH,
+					}),
+					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue),
+				),
+			),
+		),
+	),
+	gumi.Tool.MarginMinRegular(4,
+		gumi.LHorizontal1(
+			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow, func(self *gumi.MTToggle, active bool) {
+				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+				if active{
+					pbar.Set(1)
+				}else {
+					pbar.Set(0)
+				}
+			}),
+			gumi.LCenter0(
+				gumi.LinkingFrom(
+					gumi.NSize0(gumi.Size{
+						Vertical:gumi.MINLENGTH,
+						Horizontal:gumi.MAXLENGTH,
+					}),
+					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow),
+				),
+			),
+		),
+	),
 }
 var radios = []gumi.GUMI{
 	gumi.Tool.MarginMinRegular(4, gumi.MTRadio1(

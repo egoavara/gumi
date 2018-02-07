@@ -247,12 +247,13 @@ func (s *MTDropbox) Occur(event Event) {
 					// 선택상태, 커서 진입인 경우 selected, 선택하기
 					if s.hover >= 0 {
 						s.selected = s.hover
-						s.active = false
-						s.stretch.To = 0
-						s.scr.hookRequest(s.hookid, nil)
-						if s.onChange != nil {
-							s.onChange(s, s.Elems.Get(s.selected))
-						}
+
+					}
+					s.active = false
+					s.stretch.To = 0
+					s.scr.hookRequest(s.hookid, nil)
+					if s.onChange != nil {
+						s.onChange(s, s.Elems.Get(s.selected))
 					}
 				}
 			} else {

@@ -40,8 +40,8 @@ func (s *LCenter) rect(r image.Rectangle) {
 			hori = r.Dx()
 		}
 	}
-	left := (r.Dx() - hori) / 2
-	top := (r.Dy() - vert) / 2
+	left := (r.Dx() - hori) / 2 + r.Min.X
+	top := (r.Dy() - vert) / 2+ r.Min.Y
 	s.child.rect(image.Rect(left, top, left + hori, top + vert))
 }
 func (s *LCenter) update(info *Information, style *Style) {

@@ -56,6 +56,10 @@ var (
 		Min: 0,
 		Max: math.MaxUint16,
 	}
+	MINLENGTH = Length{
+		Min: 0,
+		Max: 0,
+	}
 	MAXLENGTH = Length{
 		Min: math.MaxUint16,
 		Max: math.MaxUint16,

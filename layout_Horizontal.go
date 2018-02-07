@@ -2,7 +2,6 @@ package gumi
 
 import (
 	"image"
-	"math"
 	"fmt"
 	"sync"
 )
@@ -27,19 +26,16 @@ func (s *LHorizontal) draw(frame *image.RGBA) {
 	}
 }
 func (s *LHorizontal) size() Size {
-	var min, max, sum uint16 = 0, math.MaxUint16, 0
+	var minMax, sum uint16 = 0, 0
 	for _, v := range s.child{
 		sz := v.size()
-		if sz.Vertical.Min > min{
-			min = sz.Vertical.Min
-		}
-		if sz.Vertical.Max < max{
-			max = sz.Vertical.Max
+		if sz.Vertical.Min > minMax{
+			minMax = sz.Vertical.Min
 		}
 		sum += sz.Horizontal.Min
 	}
 	return Size{
-		Length{Min:min, Max:max},
+		MinLength(minMax),
 		MinLength(sum),
 	}
 }
@@ -55,7 +51,6 @@ func (s *LHorizontal) rect(r image.Rectangle) {
 	dis := s.rule(r.Dx(), tempHori)
 	//
 	var startat = r.Min.X
-	dy := r.Dy()
 	for i, v := range s.child{
 		r := image.Rect(
 			startat,
@@ -63,9 +58,6 @@ func (s *LHorizontal) rect(r image.Rectangle) {
 			startat + dis[i],
 			r.Max.Y,
 		)
-		if int(tempVert[i].Max) < dy{
-			r.Max.Y = r.Min.Y + int(tempVert[i].Max)
-		}
 		v.rect(r)
 		startat += dis[i]
 	}
@@ -84,12 +76,18 @@ func LHorizontal0(rule Distribute, childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
 		rule:rule,
 	}
+	for _, v := range childrun{
+		v.Born(s)
+	}
 	s.Breed(childrun)
 	return s
 }
 func LHorizontal1(childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
 		rule: Distribution.Minimalize,
+	}
+	for _, v := range childrun{
+		v.Born(s)
 	}
 	s.Breed(childrun)
 	return s
