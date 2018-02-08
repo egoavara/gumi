@@ -184,7 +184,7 @@ func (s *MTEdit) Occur(event Event) {
 		} else {
 			s.cursorEnter = false
 		}
-	case EventRune:
+	case EventRuneComplete:
 		if s.active {
 			s.text += string(ev.Rune)
 			if s.onChange != nil {

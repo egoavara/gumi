@@ -6,6 +6,7 @@ import (
 	"github.com/iamGreedy/gumi/gutl"
 	"golang.org/x/image/font/gofont/goregular"
 	"sync"
+	"github.com/golang/freetype/truetype"
 )
 
 type Style struct {
@@ -53,4 +54,22 @@ func DefaultStyle() *Style {
 		defer defaultStyleSingletonMutex.RUnlock()
 	}
 	return defaultStyleSingleton
+}
+func DefaultStyleFont(font *truetype.Font, size float64) {
+	defaultStyleSingletonMutex.Lock()
+	defer defaultStyleSingletonMutex.Unlock()
+	if defaultStyleSingleton == nil {
+		temp := &Style{
+			Default: StyleDefault{
+				Font:      gutl.NewFont(font, size),
+				LineWidth: 1,
+			},
+			Map: map[string]interface{}{
+				"dummy": nil,
+			},
+		}
+		defaultStyleSingleton = temp
+	} else {
+		defaultStyleSingleton.Default.Font = gutl.NewFont(font, size)
+	}
 }

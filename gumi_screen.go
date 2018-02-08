@@ -11,7 +11,7 @@ type Screen struct {
 	_hook  map[uint64]func(event Event) Event
 	_defer map[uint64]func(rgba *image.RGBA)
 	//
-	root GUMI
+	root GUMIRoot
 }
 
 func NewScreen(w, h int) *Screen {

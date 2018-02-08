@@ -23,26 +23,29 @@ func (s *gumiRoot) size() Size {
 func (s *gumiRoot) rect(r image.Rectangle) {
 	s.child.rect(r)
 }
+func (s *gumiRoot) Screen() *Screen {
+	return s.scr
+}
 func (s *gumiRoot) update(info *Information, style *Style) {
 	s.child.update(info, style)
 }
 func (s *gumiRoot) Occur(event Event) {
 	s.child.Occur(event)
 }
-func newGUMIRoot(scr *Screen, under GUMI) GUMI {
+func newGUMIRoot(scr *Screen, under GUMI) GUMIRoot {
 	temp := &gumiRoot{
 		scr: scr,
 	}
-
-	return LinkingFrom(temp, under)
+	LinkingFrom(temp, under)
+	return temp
 }
 
-func getScreen(g GUMI) *Screen {
+func Root(g GUMI) GUMIRoot {
 	if g == nil{
 		return nil
 	}
 	if v, ok := g.(*gumiRoot); ok{
-		return v.scr
+		return v
 	}
-	return getScreen(g.Parent())
+	return Root(g.Parent())
 }

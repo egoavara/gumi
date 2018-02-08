@@ -6,6 +6,7 @@ const (
 	CURSOR     EventKind = iota
 	SCROLL     EventKind = iota
 	RUNE       EventKind = iota
+	RUNEEDIT       EventKind = iota
 	// RESIZE     EventKind = iota
 )
 
@@ -46,12 +47,18 @@ func (EventKeyRelease) Kind() EventKind {
 	return KEYRELEASE
 }
 
-type EventRune struct {
+type EventRuneComplete struct {
 	Rune rune
 }
 
-func (EventRune) Kind() EventKind {
+func (EventRuneComplete) Kind() EventKind {
 	return RUNE
 }
 
+type EventRuneEdit struct {
+	Rune rune
+}
 
+func (EventRuneEdit) Kind() EventKind {
+	return RUNEEDIT
+}

@@ -7,7 +7,7 @@ import (
 
 type GLUMIFullScreen struct {
 	screen *gumi.Screen
-	Event  GLFWEvent
+	Event  Handler
 	Render GLRender
 	fps FPS
 	//
@@ -18,7 +18,7 @@ type GLUMIFullScreen struct {
 
 func NewGLUMI() *GLUMIFullScreen {
 	temp := &GLUMIFullScreen{}
-	temp.Event = GLFWEvent{glumi: temp}
+	temp.Event = Handler{glumi: temp}
 	temp.Render = GLRender{glumi:temp}
 	return temp
 }

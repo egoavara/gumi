@@ -12,7 +12,7 @@ func main() {
 			gumi.Drawing.Ruler.Hint.Vertical(100),
 			gumi.Drawing.Ruler.Hint.Horizontal(100),
 		),
-		gumi.NBackground0(),
+		//gumi.NBackground0(),
 		gumi.LVertical1(
 			gumi.LVertical1(
 				gumi.AText0("Test1"),

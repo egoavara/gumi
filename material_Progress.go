@@ -49,7 +49,7 @@ func (s *MTProgress) draw(frame *image.RGBA) {
 	var ctx = GGContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var percentpr = s.progress.Value()
-	var radius = h / 2
+
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
 	//
@@ -57,6 +57,7 @@ func (s *MTProgress) draw(frame *image.RGBA) {
 	default:
 		fallthrough
 	case AxisHorizontal:
+		var radius = h / 2
 		// background
 		ctx.SetColor(Scale.Color(baseColor0, baseColor1, percentpr))
 		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
@@ -71,6 +72,7 @@ func (s *MTProgress) draw(frame *image.RGBA) {
 		ctx.DrawArc(radius+percentLength, radius, radius, gg.Radians(-90), gg.Radians(90))
 		ctx.Fill()
 	case AxisVertical:
+		var radius = w / 2
 		// background
 		ctx.SetColor(Scale.Color(baseColor0, baseColor1, percentpr))
 		ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(360))
@@ -80,9 +82,9 @@ func (s *MTProgress) draw(frame *image.RGBA) {
 		// progress bar
 		percentLength := Scale.Length(h-radius*2, percentpr)
 		ctx.SetColor(Scale.Color(mainColor0, mainColor1, percentpr))
-		ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(360))
-		ctx.DrawRectangle(0, radius, w, percentLength)
-		ctx.DrawArc(radius, radius + percentLength, radius, gg.Radians(0), gg.Radians(180))
+		ctx.DrawArc(radius, h - radius - percentLength, radius, gg.Radians(180), gg.Radians(360))
+		ctx.DrawRectangle(0, h - radius - percentLength, w, percentLength)
+		ctx.DrawArc(radius, h - radius, radius, gg.Radians(0), gg.Radians(180))
 		ctx.Fill()
 	}
 }

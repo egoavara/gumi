@@ -9,6 +9,9 @@ import (
 	"github.com/iamGreedy/gumi/gutl"
 	"log"
 	"runtime"
+	"github.com/golang/freetype/truetype"
+	"time"
+	"github.com/iamGreedy/gumi/res"
 )
 
 func main() {
@@ -19,10 +22,12 @@ func main() {
 	// Init GLFW
 	GLFWInit()
 	window := GLFWWindow(width, height)
+
 	// Init GL
 	GLInit()
 	fmt.Println("OpenGL version : ", gl.GoStr(gl.GetString(gl.VERSION)))
-	//glfw.SwapInterval(0)
+	// Init GUMI
+	GUMIInit()
 	// Init GLumi
 	GLUMIInit()
 	// GLumi Object allocate
@@ -36,6 +41,10 @@ func main() {
 	window.SetMouseButtonCallback(lumi.Event.DirectMouseButton)
 	window.SetCharCallback(lumi.Event.DirectRune)
 	window.SetScrollCallback(lumi.Event.DirectScroll)
+
+	//window.SetCharModsCallback(func(w *glfw.Window, char rune, mods glfw.ModifierKey) {
+	//	fmt.Println(string([]rune{char}), mods)
+	//})
 	//
 	modal := gumi.ALModal0()
 	modal.SetModal(gumi.LinkingFrom(
@@ -59,24 +68,44 @@ func main() {
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton1(gumi.Material.Pallette.Red, "Close", func(self *gumi.MTButton) {
 				window.SetShouldClose(true)
 			})),
+			//
 			gumi.ASpacer2(gumi.MinLength(20)),
+			//
 			gumi.LVertical1(ToggleProgress...),
-			gumi.LHorizontal1(toggles...),
-			gumi.LHorizontal1(radios...),
-			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Modal", func(self *gumi.MTButton) {
-				modal.SetShow(!modal.GetShow())
+			gumi.LHorizontal1(Radios...),
+			//
+			gumi.ASpacer2(gumi.MinLength(20)),
+			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Reset", func(self *gumi.MTButton) {
+				for _, v := range VerticalProgress {
+					v.Childrun()[0].(*gumi.MTProgress).Set(0)
+				}
 			})),
+			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Run", func(self *gumi.MTButton) {
+				for i, v := range VerticalProgress {
+					go func(index int, g gumi.GUMI) {
+						t := time.NewTimer(200 * time.Millisecond * time.Duration(index))
+						defer t.Stop()
+						<- t.C
+						g.Childrun()[0].(*gumi.MTProgress).Set(1)
+					}(i, v)
+				}
+			})),
+			gumi.LinkingFrom(
+				gumi.NSize0(gumi.Size{Horizontal: gumi.AUTOLENGTH, Vertical: gumi.MinLength(180)}),
+				gumi.LHorizontal1(VerticalProgress...),
+			),
+			//
+			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Modal", func(self *gumi.MTButton) { modal.SetShow(!modal.GetShow()) })),
 			gumi.Tool.MarginMinRegular(4, gumi.MTDropbox3(func(self *gumi.MTDropbox, selected string) {
 				fmt.Printf("MTDropbox %6s : %s\n", self.GetMaterialColor(), selected)
-			},
-				"Hello 0", "Hello 1", "Hello 2", "Hello 3", "Hello 4", "Hello 5", "Hello 6", "Hello 7", "Hello 8", "Hello 9",
-				"Hello 10", "Hello 11", "Hello 12", "Hello 13", "Hello 14", "Hello 15", "Hello 16", "Hello 17", "Hello 18", "Hello 19",
-			)),
+			}, DropboxElems...)),
 			gumi.LinkingFrom(
 				gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
 				gumi.MTEdit0(),
 			),
+			gumi.AImage0(res.ImageHexagon),
 			gumi.AText1("Hello, World!", gumi.Align_CENTER),
+			gumi.AText1("안녕!", gumi.Align_CENTER),
 		),
 	))
 
@@ -105,17 +134,17 @@ var ToggleProgress = []gumi.GUMI{
 		gumi.LHorizontal1(
 			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.White, func(self *gumi.MTToggle, active bool) {
 				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
-				if active{
+				if active {
 					pbar.Set(1)
-				}else {
+				} else {
 					pbar.Set(0)
 				}
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
 					gumi.NSize0(gumi.Size{
-						Vertical:gumi.MINLENGTH,
-						Horizontal:gumi.MAXLENGTH,
+						Vertical:   gumi.MINLENGTH,
+						Horizontal: gumi.MAXLENGTH,
 					}),
 					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.White),
@@ -127,17 +156,17 @@ var ToggleProgress = []gumi.GUMI{
 		gumi.LHorizontal1(
 			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Red, func(self *gumi.MTToggle, active bool) {
 				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
-				if active{
+				if active {
 					pbar.Set(1)
-				}else {
+				} else {
 					pbar.Set(0)
 				}
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
 					gumi.NSize0(gumi.Size{
-						Vertical:gumi.MINLENGTH,
-						Horizontal:gumi.MAXLENGTH,
+						Vertical:   gumi.MINLENGTH,
+						Horizontal: gumi.MAXLENGTH,
 					}),
 					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Red),
@@ -149,17 +178,17 @@ var ToggleProgress = []gumi.GUMI{
 		gumi.LHorizontal1(
 			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Green, func(self *gumi.MTToggle, active bool) {
 				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
-				if active{
+				if active {
 					pbar.Set(1)
-				}else {
+				} else {
 					pbar.Set(0)
 				}
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
 					gumi.NSize0(gumi.Size{
-						Vertical:gumi.MINLENGTH,
-						Horizontal:gumi.MAXLENGTH,
+						Vertical:   gumi.MINLENGTH,
+						Horizontal: gumi.MAXLENGTH,
 					}),
 					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Green),
@@ -171,17 +200,17 @@ var ToggleProgress = []gumi.GUMI{
 		gumi.LHorizontal1(
 			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue, func(self *gumi.MTToggle, active bool) {
 				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
-				if active{
+				if active {
 					pbar.Set(1)
-				}else {
+				} else {
 					pbar.Set(0)
 				}
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
 					gumi.NSize0(gumi.Size{
-						Vertical:gumi.MINLENGTH,
-						Horizontal:gumi.MAXLENGTH,
+						Vertical:   gumi.MINLENGTH,
+						Horizontal: gumi.MAXLENGTH,
 					}),
 					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue),
@@ -193,17 +222,17 @@ var ToggleProgress = []gumi.GUMI{
 		gumi.LHorizontal1(
 			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow, func(self *gumi.MTToggle, active bool) {
 				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
-				if active{
+				if active {
 					pbar.Set(1)
-				}else {
+				} else {
 					pbar.Set(0)
 				}
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
 					gumi.NSize0(gumi.Size{
-						Vertical:gumi.MINLENGTH,
-						Horizontal:gumi.MAXLENGTH,
+						Vertical:   gumi.MINLENGTH,
+						Horizontal: gumi.MAXLENGTH,
 					}),
 					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow),
@@ -212,7 +241,7 @@ var ToggleProgress = []gumi.GUMI{
 		),
 	),
 }
-var radios = []gumi.GUMI{
+var Radios = []gumi.GUMI{
 	gumi.Tool.MarginMinRegular(4, gumi.MTRadio1(
 		gumi.Material.Pallette.White,
 		gumi.Material.Pallette.White,
@@ -249,42 +278,18 @@ var radios = []gumi.GUMI{
 		},
 	)),
 }
-var toggles = []gumi.GUMI{
-	gumi.Tool.MarginMinRegular(4, gumi.MTToggle1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.White,
-		func(self *gumi.MTToggle, active bool) {
-			fmt.Printf("MTToggle %6s : %v\n", self.GetToMaterialColor(), active)
-		},
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTToggle1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Red,
-		func(self *gumi.MTToggle, active bool) {
-			fmt.Printf("MTToggle %6s : %v\n", self.GetToMaterialColor(), active)
-		},
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTToggle1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Green,
-		func(self *gumi.MTToggle, active bool) {
-			fmt.Printf("MTToggle %6s : %v\n", self.GetToMaterialColor(), active)
-		},
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTToggle1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Blue,
-		func(self *gumi.MTToggle, active bool) {
-			fmt.Printf("MTToggle %6s : %v\n", self.GetToMaterialColor(), active)
-		},
-	)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTToggle1(
-		gumi.Material.Pallette.White,
-		gumi.Material.Pallette.Yellow,
-		func(self *gumi.MTToggle, active bool) {
-			fmt.Printf("MTToggle %6s : %v\n", self.GetToMaterialColor(), active)
-		},
-	)),
+var VerticalProgress = []gumi.GUMI{
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.White, gumi.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Red, gumi.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Green, gumi.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue, gumi.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow, gumi.AxisVertical)),
+}
+var DropboxElems = []string{
+	"Hello 0", "Hello 1", "Hello 2", "Hello 3", "Hello 4",
+	"Hello 5", "Hello 6", "Hello 7", "Hello 8", "Hello 9",
+	"Hello 10", "Hello 11", "Hello 12", "Hello 13", "Hello 14",
+	"Hello 15", "Hello 16", "Hello 17", "Hello 18", "Hello 19",
 }
 
 func GoRuntimeInit() {
@@ -309,17 +314,26 @@ func GLFWInit() {
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.Decorated, glfw.False)
+
+}
+func GUMIInit() {
+	f, err := truetype.Parse(res.NanumSquareRoundR)
+	if err != nil {
+		panic(err)
+	}
+	gumi.DefaultStyleFont(f, 12)
 }
 func GLFWWindow(width, height int) *glfw.Window {
-	var vidmod = glfw.GetPrimaryMonitor().GetVideoMode()
+	var monitor = glfw.GetPrimaryMonitor()
+	var videomode = monitor.GetVideoMode()
 	var windW, windH int
-	if width > vidmod.Width {
-		windW = vidmod.Width
+	if width > videomode.Width {
+		windW = videomode.Width
 	} else {
 		windW = width
 	}
-	if height > vidmod.Height {
-		windH = vidmod.Height
+	if height > videomode.Height {
+		windH = videomode.Height
 	} else {
 		windH = height
 	}
@@ -327,7 +341,7 @@ func GLFWWindow(width, height int) *glfw.Window {
 	if err != nil {
 		panic(err)
 	}
-	window.SetPos((vidmod.Width-windW)/2, (vidmod.Height-windH)/2)
+	window.SetPos((videomode.Width-windW)/2, (videomode.Height-windH)/2)
 	window.MakeContextCurrent()
 	return window
 }

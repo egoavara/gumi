@@ -54,7 +54,7 @@ type MTDropbox struct {
 type MTDropboxChange func(self *MTDropbox, selected string)
 
 func (s *MTDropbox) init() {
-	s.scr = getScreen(s)
+	s.scr = Root(s).Screen()
 	s.deferid = s.scr.deferReserve()
 	s.hookid = s.scr.hookReserve()
 	//

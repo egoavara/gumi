@@ -42,7 +42,7 @@ const (
 	KEY_9
 	// Special
 	KEY_BACKQUOTE     // `
-	KEY_QUOTE         // '
+	KEY_APOSTROPHE    // '
 	KEY_LEFTBRACKET   // [
 	KEY_RIGHTBRACKET  // ]
 	KEY_SEMICOLON     // ;
@@ -66,8 +66,9 @@ const (
 	KEY_F11
 	KEY_F12
 	// Control
-	KEY_ESC
+	KEY_ESCAPE
 	KEY_BACKSPACE
+	KEY_DELETE
 	KEY_SPACE
 	KEY_ENTER
 	KEY_SHIFT	// mac : Shift

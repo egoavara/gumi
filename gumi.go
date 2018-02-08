@@ -13,6 +13,11 @@ type GUMI interface{
 	fmt.Stringer
 }
 
+type GUMIRoot interface{
+	GUMI
+	Screen() *Screen
+}
+
 type GUMIRenderer interface{
 	draw(frame *image.RGBA)
 	size() Size

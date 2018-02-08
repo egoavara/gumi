@@ -46,7 +46,7 @@ func (s *AText) draw(frame *image.RGBA) {
 	case Align_LEFT:
 		drawX = 0
 	}
-	ctx.DrawString(s.text, drawX, drawY-2)
+	ctx.DrawString(s.text, drawX, drawY - 3)
 }
 func (s *AText) size() Size {
 	s.style.Default.Font.Use()
