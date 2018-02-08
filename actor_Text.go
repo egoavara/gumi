@@ -26,7 +26,6 @@ func (s *AText) draw(frame *image.RGBA) {
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
 	ctx.SetColor(s.textColor)
-
 	expectw, expecth := ctx.MeasureString(s.text)
 	v, h := ParseAlign(s.align)
 	var drawX, drawY float64
@@ -46,7 +45,7 @@ func (s *AText) draw(frame *image.RGBA) {
 	case Align_LEFT:
 		drawX = 0
 	}
-	ctx.DrawString(s.text, drawX, drawY - 3)
+	ctx.DrawString(s.text, drawX, drawY - 1)
 }
 func (s *AText) size() Size {
 	s.style.Default.Font.Use()

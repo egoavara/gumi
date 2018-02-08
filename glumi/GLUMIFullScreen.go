@@ -18,7 +18,7 @@ type GLUMIFullScreen struct {
 
 func NewGLUMI() *GLUMIFullScreen {
 	temp := &GLUMIFullScreen{}
-	temp.Event = Handler{glumi: temp}
+	temp.Event = Handler{glumi: temp, keymap:make(map[gumi.GUMIKey]gumi.EventKind)}
 	temp.Render = GLRender{glumi:temp}
 	return temp
 }

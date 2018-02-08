@@ -46,7 +46,7 @@ func (s *ALModal) Occur(event Event) {
 	if s.show{
 		s.modal.Occur(event)
 	}else {
-		if event.Kind() == CURSOR{
+		if event.Kind() == EVENT_CURSOR {
 			s.lastCursorEvent = event.(EventCursor)
 		}
 		s.child.Occur(event)

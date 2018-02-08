@@ -263,7 +263,7 @@ package glumi
 //	case glfw.Repeat:
 //	}
 //}
-//func (s *GLFWEvent) MouseButton(button glfw.MouseButton, action glfw.Action) {
+//func (s *GLFWEvent) Mouse(button glfw.Mouse, action glfw.Action) {
 //	var convkey uint8
 //	switch button {
 //	case glfw.MouseButton1:
@@ -307,8 +307,8 @@ package glumi
 //func (s *GLFWEvent) DirectKey(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 //	s.Key(key, action)
 //}
-//func (s *GLFWEvent) DirectMouseButton(w *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {
-//	s.MouseButton(button, action)
+//func (s *GLFWEvent) DirectMouseButton(w *glfw.Window, button glfw.Mouse, action glfw.Action, mod glfw.ModifierKey) {
+//	s.Mouse(button, action)
 //}
 //func (s *GLFWEvent) DirectCursor(w *glfw.Window, xpos float64, ypos float64) {
 //	s.Cursor(xpos, ypos)

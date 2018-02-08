@@ -31,7 +31,10 @@ type MTEdit struct {
 	deleteOn              bool
 	deleteCount           int
 	deleteTheresholdStack int64
+	deleteRequestCount    uint
 	ketCTRL               bool
+	editingRune           rune
+	editingNow            bool
 	//
 	align    Align
 	text     string
@@ -61,9 +64,14 @@ func (s *MTEdit) draw(frame *image.RGBA) {
 	defer s.style.releaseContext(ctx)
 	// string position make
 	var drawtext = s.text
-	if s.active && s.textCursor.Switch {
-		drawtext += "_"
+	if s.editingRune != 0 {
+		drawtext += string(s.editingRune)
+	} else {
+		if s.active && s.textCursor.Switch {
+			drawtext += "_"
+		}
 	}
+
 	var expectw, expecth = ctx.MeasureString(drawtext)
 	var stringposX, stringposY float64
 	var vert, hori = ParseAlign(s.align)
@@ -116,24 +124,46 @@ func (s *MTEdit) update(info *Information, style *Style) {
 	s.style = style
 	//
 	s.studio.Animate(info)
+	if s.deleteRequestCount >0 {
+		if !s.editingNow{
+			if s.ketCTRL {
+				s.text = StringControlBackSpace(s.text)
+			} else {
+				s.text = StringBackSpace(s.text, 1)
+			}
+		}else {
+			if s.editingRune == 0{
+				s.editingNow = false
+			}
+		}
+		s.deleteRequestCount = 0
+	}
 	s.deleteSum += info.Dt
 	s.deleteTheresholdStack += info.Dt
 	temp := s.deleteSum / mtEditDeleteInterval
 	if temp >= 1 {
 		s.deleteSum -= temp * mtEditDeleteInterval
 		if s.deleteOn && s.deleteTheresholdStack > mtEditDeleteThereshold {
-			for i := int64(0); i < temp; i++ {
-				s.deleteCount += 1
-				if s.ketCTRL {
-					s.text = StringControlBackSpace(s.text)
-				} else {
-					s.text = StringBackSpace(s.text, 1)
+			if !s.editingNow{
+				for i := int64(0); i < temp; i++ {
+					s.deleteCount += 1
+					if s.ketCTRL {
+						s.text = StringControlBackSpace(s.text)
+					} else {
+						s.text = StringBackSpace(s.text, 1)
+					}
+				}
+			}else {
+				if s.editingRune == 0{
+					s.editingNow = false
 				}
 			}
 		}
 	}
 }
-
+func (s *MTEdit) deleteRequest(count uint) {
+	s.deleteRequestCount += count
+}
 func (s *MTEdit) Occur(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
@@ -154,11 +184,7 @@ func (s *MTEdit) Occur(event Event) {
 		case KEY_BACKSPACE:
 			if s.active {
 				if s.deleteCount == 0 {
-					if s.ketCTRL {
-						s.text = StringControlBackSpace(s.text)
-					} else {
-						s.text = StringBackSpace(s.text, 1)
-					}
+					s.deleteRequest(1)
 				}
 				s.deleteOn = false
 				s.deleteCount = 0
@@ -184,8 +210,15 @@ func (s *MTEdit) Occur(event Event) {
 		} else {
 			s.cursorEnter = false
 		}
+	case EventRuneEdit:
+		if s.active {
+			s.editingRune = ev.Rune
+			s.editingNow = true
+		}
 	case EventRuneComplete:
 		if s.active {
+			s.editingRune = 0
+			s.editingNow = false
 			s.text += string(ev.Rune)
 			if s.onChange != nil {
 				s.onChange(s, s.text)

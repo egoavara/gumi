@@ -281,7 +281,7 @@ func (s *MTDropbox) Occur(event Event) {
 				sum := s.bound.Max.Y + mtDropboxElemMargin
 				if y >= s.bound.Max.Y {
 					for i, elem := range s.Elems.refer() {
-						if sum <= y+int(s.scroll.Current) && y+int(s.scroll.Current) < sum+elem.h+mtDropboxElemMargin {
+						if sum <= y+int(s.scroll.Value()) && y+int(s.scroll.Value()) < sum+elem.h+mtDropboxElemMargin {
 							s.hover = i
 							break
 						}

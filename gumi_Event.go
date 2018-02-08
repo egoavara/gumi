@@ -1,12 +1,12 @@
 package gumi
 
 const (
-	KEYPRESS   EventKind = iota
-	KEYRELEASE EventKind = iota
-	CURSOR     EventKind = iota
-	SCROLL     EventKind = iota
-	RUNE       EventKind = iota
-	RUNEEDIT       EventKind = iota
+	EVENT_KEYPRESS     EventKind = iota
+	EVENT_KEYRELEASE   EventKind = iota
+	EVENT_CURSOR       EventKind = iota
+	EVENT_SCROLL       EventKind = iota
+	EVENT_RUNECOMPLETE EventKind = iota
+	EVENT_RUNEEDIT     EventKind = iota
 	// RESIZE     EventKind = iota
 )
 
@@ -20,7 +20,7 @@ type EventCursor struct {
 }
 
 func (EventCursor) Kind() EventKind {
-	return CURSOR
+	return EVENT_CURSOR
 }
 
 type EventScroll struct {
@@ -28,23 +28,23 @@ type EventScroll struct {
 }
 
 func (EventScroll) Kind() EventKind {
-	return SCROLL
+	return EVENT_SCROLL
 }
 
 type EventKeyPress struct {
-	Key uint8
+	Key GUMIKey
 }
 
 func (EventKeyPress) Kind() EventKind {
-	return KEYPRESS
+	return EVENT_KEYPRESS
 }
 
 type EventKeyRelease struct {
-	Key uint8
+	Key GUMIKey
 }
 
 func (EventKeyRelease) Kind() EventKind {
-	return KEYRELEASE
+	return EVENT_KEYRELEASE
 }
 
 type EventRuneComplete struct {
@@ -52,7 +52,7 @@ type EventRuneComplete struct {
 }
 
 func (EventRuneComplete) Kind() EventKind {
-	return RUNE
+	return EVENT_RUNECOMPLETE
 }
 
 type EventRuneEdit struct {
@@ -60,5 +60,5 @@ type EventRuneEdit struct {
 }
 
 func (EventRuneEdit) Kind() EventKind {
-	return RUNEEDIT
+	return EVENT_RUNEEDIT
 }
