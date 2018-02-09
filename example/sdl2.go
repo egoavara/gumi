@@ -14,15 +14,20 @@ import (
 )
 
 func main() {
-	var width, height = gutl.DefinedResolutions.Get("HD")
+	var width, height = gutl.DefinedResolutions.Get("SXGA")
 	var err error
 
 	// init go:runtime
 	GoRuntimeInit()
 	// Init SDL2
 	SDL2Init()
-	wnd, ctx := SDL2Window(width, height)
-	sdl.GLMakeCurrent(wnd, ctx)
+	wnd := SDL2Window(width, height)
+	//suf, err := wnd.GetSurface()
+	//fmt.Println(wnd.GetSize())
+	//fmt.Println(suf.W, suf.H)
+	//wnd.SetBordered(false)
+	ctx, err := sdl.GLCreateContext(wnd)
+	ASSERT(err)
 	defer sdl.GLDeleteContext(ctx)
 	// Init GL
 	GLInit()
@@ -53,6 +58,8 @@ func main() {
 		gumi.NDrawing1(
 			gumi.Drawing.FPS(),
 			//gumi.Drawing.Ruler.Screen(),
+			gumi.Drawing.Ruler.Graduation.Vertical(10),
+			gumi.Drawing.Ruler.Graduation.Horizontal(10),
 			gumi.Drawing.Ruler.Hint.Vertical(100),
 			gumi.Drawing.Ruler.Hint.Horizontal(100),
 		),
@@ -118,6 +125,9 @@ func main() {
 			if err != nil {
 				return err
 			}
+			//if v, ok := event.(*sdl.MouseMotionEvent); ok{
+			//}
+
 		}
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 		return nil
@@ -306,17 +316,21 @@ func GLInit() {
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 }
 func SDL2Init() {
-	err := sdl.Init(sdl.INIT_EVERYTHING)
+	ASSERT(sdl.Init(sdl.INIT_EVERYTHING))
+	sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
+	sdl.GLSetAttribute(sdl.GL_CONTEXT_MINOR_VERSION, 1)
+	sdl.GLSetAttribute(sdl.GL_CONTEXT_FORWARD_COMPATIBLE_FLAG, 1)
+	sdl.GLSetAttribute(sdl.GL_CONTEXT_PROFILE_MASK, sdl.GL_CONTEXT_PROFILE_CORE)
+	sdl.GLSetAttribute(sdl.GL_DOUBLEBUFFER, 1)
+}
+func ASSERT(err error)  {
 	if err != nil {
 		panic(err)
 	}
 }
-func SDL2Window(w, h int) (*sdl.Window, sdl.GLContext) {
+func SDL2Window(w, h int) (*sdl.Window) {
 	var disp sdl.DisplayMode
-	err := sdl.GetDesktopDisplayMode(0, &disp)
-	if err != nil {
-		panic(err)
-	}
+	ASSERT(sdl.GetDesktopDisplayMode(0, &disp))
 	var windW, windH int32
 	if int32(w) > disp.W {
 		windW = disp.W
@@ -328,17 +342,11 @@ func SDL2Window(w, h int) (*sdl.Window, sdl.GLContext) {
 	} else {
 		windH = int32(h)
 	}
-	wnd, err := sdl.CreateWindow("GUMI", (disp.W-windW)/2, (disp.H-windH)/2, windW, windH,
-		sdl.WINDOW_ALLOW_HIGHDPI | sdl.WINDOW_BORDERLESS | sdl.WINDOW_OPENGL,
+	wnd, err := sdl.CreateWindow("GUMI", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, windW, windH,
+		sdl.WINDOW_OPENGL | sdl.WINDOW_ALWAYS_ON_TOP,
 	)
-	if err != nil {
-		panic(err)
-	}
-	ctx, err := sdl.GLCreateContext(wnd)
-	if err != nil {
-		panic(err)
-	}
-	return wnd, ctx
+	ASSERT(err)
+	return wnd
 }
 func GUMIInit() {
 	f, err := truetype.Parse(res.NanumSquareRoundR)

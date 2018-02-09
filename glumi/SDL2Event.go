@@ -417,6 +417,7 @@ func (s *Handler) Key(event *sdl.KeyboardEvent) {
 	}
 }
 func (s *Handler) Cursor(event *sdl.MouseMotionEvent) {
+
 	s.glumi.screen.Event(gumi.EventCursor{
 		X:uint16(event.X),
 		Y:uint16(event.Y),

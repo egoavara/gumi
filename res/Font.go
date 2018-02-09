@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 )
 
+
 var (
 	NanumSquareRoundB  []byte
 	NanumSquareRoundEB []byte
