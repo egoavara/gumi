@@ -1,4 +1,4 @@
-package gutl
+package svg
 
 import "image/color"
 
