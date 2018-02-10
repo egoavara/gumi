@@ -3,27 +3,28 @@ package gumi
 import (
 	"image"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type NMargin struct {
 	SingleStructure
-	b Blank
+	b gumre.Blank
 }
 
 func (s *NMargin) String() string {
 	return fmt.Sprintf("%s(margin:%v)", "NMargin", s.b)
 }
 
-func (s *NMargin) draw(frame *image.RGBA) {
-	s.child.draw(frame)
+func (s *NMargin) GUMIRender(frame *image.RGBA) {
+	s.child.GUMIRender(frame)
 }
-func (s *NMargin) size() Size {
-	sz := s.child.size()
+func (s *NMargin) GUMISize() gumre.Size {
+	sz := s.child.GUMISize()
 
 	hmin := sz.Horizontal.Min + s.b.L.Min + s.b.R.Min
 	var hmax uint16
-	if uint(sz.Horizontal.Max) + uint(s.b.L.Max) + uint(s.b.R.Max) > uint(AUTOLENGTH.Max){
-		hmax = AUTOLENGTH.Max
+	if uint(sz.Horizontal.Max) + uint(s.b.L.Max) + uint(s.b.R.Max) > uint(gumre.AUTOLENGTH.Max){
+		hmax = gumre.AUTOLENGTH.Max
 	}else {
 		hmax = sz.Horizontal.Max + s.b.L.Max + s.b.R.Max
 	}
@@ -31,17 +32,17 @@ func (s *NMargin) size() Size {
 
 	vmin := sz.Vertical.Min + s.b.B.Min + s.b.T.Min
 	var vmax uint16
-	if uint(sz.Vertical.Max) + uint(s.b.B.Max) + uint(s.b.T.Max) > uint(AUTOLENGTH.Max){
-		vmax = AUTOLENGTH.Max
+	if uint(sz.Vertical.Max) + uint(s.b.B.Max) + uint(s.b.T.Max) > uint(gumre.AUTOLENGTH.Max){
+		vmax = gumre.AUTOLENGTH.Max
 	}else {
 		vmax = sz.Vertical.Max + s.b.L.Max + s.b.R.Max
 	}
-	return Size{
-		Length{vmin, vmax},
-		Length{hmin, hmax},
+	return gumre.Size{
+		gumre.Length{vmin, vmax},
+		gumre.Length{hmin, hmax},
 	}
 }
-func helper(have int, l, a, b Length) (resl, resa, resb int) {
+func helper(have int, l, a, b gumre.Length) (resl, resa, resb int) {
 	if int(l.Max) + int(a.Max) + int(b.Max) <= have{
 		// 최대값도 만족 가능
 		resl = int(l.Max)
@@ -68,34 +69,34 @@ func helper(have int, l, a, b Length) (resl, resa, resb int) {
 	}
 	return
 }
-func (s *NMargin) rect(rect image.Rectangle) {
-	sz := s.child.size()
+func (s *NMargin) GUMIClip(rect image.Rectangle) {
+	sz := s.child.GUMISize()
 	//
 
 	var w, l, _ = helper(rect.Dx(), sz.Horizontal, s.b.L, s.b.R)
 	var h, _, t = helper(rect.Dy(), sz.Vertical, s.b.B, s.b.T)
-	s.child.rect(image.Rect(
+	s.child.GUMIClip(image.Rect(
 		rect.Min.X + l,
 		rect.Min.Y + t,
 		rect.Min.X + l + w,
 		rect.Min.Y + t + h,
 	))
 }
-func (s *NMargin) update(info *Information, style *Style) {
-	s.child.update(info, style)
+func (s *NMargin) GUMIUpdate(info *Information, style *Style) {
+	s.child.GUMIUpdate(info, style)
 }
-func (s *NMargin) Occur(event Event) {
-	s.child.Occur(event)
+func (s *NMargin) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
-func NMargin0(sz Blank) *NMargin {
+func NMargin0(sz gumre.Blank) *NMargin {
 	return &NMargin{
 		b: sz,
 	}
 }
-func (s *NMargin) Set(sz Blank) {
+func (s *NMargin) Set(sz gumre.Blank) {
 	s.b = sz
 }
-func (s *NMargin) Get() Blank {
+func (s *NMargin) Get() gumre.Blank {
 	return s.b
 }
 

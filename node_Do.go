@@ -3,15 +3,18 @@ package gumi
 import (
 	"image"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type NDo struct {
+	GUMI
 	SingleStructure
-	fnDraw   struct{ Before, After func(frame *image.RGBA) }
+	fnDraw   NDoDrawing
 	fnRect   func(rect *image.Rectangle)
 	fnUpdate func(info *Information, style *Style) (*Information, *Style)
 	fnOccur  func(event Event) Event
 }
+type NDoDrawing struct{ Before, After func(frame *image.RGBA) }
 
 func (s *NDo) String() string {
 	temp := ""
@@ -22,7 +25,7 @@ func (s *NDo) String() string {
 		temp += "Draw.After, "
 	}
 	if s.fnOccur != nil{
-		temp += "Occur, "
+		temp += "GUMIHappen, "
 	}
 	if s.fnRect != nil{
 		temp += "Rect, "
@@ -37,28 +40,28 @@ func (s *NDo) String() string {
 	return fmt.Sprintf("%s(%s)", "NDo", temp)
 }
 
-func (s *NDo) draw(frame *image.RGBA) {
+func (s *NDo) GUMIRender(frame *image.RGBA) {
 	if s.fnDraw.Before != nil {
 		s.fnDraw.Before(frame)
 	}
 	if s.fnDraw.After != nil {
 		defer s.fnDraw.After(frame)
 	}
-	s.child.draw(frame)
+	s.child.GUMIRender(frame)
 }
 
-func (s *NDo) size() Size {
-	return s.child.size()
+func (s *NDo) GUMISize() gumre.Size {
+	return s.child.GUMISize()
 }
 
-func (s *NDo) rect(r image.Rectangle) {
+func (s *NDo) GUMIClip(r image.Rectangle) {
 	if s.fnRect != nil {
 		s.fnRect(&r)
 	}
-	s.child.rect(r)
+	s.child.GUMIClip(r)
 }
 
-func (s *NDo) update(info *Information, style *Style) {
+func (s *NDo) GUMIUpdate(info *Information, style *Style) {
 	if s.fnUpdate != nil {
 		temp1, temp2 := s.fnUpdate(info, style)
 		if temp1 != nil {
@@ -68,28 +71,28 @@ func (s *NDo) update(info *Information, style *Style) {
 			style = temp2
 		}
 	}
-	s.child.update(info, style)
+	s.child.GUMIUpdate(info, style)
 }
 
-func (s *NDo) Occur(event Event) {
+func (s *NDo) GUMIHappen(event Event) {
 	if s.fnOccur != nil {
 		event = s.fnOccur(event)
 		if event == nil {
 			return
 		}
 	}
-	s.child.Occur(event)
+	s.child.GUMIHappen(event)
 }
 
 func NDo0(
-	fnDraw *struct{ Before, After func(frame *image.RGBA) },
+	fnDraw *NDoDrawing,
 	fnRect func(rect *image.Rectangle),
 	fnUpdate func(info *Information, style *Style) (*Information, *Style),
 	fnOccur func(event Event) Event,
 ) *NDo {
 
 	if fnDraw == nil {
-		fnDraw = &struct{ Before, After func(frame *image.RGBA) }{
+		fnDraw = &NDoDrawing{
 			After:  nil,
 			Before: nil,
 		}

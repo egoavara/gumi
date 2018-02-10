@@ -3,29 +3,30 @@ package gumi
 import (
 	"image"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type AEmpty struct {
 	VoidStructure
 }
 
-func (AEmpty) draw(frame *image.RGBA) {
+func (AEmpty) GUMIRender(frame *image.RGBA) {
 }
 
-func (AEmpty) size() Size {
-	return Size{
-		AUTOLENGTH,
-		AUTOLENGTH,
+func (AEmpty) GUMISize() gumre.Size {
+	return gumre.Size{
+		gumre.AUTOLENGTH,
+		gumre.AUTOLENGTH,
 	}
 }
 
-func (AEmpty) rect(image.Rectangle) {
+func (AEmpty) GUMIClip(image.Rectangle) {
 }
 
-func (AEmpty) update(info *Information, style *Style) {
+func (AEmpty) GUMIUpdate(info *Information, style *Style) {
 }
 
-func (AEmpty) Occur(event Event) {
+func (AEmpty) GUMIHappen(event Event) {
 }
 func (s AEmpty) String() string {
 	return fmt.Sprintf("%s", "AEmpty")

@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/draw"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type AImage struct {
@@ -17,26 +18,26 @@ func (s *AImage) String() string {
 	return fmt.Sprintf("%s", "AImage")
 }
 
-func (s *AImage) draw(frame *image.RGBA) {
+func (s *AImage) GUMIRender(frame *image.RGBA) {
 	draw.Draw(frame, s.bound, s.img, s.img.Bounds().Min, draw.Over)
 }
 
-func (s AImage) size() Size {
+func (s AImage) GUMISize() gumre.Size {
 	bd := s.img.Bounds()
-	return Size{
-		Horizontal: MinLength(uint16(bd.Dx())),
-		Vertical:   MinLength(uint16(bd.Dy())),
+	return gumre.Size{
+		Horizontal: gumre.MinLength(uint16(bd.Dx())),
+		Vertical:   gumre.MinLength(uint16(bd.Dy())),
 	}
 }
-func (s *AImage) rect(rect image.Rectangle) {
+func (s *AImage) GUMIClip(rect image.Rectangle) {
 	s.bound = rect
 }
 
-func (s *AImage) update(info *Information, style *Style) {
+func (s *AImage) GUMIUpdate(info *Information, style *Style) {
 
 }
 
-func (s *AImage) Occur(event Event) {
+func (s *AImage) GUMIHappen(event Event) {
 }
 
 func AImage0(img image.Image) *AImage {

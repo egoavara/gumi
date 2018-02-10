@@ -104,8 +104,8 @@ package main
 //				gumi.MTEdit0(),
 //			),
 //			gumi.AImage0(res.ImageHexagon),
-//			gumi.AText1("Hello, World!", gumi.Align_CENTER),
-//			gumi.AText1("안녕!", gumi.Align_CENTER),
+//			gumi.AText1("Hello, World!", gumi.AlignCenter),
+//			gumi.AText1("안녕!", gumi.AlignCenter),
 //		),
 //	))
 //
@@ -321,7 +321,7 @@ package main
 //	if err != nil {
 //		panic(err)
 //	}
-//	gumi.DefaultStyleFont(f, 12)
+//	gumi.ModifyDefaultStyle(f, 12)
 //}
 //func GLFWWindow(width, height int) *glfw.Window {
 //	var monitor = glfw.GetPrimaryMonitor()

@@ -3,62 +3,63 @@ package gumi
 import (
 	"fmt"
 	"image"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type NSize struct {
 	SingleStructure
-	sz Size
+	sz gumre.Size
 }
 
 func (s *NSize) String() string {
-	return fmt.Sprintf("%s(size:%v)", "NSize", s.sz)
+	return fmt.Sprintf("%s(GUMISize:%v)", "NSize", s.sz)
 }
-func (s *NSize) draw(frame *image.RGBA) {
-	s.child.draw(frame)
+func (s *NSize) GUMIRender(frame *image.RGBA) {
+	s.child.GUMIRender(frame)
 }
-func (s *NSize) size() Size {
+func (s *NSize) GUMISize() gumre.Size {
 	temp := s.sz
-	c := s.child.size()
-	if temp.Vertical == AUTOLENGTH {
+	c := s.child.GUMISize()
+	if temp.Vertical == gumre.AUTOLENGTH {
 		temp.Vertical = c.Vertical
-	} else if temp.Vertical == MINLENGTH {
+	} else if temp.Vertical == gumre.MINLENGTH {
 		temp.Vertical = c.Vertical
 		temp.Vertical.Max = c.Vertical.Min
-	} else if temp.Vertical == MAXLENGTH {
+	} else if temp.Vertical == gumre.MAXLENGTH {
 		temp.Vertical = c.Vertical
 		temp.Vertical.Min = c.Vertical.Max
 	}
-	if temp.Horizontal == AUTOLENGTH {
+	if temp.Horizontal == gumre.AUTOLENGTH {
 		temp.Horizontal = c.Horizontal
-	} else if temp.Horizontal == MINLENGTH {
+	} else if temp.Horizontal == gumre.MINLENGTH {
 		temp.Horizontal = c.Horizontal
 		temp.Horizontal.Max = c.Horizontal.Min
-	} else if temp.Horizontal == MINLENGTH {
+	} else if temp.Horizontal == gumre.MINLENGTH {
 		temp.Horizontal = c.Horizontal
 		temp.Horizontal.Min = c.Horizontal.Max
 	}
 	return temp
 }
-func (s *NSize) rect(r image.Rectangle) {
-	s.child.rect(r)
+func (s *NSize) GUMIClip(r image.Rectangle) {
+	s.child.GUMIClip(r)
 }
-func (s *NSize) update(info *Information, style *Style) {
-	s.child.update(info, style)
+func (s *NSize) GUMIUpdate(info *Information, style *Style) {
+	s.child.GUMIUpdate(info, style)
 }
-func (s *NSize) Occur(event Event) {
-	s.child.Occur(event)
+func (s *NSize) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
 
-func NSize0(sz Size) *NSize {
+func NSize0(sz gumre.Size) *NSize {
 	return &NSize{
 		sz: sz,
 	}
 }
 
 //
-func (s *NSize) Set(sz Size) {
+func (s *NSize) Set(sz gumre.Size) {
 	s.sz = sz
 }
-func (s *NSize) Get() Size {
+func (s *NSize) Get() gumre.Size {
 	return s.sz
 }

@@ -4,45 +4,46 @@ import (
 	"image"
 	"fmt"
 	"sync"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type LVertical struct {
 	MultipleStructure
-	rule Distribute
+	rule gumre.Distribute
 }
 
-func (s *LVertical) draw(frame *image.RGBA) {
+func (s *LVertical) GUMIRender(frame *image.RGBA) {
 	wg := new(sync.WaitGroup)
 	wg.Add(len(s.child))
 	defer wg.Wait()
 	for _, v := range s.child{
 		go func(elem GUMI) {
-			elem.draw(frame)
+			elem.GUMIRender(frame)
 			wg.Done()
 		}(v)
 	}
 }
-func (s *LVertical) size() Size {
+func (s *LVertical) GUMISize() gumre.Size {
 	var minMax, sum uint16 = 0, 0
 	for _, v := range s.child{
-		sz := v.size()
+		sz := v.GUMISize()
 		if sz.Horizontal.Min > minMax{
 			minMax = sz.Horizontal.Min
 		}
 		sum += sz.Vertical.Min
 	}
-	return Size{
-		MinLength(sum),
-		MinLength(minMax),
+	return gumre.Size{
+		gumre.MinLength(sum),
+		gumre.MinLength(minMax),
 	}
 }
-func (s *LVertical) rect(r image.Rectangle) {
-	var tempVert = make([]Length, len(s.child))
-	var tempHori = make([]Length, len(s.child))
+func (s *LVertical) GUMIClip(r image.Rectangle) {
+	var tempVert = make([]gumre.Length, len(s.child))
+	var tempHori = make([]gumre.Length, len(s.child))
 
 	for i, v := range s.child{
-		tempVert[i] = v.size().Vertical
-		tempHori[i] = v.size().Horizontal
+		tempVert[i] = v.GUMISize().Vertical
+		tempHori[i] = v.GUMISize().Horizontal
 	}
 	dis := s.rule(r.Dy(), tempVert)
 	//
@@ -54,18 +55,18 @@ func (s *LVertical) rect(r image.Rectangle) {
 			r.Max.X,
 			startat + dis[i],
 		)
-		v.rect(inrect)
+		v.GUMIClip(inrect)
 		startat += dis[i]
 	}
 }
-func (s *LVertical) update(info *Information, style *Style) {
+func (s *LVertical) GUMIUpdate(info *Information, style *Style) {
 	for _, v := range s.child{
-		v.update(info, style)
+		v.GUMIUpdate(info, style)
 	}
 }
-func (s *LVertical) Occur(event Event) {
+func (s *LVertical) GUMIHappen(event Event) {
 	for _, v := range s.child{
-		go v.Occur(event)
+		go v.GUMIHappen(event)
 	}
 }
 func (s *LVertical) String() string{
@@ -74,23 +75,33 @@ func (s *LVertical) String() string{
 	)
 }
 
-func LVertical0(rule Distribute, childrun ...GUMI) *LVertical {
+func LVertical0(rule gumre.Distribute, childrun ...GUMI) *LVertical {
 	s := &LVertical{
 		rule:rule,
 	}
 	for _, v := range childrun{
-		v.Born(s)
+		v.born(s)
 	}
-	s.Breed(childrun)
+	s.breed(childrun)
 	return s
 }
 func LVertical1(childrun ...GUMI) *LVertical {
 	s := &LVertical{
-		rule: Distribution.Minimalize,
+		rule: gumre.Distribution.Minimalize,
 	}
 	for _, v := range childrun{
-		v.Born(s)
+		v.born(s)
 	}
-	s.Breed(childrun)
+	s.breed(childrun)
 	return s
+}
+
+func (s *LVertical) LoadElements(index gumre.Index, count int) []GUMI {
+	return loadGUMIChildrun(s.child, index, count)
+}
+func (s *LVertical) SizeElements() int {
+	return len(s.child)
+}
+func (s *LVertical) SaveElements(mode gumre.Mode, index gumre.Index, elem ...GUMI) (input int) {
+	return saveGUMIChildrun(&s.child, mode, index, elem...)
 }

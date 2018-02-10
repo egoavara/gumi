@@ -1,94 +1,108 @@
 package gumi
 
 import (
-	"image"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
+	"image"
 	"sync"
 )
 
 type LHorizontal struct {
 	MultipleStructure
-	rule Distribute
+	rule gumre.Distribute
 }
 
 func (s *LHorizontal) String() string {
 	return fmt.Sprintf("%s(childrun:%d)", "LHorizontal", len(s.Childrun()))
 }
-func (s *LHorizontal) draw(frame *image.RGBA) {
+func (s *LHorizontal) GUMIRender(frame *image.RGBA) {
 	wg := new(sync.WaitGroup)
 	wg.Add(len(s.child))
 	defer wg.Wait()
-	for _, v := range s.child{
+	for _, v := range s.child {
 		go func(elem GUMI) {
-			elem.draw(frame)
+			elem.GUMIRender(frame)
 			wg.Done()
 		}(v)
 	}
 }
-func (s *LHorizontal) size() Size {
+func (s *LHorizontal) GUMISize() gumre.Size {
 	var minMax, sum uint16 = 0, 0
-	for _, v := range s.child{
-		sz := v.size()
-		if sz.Vertical.Min > minMax{
+	for _, v := range s.child {
+		sz := v.GUMISize()
+		if sz.Vertical.Min > minMax {
 			minMax = sz.Vertical.Min
 		}
 		sum += sz.Horizontal.Min
 	}
-	return Size{
-		MinLength(minMax),
-		MinLength(sum),
+	return gumre.Size{
+		gumre.MinLength(minMax),
+		gumre.MinLength(sum),
 	}
 }
-func (s *LHorizontal) rect(r image.Rectangle) {
+func (s *LHorizontal) GUMIClip(r image.Rectangle) {
 	//
-	var tempVert = make([]Length, len(s.child))
-	var tempHori = make([]Length, len(s.child))
+	var tempVert = make([]gumre.Length, len(s.child))
+	var tempHori = make([]gumre.Length, len(s.child))
 
-	for i, v := range s.child{
-		tempVert[i] = v.size().Vertical
-		tempHori[i] = v.size().Horizontal
+	for i, v := range s.child {
+		tempVert[i] = v.GUMISize().Vertical
+		tempHori[i] = v.GUMISize().Horizontal
 	}
 	dis := s.rule(r.Dx(), tempHori)
 	//
 	var startat = r.Min.X
-	for i, v := range s.child{
+	for i, v := range s.child {
 		r := image.Rect(
 			startat,
 			r.Min.Y,
-			startat + dis[i],
+			startat+dis[i],
 			r.Max.Y,
 		)
-		v.rect(r)
+		v.GUMIClip(r)
 		startat += dis[i]
 	}
 }
-func (s *LHorizontal) update(info *Information, style *Style) {
-	for _, v := range s.child{
-		v.update(info, style)
+func (s *LHorizontal) GUMIUpdate(info *Information, style *Style) {
+	for _, v := range s.child {
+		v.GUMIUpdate(info, style)
 	}
 }
-func (s *LHorizontal) Occur(event Event) {
-	for _, v := range s.child{
-		v.Occur(event)
+func (s *LHorizontal) GUMIHappen(event Event) {
+	for _, v := range s.child {
+		v.GUMIHappen(event)
 	}
 }
-func LHorizontal0(rule Distribute, childrun ...GUMI) *LHorizontal {
+
+func LHorizontal0(rule gumre.Distribute, childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
-		rule:rule,
+		rule: rule,
 	}
-	for _, v := range childrun{
-		v.Born(s)
+	for _, v := range childrun {
+		v.born(s)
 	}
-	s.Breed(childrun)
+	s.breed(childrun)
 	return s
 }
 func LHorizontal1(childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
-		rule: Distribution.Minimalize,
+		rule: gumre.Distribution.Minimalize,
 	}
-	for _, v := range childrun{
-		v.Born(s)
+	for _, v := range childrun {
+		v.born(s)
 	}
-	s.Breed(childrun)
+	s.breed(childrun)
 	return s
 }
+
+func (s *LHorizontal) LoadElements(index gumre.Index, count int) []GUMI {
+	return loadGUMIChildrun(s.child, index, count)
+}
+func (s *LHorizontal) SizeElements() int {
+	return len(s.child)
+}
+func (s *LHorizontal) SaveElements(mode gumre.Mode, index gumre.Index, elem ...GUMI) (input int) {
+	return saveGUMIChildrun(&s.child, mode, index, elem...)
+}
+
+

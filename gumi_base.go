@@ -6,13 +6,13 @@ type SingleStructure struct {
 	parent GUMI
 	child  GUMI
 }
-func (s *SingleStructure) init() {
-	s.child.init()
+func (s *SingleStructure) GUMIInit() {
+	s.child.GUMIInit()
 }
-func (s *SingleStructure) Born(gumi GUMI) {
+func (s *SingleStructure) born(gumi GUMI) {
 	s.parent = gumi
 }
-func (s *SingleStructure) Breed(gumi []GUMI) {
+func (s *SingleStructure) breed(gumi []GUMI) {
 	if len(gumi) > 0 {
 		s.child = gumi[0]
 	}
@@ -29,15 +29,15 @@ type MultipleStructure struct {
 	child  []GUMI
 }
 
-func (s *MultipleStructure) init() {
+func (s *MultipleStructure) GUMIInit() {
 	for _ , v := range s.child{
-		v.init()
+		v.GUMIInit()
 	}
 }
-func (s *MultipleStructure) Born(gumi GUMI) {
+func (s *MultipleStructure) born(gumi GUMI) {
 	s.parent = gumi
 }
-func (s *MultipleStructure) Breed(gumi []GUMI) {
+func (s *MultipleStructure) breed(gumi []GUMI) {
 	s.child = gumi
 }
 func (s *MultipleStructure) Parent() GUMI {
@@ -54,12 +54,12 @@ func (s *MultipleStructure) Childrun() []GUMI {
 type VoidStructure struct {
 	parent GUMI
 }
-func (s *VoidStructure) init() {
+func (s *VoidStructure) GUMIInit() {
 }
-func (s *VoidStructure) Born(gumi GUMI) {
+func (s *VoidStructure) born(gumi GUMI) {
 	s.parent = gumi
 }
-func (s *VoidStructure) Breed(gumi []GUMI) {
+func (s *VoidStructure) breed(gumi []GUMI) {
 }
 func (s *VoidStructure) Parent() GUMI {
 	return s.parent

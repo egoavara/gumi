@@ -6,7 +6,7 @@ import (
 	"github.com/golang/freetype/truetype"
 	"github.com/iamGreedy/gumi"
 	"github.com/iamGreedy/gumi/glumi"
-	"github.com/iamGreedy/gumi/gutl"
+	"github.com/iamGreedy/gumi/gumre"
 	"github.com/iamGreedy/gumi/res"
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	var width, height = gutl.DefinedResolutions.Get("SXGA")
+	var width, height = gumre.DefinedResolutions.Get("FHD")
 	var err error
 
 	// init go:runtime
@@ -27,7 +27,7 @@ func main() {
 	//fmt.Println(suf.W, suf.H)
 	//wnd.SetBordered(false)
 	ctx, err := sdl.GLCreateContext(wnd)
-	ASSERT(err)
+	gumre.Assert(err)
 	defer sdl.GLDeleteContext(ctx)
 	// Init GL
 	GLInit()
@@ -47,7 +47,7 @@ func main() {
 	modal := gumi.ALModal0()
 	modal.SetModal(gumi.LinkingFrom(
 		gumi.NBackground0(gumi.Material.Pallette.SilluetImage()),
-		gumi.LCenter0(gumi.NMinimum0(gumi.AxisBoth, gumi.MTButton0("Modal, Hello!", func(self *gumi.MTButton) {
+		gumi.LCenter0(gumi.NMinimum0(gumre.AxisBoth, gumi.MTButton0("Modal, Hello!", func(self *gumi.MTButton) {
 			modal.SetShow(!modal.GetShow())
 		}))),
 	))
@@ -63,18 +63,18 @@ func main() {
 			gumi.Drawing.Ruler.Hint.Vertical(100),
 			gumi.Drawing.Ruler.Hint.Horizontal(100),
 		),
-		gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(20))),
+		gumi.NMargin0(gumre.RegularBlank(gumre.MinLength(20))),
 		gumi.LVertical1(
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton1(gumi.Material.Pallette.Red, "Close", func(self *gumi.MTButton) {
 				err = glumi.Stop
 			})),
 			//
-			gumi.ASpacer2(gumi.MinLength(20)),
+			gumi.ASpacer2(gumre.MinLength(20)),
 			//
 			gumi.LVertical1(ToggleProgress...),
 			gumi.LHorizontal1(Radios...),
 			//
-			gumi.ASpacer2(gumi.MinLength(20)),
+			gumi.ASpacer2(gumre.MinLength(20)),
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Reset", func(self *gumi.MTButton) {
 				for _, v := range VerticalProgress {
 					v.Childrun()[0].(*gumi.MTProgress).Set(0)
@@ -91,7 +91,7 @@ func main() {
 				}
 			})),
 			gumi.LinkingFrom(
-				gumi.NSize0(gumi.Size{Horizontal: gumi.AUTOLENGTH, Vertical: gumi.MinLength(180)}),
+				gumi.NSize0(gumre.Size{Horizontal: gumre.AUTOLENGTH, Vertical: gumre.MinLength(180)}),
 				gumi.LHorizontal1(VerticalProgress...),
 			),
 			//
@@ -100,12 +100,12 @@ func main() {
 				fmt.Printf("MTDropbox %6s : %s\n", self.GetMaterialColor(), selected)
 			}, DropboxElems...)),
 			gumi.LinkingFrom(
-				gumi.NMargin0(gumi.RegularBlank(gumi.MinLength(4))),
+				gumi.NMargin0(gumre.RegularBlank(gumre.MinLength(4))),
 				gumi.MTEdit0(),
 			),
 			gumi.AImage0(res.ImageHexagon),
-			gumi.AText1("Hello, World!", gumi.Align_CENTER),
-			gumi.AText1("안녕!", gumi.Align_CENTER),
+			gumi.AText1("Hello, World!", gumre.AlignCenter),
+			gumi.AText1("안녕!", gumre.AlignCenter),
 		),
 	))
 
@@ -153,11 +153,11 @@ var ToggleProgress = []gumi.GUMI{
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
-					gumi.NSize0(gumi.Size{
-						Vertical:   gumi.MINLENGTH,
-						Horizontal: gumi.MAXLENGTH,
+					gumi.NSize0(gumre.Size{
+						Vertical:   gumre.MINLENGTH,
+						Horizontal: gumre.MAXLENGTH,
 					}),
-					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.NMargin0(gumre.SymmetryBlank(gumre.MinLength(4), gumre.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.White),
 				),
 			),
@@ -175,11 +175,11 @@ var ToggleProgress = []gumi.GUMI{
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
-					gumi.NSize0(gumi.Size{
-						Vertical:   gumi.MINLENGTH,
-						Horizontal: gumi.MAXLENGTH,
+					gumi.NSize0(gumre.Size{
+						Vertical:   gumre.MINLENGTH,
+						Horizontal: gumre.MAXLENGTH,
 					}),
-					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.NMargin0(gumre.SymmetryBlank(gumre.MinLength(4), gumre.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Red),
 				),
 			),
@@ -197,11 +197,11 @@ var ToggleProgress = []gumi.GUMI{
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
-					gumi.NSize0(gumi.Size{
-						Vertical:   gumi.MINLENGTH,
-						Horizontal: gumi.MAXLENGTH,
+					gumi.NSize0(gumre.Size{
+						Vertical:   gumre.MINLENGTH,
+						Horizontal: gumre.MAXLENGTH,
 					}),
-					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.NMargin0(gumre.SymmetryBlank(gumre.MinLength(4), gumre.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Green),
 				),
 			),
@@ -219,11 +219,11 @@ var ToggleProgress = []gumi.GUMI{
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
-					gumi.NSize0(gumi.Size{
-						Vertical:   gumi.MINLENGTH,
-						Horizontal: gumi.MAXLENGTH,
+					gumi.NSize0(gumre.Size{
+						Vertical:   gumre.MINLENGTH,
+						Horizontal: gumre.MAXLENGTH,
 					}),
-					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.NMargin0(gumre.SymmetryBlank(gumre.MinLength(4), gumre.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue),
 				),
 			),
@@ -241,11 +241,11 @@ var ToggleProgress = []gumi.GUMI{
 			}),
 			gumi.LCenter0(
 				gumi.LinkingFrom(
-					gumi.NSize0(gumi.Size{
-						Vertical:   gumi.MINLENGTH,
-						Horizontal: gumi.MAXLENGTH,
+					gumi.NSize0(gumre.Size{
+						Vertical:   gumre.MINLENGTH,
+						Horizontal: gumre.MAXLENGTH,
 					}),
-					gumi.NMargin0(gumi.SymmetryBlank(gumi.MinLength(4), gumi.AUTOLENGTH)),
+					gumi.NMargin0(gumre.SymmetryBlank(gumre.MinLength(4), gumre.AUTOLENGTH)),
 					gumi.MTProgress1(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow),
 				),
 			),
@@ -290,11 +290,11 @@ var Radios = []gumi.GUMI{
 	)),
 }
 var VerticalProgress = []gumi.GUMI{
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.White, gumi.AxisVertical)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Red, gumi.AxisVertical)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Green, gumi.AxisVertical)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue, gumi.AxisVertical)),
-	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow, gumi.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.White, gumre.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Red, gumre.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Green, gumre.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue, gumre.AxisVertical)),
+	gumi.Tool.MarginMinRegular(4, gumi.MTProgress2(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow, gumre.AxisVertical)),
 }
 var DropboxElems = []string{
 	"Hello 0", "Hello 1", "Hello 2", "Hello 3", "Hello 4",
@@ -316,21 +316,16 @@ func GLInit() {
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 }
 func SDL2Init() {
-	ASSERT(sdl.Init(sdl.INIT_EVERYTHING))
+	gumre.Assert(sdl.Init(sdl.INIT_EVERYTHING))
 	sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
 	sdl.GLSetAttribute(sdl.GL_CONTEXT_MINOR_VERSION, 1)
 	sdl.GLSetAttribute(sdl.GL_CONTEXT_FORWARD_COMPATIBLE_FLAG, 1)
 	sdl.GLSetAttribute(sdl.GL_CONTEXT_PROFILE_MASK, sdl.GL_CONTEXT_PROFILE_CORE)
 	sdl.GLSetAttribute(sdl.GL_DOUBLEBUFFER, 1)
 }
-func ASSERT(err error)  {
-	if err != nil {
-		panic(err)
-	}
-}
-func SDL2Window(w, h int) (*sdl.Window) {
+func SDL2Window(w, h int) *sdl.Window {
 	var disp sdl.DisplayMode
-	ASSERT(sdl.GetDesktopDisplayMode(0, &disp))
+	gumre.Assert(sdl.GetDesktopDisplayMode(0, &disp))
 	var windW, windH int32
 	if int32(w) > disp.W {
 		windW = disp.W
@@ -343,9 +338,9 @@ func SDL2Window(w, h int) (*sdl.Window) {
 		windH = int32(h)
 	}
 	wnd, err := sdl.CreateWindow("GUMI", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, windW, windH,
-		sdl.WINDOW_OPENGL | sdl.WINDOW_ALWAYS_ON_TOP,
+		sdl.WINDOW_OPENGL|sdl.WINDOW_ALWAYS_ON_TOP,
 	)
-	ASSERT(err)
+	gumre.Assert(err)
 	return wnd
 }
 func GUMIInit() {
@@ -353,7 +348,7 @@ func GUMIInit() {
 	if err != nil {
 		panic(err)
 	}
-	gumi.DefaultStyleFont(f, 12)
+	gumi.ModifyDefaultStyle(f, 12)
 }
 func GLUMIInit() {
 	err := glumi.Init()

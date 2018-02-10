@@ -3,6 +3,7 @@ package gumi
 import (
 	"fmt"
 	"image"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 const (
@@ -24,8 +25,8 @@ type MTRadio struct {
 	styleStore
 	//
 	mtColorFromTo
-	studio *AnimationStudio
-	onoff *AnimationPercent
+	studio *gumre.Studio
+	onoff *gumre.Percenting
 	//
 	cursorEnter, active bool
 	onActive            MTRadioActive
@@ -35,15 +36,15 @@ type MTRadioActive func(self *MTRadio, active bool)
 func (s *MTRadio) String() string {
 	return fmt.Sprintf("%s(active:%v)", "MTRadio", s.active)
 }
-func (s *MTRadio) init() {
-	s.studio = NewAnimationStudio(mtRadioAnimationLength)
-	s.onoff = s.studio.Set(mtRadioAnimationOnOff, &AnimationPercent{
-		Delta: Animation.DeltaByMillis(mtRadioAnimationOnOffDeltaMillis),
+func (s *MTRadio) GUMIInit() {
+	s.studio = gumre.Animation.Studio(mtRadioAnimationLength)
+	s.onoff = s.studio.Set(mtRadioAnimationOnOff, &gumre.Percenting{
+		Delta: gumre.Animation.PercentingByMillis(mtRadioAnimationOnOffDeltaMillis),
 		Fn:    Material.DefaultAnimation.Radio,
-	}).(*AnimationPercent)
+	}).(*gumre.Percenting)
 }
-func (s *MTRadio) draw(frame *image.RGBA) {
-	var ctx = GGContextRGBASub(frame, s.bound)
+func (s *MTRadio) GUMIRender(frame *image.RGBA) {
+	var ctx = createContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var baseColor0 = s.GetFromMaterialColor().BaseColor()
 	var mainColor1 = s.GetToMaterialColor().MainColor()
@@ -58,25 +59,25 @@ func (s *MTRadio) draw(frame *image.RGBA) {
 	ctx.DrawCircle(w/2, h/2, innerRadius)
 	ctx.Fill()
 }
-func (s *MTRadio) size() Size {
-	return Size{
-		Vertical:   FixLength(mtRadioMinHeight),
-		Horizontal: FixLength(mtRadioMinWidth),
+func (s *MTRadio) GUMISize() gumre.Size {
+	return gumre.Size{
+		Vertical:   gumre.FixLength(mtRadioMinHeight),
+		Horizontal: gumre.FixLength(mtRadioMinWidth),
 	}
 }
-func (s *MTRadio) rect(r image.Rectangle) {
+func (s *MTRadio) GUMIClip(r image.Rectangle) {
 	s.bound = r
 }
-func (s *MTRadio) update(info *Information, style *Style) {
+func (s *MTRadio) GUMIUpdate(info *Information, style *Style) {
 	s.style = style
 	if s.active {
 		s.onoff.Request(1)
 	} else {
 		s.onoff.Request(0)
 	}
-	s.studio.Animate(info)
+	s.studio.Animate(float64(info.Dt))
 }
-func (s *MTRadio) Occur(event Event) {
+func (s *MTRadio) GUMIHappen(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
 	case EventKeyRelease:

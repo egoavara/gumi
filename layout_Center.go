@@ -3,6 +3,7 @@ package gumi
 import (
 	"image"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type LCenter struct {
@@ -13,14 +14,14 @@ func (s *LCenter) String() string {
 	return fmt.Sprintf("%s", "LCenter")
 }
 
-func (s *LCenter) draw(frame *image.RGBA) {
-	s.child.draw(frame)
+func (s *LCenter) GUMIRender(frame *image.RGBA) {
+	s.child.GUMIRender(frame)
 }
-func (s *LCenter) size() Size {
-	return s.child.size()
+func (s *LCenter) GUMISize() gumre.Size {
+	return s.child.GUMISize()
 }
-func (s *LCenter) rect(r image.Rectangle) {
-	sz := s.child.size()
+func (s *LCenter) GUMIClip(r image.Rectangle) {
+	sz := s.child.GUMISize()
 	var vert, hori int
 	if int(sz.Vertical.Max) < r.Dy(){
 		vert = int(sz.Vertical.Max)
@@ -42,20 +43,27 @@ func (s *LCenter) rect(r image.Rectangle) {
 	}
 	left := (r.Dx() - hori) / 2 + r.Min.X
 	top := (r.Dy() - vert) / 2+ r.Min.Y
-	s.child.rect(image.Rect(left, top, left + hori, top + vert))
+	s.child.GUMIClip(image.Rect(left, top, left + hori, top + vert))
 }
-func (s *LCenter) update(info *Information, style *Style) {
-	s.child.update(info, style)
+func (s *LCenter) GUMIUpdate(info *Information, style *Style) {
+	s.child.GUMIUpdate(info, style)
 }
-func (s *LCenter) Occur(event Event) {
-	s.child.Occur(event)
+func (s *LCenter) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
 
 func LCenter0(elem GUMI) *LCenter {
 	temp := &LCenter{
 
 	}
-	elem.Born(temp)
-	temp.Breed([]GUMI{elem})
+	elem.born(temp)
+	temp.breed([]GUMI{elem})
 	return temp
+}
+
+func (s *LCenter) LoadElement() GUMI {
+	return s.child
+}
+func (s *LCenter) SaveElement(elem GUMI) {
+	s.child = elem
 }

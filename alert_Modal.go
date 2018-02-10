@@ -3,6 +3,7 @@ package gumi
 import (
 	"image"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type ALModal struct {
@@ -16,40 +17,40 @@ type ALModal struct {
 	show bool
 }
 
-func (s *ALModal) init() {
-	s.modal.init()
-	s.child.init()
+func (s *ALModal) GUMIInit() {
+	s.modal.GUMIInit()
+	s.child.GUMIInit()
 }
-func (s *ALModal) draw(frame *image.RGBA) {
-	s.child.draw(frame)
+func (s *ALModal) GUMIRender(frame *image.RGBA) {
+	s.child.GUMIRender(frame)
 	if s.show{
-		s.modal.draw(frame)
+		s.modal.GUMIRender(frame)
 	}
 }
-func (s *ALModal) size() Size {
-	return s.child.size()
+func (s *ALModal) GUMISize() gumre.Size {
+	return s.child.GUMISize()
 }
-func (s *ALModal) rect(r image.Rectangle) {
+func (s *ALModal) GUMIClip(r image.Rectangle) {
 	s.bound = r
 	if s.show{
-		s.modal.rect(r)
+		s.modal.GUMIClip(r)
 	}else {
-		s.child.rect(r)
+		s.child.GUMIClip(r)
 	}
 }
-func (s *ALModal) update(info *Information, style *Style) {
+func (s *ALModal) GUMIUpdate(info *Information, style *Style) {
 	s.style = style
-	s.child.update(info, style)
-	s.modal.update(info, style)
+	s.child.GUMIUpdate(info, style)
+	s.modal.GUMIUpdate(info, style)
 }
-func (s *ALModal) Occur(event Event) {
+func (s *ALModal) GUMIHappen(event Event) {
 	if s.show{
-		s.modal.Occur(event)
+		s.modal.GUMIHappen(event)
 	}else {
 		if event.Kind() == EVENT_CURSOR {
 			s.lastCursorEvent = event.(EventCursor)
 		}
-		s.child.Occur(event)
+		s.child.GUMIHappen(event)
 	}
 }
 func (s *ALModal) String() string {
@@ -64,21 +65,21 @@ func ALModal1(modal GUMI) *ALModal {
 	temp := &ALModal{
 		modal:modal,
 	}
-	temp.modal.Born(temp)
+	temp.modal.born(temp)
 	return temp
 }
 
 //
 func (s *ALModal ) SetModal(modal GUMI)  {
 	s.modal = modal
-	s.modal.Born(s)
+	s.modal.born(s)
 }
 func (s *ALModal ) GetModal() GUMI {
 	return s.modal
 }
 func (s *ALModal ) SetShow(show bool)  {
 	s.show = show
-	s.modal.Occur(s.lastCursorEvent)
+	s.modal.GUMIHappen(s.lastCursorEvent)
 }
 func (s *ALModal ) GetShow() bool {
 	return s.show

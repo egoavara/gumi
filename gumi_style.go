@@ -3,7 +3,7 @@ package gumi
 import (
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype"
-	"github.com/iamGreedy/gumi/gutl"
+	"github.com/iamGreedy/gumi/gumre"
 	"golang.org/x/image/font/gofont/goregular"
 	"sync"
 	"github.com/golang/freetype/truetype"
@@ -24,7 +24,7 @@ func (s *Style) releaseContext(ctx *gg.Context) {
 }
 
 type StyleDefault struct {
-	Font *gutl.Font
+	Font *gumre.Font
 	//
 	LineWidth float64
 }
@@ -41,7 +41,7 @@ func DefaultStyle() *Style {
 		f, _ := freetype.ParseFont(goregular.TTF)
 		temp := &Style{
 			Default: StyleDefault{
-				Font:      gutl.NewFont(f, 12),
+				Font:      gumre.NewFont(f, 12),
 				LineWidth: 1,
 			},
 			Map: map[string]interface{}{
@@ -55,13 +55,13 @@ func DefaultStyle() *Style {
 	}
 	return defaultStyleSingleton
 }
-func DefaultStyleFont(font *truetype.Font, size float64) {
+func ModifyDefaultStyle(font *truetype.Font, size float64) {
 	defaultStyleSingletonMutex.Lock()
 	defer defaultStyleSingletonMutex.Unlock()
 	if defaultStyleSingleton == nil {
 		temp := &Style{
 			Default: StyleDefault{
-				Font:      gutl.NewFont(font, size),
+				Font:      gumre.NewFont(font, size),
 				LineWidth: 1,
 			},
 			Map: map[string]interface{}{
@@ -70,6 +70,6 @@ func DefaultStyleFont(font *truetype.Font, size float64) {
 		}
 		defaultStyleSingleton = temp
 	} else {
-		defaultStyleSingleton.Default.Font = gutl.NewFont(font, size)
+		defaultStyleSingleton.Default.Font = gumre.NewFont(font, size)
 	}
 }

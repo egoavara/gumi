@@ -48,12 +48,12 @@ func (s *Screen) Event(event Event) {
 	if event == nil {
 		return
 	}
-	s.root.Occur(event)
+	s.root.GUMIHappen(event)
 }
 
 //
 func (s *Screen) Init() {
-	s.root.init()
+	s.root.GUMIInit()
 }
 func (s *Screen) Update(info *Information, style *Style) {
 	if info == nil {
@@ -62,13 +62,13 @@ func (s *Screen) Update(info *Information, style *Style) {
 	if style == nil {
 		style = DefaultStyle()
 	}
-	s.root.update(info, style)
+	s.root.GUMIUpdate(info, style)
 }
 func (s *Screen) Ready() {
-	s.root.rect(s.frame.Rect)
+	s.root.GUMIClip(s.frame.Rect)
 }
 func (s *Screen) Draw() {
-	s.root.draw(s.frame)
+	s.root.GUMIRender(s.frame)
 	for _, v := range s._defer {
 		if v != nil {
 			v(s.frame)

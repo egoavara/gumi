@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/iamGreedy/gumi"
-	"github.com/iamGreedy/gumi/gutl"
+	"github.com/iamGreedy/gumi/gumre"
 	"image"
 )
 
@@ -36,7 +36,7 @@ func (Test) String() string {
 }
 
 func main() {
-	scr := gumi.NewScreen(gutl.DefinedResolutions.Get("HVGA"))
+	scr := gumi.NewScreen(gumre.DefinedResolutions.Get("HVGA"))
 	t := &Test{}
 	scr.Root(gumi.LinkingFrom(
 		gumi.NDrawing1(

@@ -456,13 +456,19 @@ func (s *Handler) Scrool(event *sdl.MouseWheelEvent) {
 	})
 }
 func (s *Handler) RuneEdit(event *sdl.TextEditingEvent) {
-	r, _ := utf8.DecodeRune(event.Text[event.Start:])
+	r, size := utf8.DecodeRune(event.Text[:])
+	if size <= 0 || r == 0{
+		return
+	}
 	s.glumi.screen.Event(gumi.EventRuneEdit{
 		Rune:r,
 	})
 }
 func (s *Handler) RuneComplete(event *sdl.TextInputEvent) {
-	r, _ := utf8.DecodeRune(event.Text[:])
+	r, size := utf8.DecodeRune(event.Text[:])
+	if size <= 0  || r == 0{
+		return
+	}
 	s.glumi.screen.Event(gumi.EventRuneComplete{
 		Rune:r,
 	})

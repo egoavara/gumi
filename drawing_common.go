@@ -3,6 +3,7 @@ package gumi
 import (
 	"github.com/fogleman/gg"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type DrawingInfo struct {
@@ -43,7 +44,7 @@ func (s *fpsDrawer ) Draw(context *gg.Context, style *Style, di *DrawingInfo)  {
 	s.i = (s.i + 1) % fpsDrawerHistory
 	//
 	context.SetColor(rulerColor)
-	avg := ifZeroBelowToOne(Average(s.dts[:]))
+	avg := ifZeroBelowToOne(gumre.Average(s.dts[:]))
 	txt := fmt.Sprintf("FPS : %.2f - AVG : %2.5f", 1000 / float64(avg), avg)
 	w := float64(context.Width())
 	mw, mh := context.MeasureString(txt)

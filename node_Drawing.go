@@ -3,6 +3,7 @@ package gumi
 import (
 	"image"
 	"fmt"
+	"github.com/iamGreedy/gumi/gumre"
 )
 
 type NDrawing struct {
@@ -16,9 +17,9 @@ type NDrawing struct {
 	di *DrawingInfo
 }
 
-func (s *NDrawing) draw(frame *image.RGBA) {
+func (s *NDrawing) GUMIRender(frame *image.RGBA) {
 	var fn = func(){
-		var ctx = GGContextRGBASub(frame, s.bound)
+		var ctx = createContextRGBASub(frame, s.bound)
 		for _, f := range s.drawfuncs {
 			ctx.Push()
 			f.Draw(ctx, s.style, s.di)
@@ -30,27 +31,27 @@ func (s *NDrawing) draw(frame *image.RGBA) {
 	}else {
 		defer fn()
 	}
-	s.child.draw(frame)
+	s.child.GUMIRender(frame)
 }
-func (s *NDrawing) size() Size {
-	return s.child.size()
+func (s *NDrawing) GUMISize() gumre.Size {
+	return s.child.GUMISize()
 }
-func (s *NDrawing) rect(r image.Rectangle) {
+func (s *NDrawing) GUMIClip(r image.Rectangle) {
 	s.bound = r
-	s.child.rect(r)
+	s.child.GUMIClip(r)
 }
-func (s *NDrawing) update(info *Information, style *Style) {
+func (s *NDrawing) GUMIUpdate(info *Information, style *Style) {
 	s.style = style
 	s.di = &DrawingInfo{
 		info.Dt,
 	}
-	s.child.update(info, style)
+	s.child.GUMIUpdate(info, style)
 }
-func (s *NDrawing) Occur(event Event) {
-	s.child.Occur(event)
+func (s *NDrawing) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
 func (s *NDrawing) String() string {
-	return fmt.Sprintf("%s(drawing:%d draw)", "NDrawing", len(s.drawfuncs))
+	return fmt.Sprintf("%s(drawing:%d GUMIRender)", "NDrawing", len(s.drawfuncs))
 }
 
 //
