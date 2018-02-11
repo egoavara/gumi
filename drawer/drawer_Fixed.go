@@ -8,11 +8,19 @@ import (
 
 type Fixed struct {
 	src  *image.RGBA
-	Mode FillupMode
-	//
-
 }
 
+func NewFixed(img image.Image) *Fixed {
+	var src *image.RGBA
+	var ok bool
+	if src, ok = img.(*image.RGBA); !ok {
+		src = image.NewRGBA(img.Bounds())
+		draw.Draw(src, src.Rect, img, image.ZP, draw.Src)
+	}
+	return &Fixed{
+		src:  src,
+	}
+}
 func (s Fixed) ColorModel() color.Model {
 	return s.src.ColorModel()
 }
@@ -26,5 +34,5 @@ func (s Fixed) At(x, y int) color.Color {
 }
 
 func (s Fixed) Draw(dst draw.Image){
-	draw.Draw(dst, dst.Bounds(), s.src, s.src.Rect.Min, draw.Over)
+	draw.Draw(dst, dst.Bounds().Intersect(s.src.Rect), s.src, s.src.Rect.Min, draw.Src)
 }

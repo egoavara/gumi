@@ -48,23 +48,20 @@ func (s Fillup) At(x, y int) color.Color {
 
 func (s Fillup) Draw(dst draw.Image) {
 	var dstSize = dst.Bounds().Size()
-	var pix, stride = startEditPix(dst)
-	defer endEditPix(dst, pix, stride)
+	var pix, stride, startx, starty = startEditPix(dst)
+	defer endEditPix(dst, pix, stride, startx, starty)
 	//
 	switch s.Mode {
 	case FillupNearestNeighbor:
-		nearestNeighbor(pix, stride, s.src.Pix, s.src.Stride, dstSize.X, dstSize.Y)
+		resizeNearestNeighbor(pix, stride, s.src.Pix, s.src.Stride, dstSize.X, dstSize.Y)
 	case FillupNearest:
-		resizeHorizontal(pix, stride, s.src.Pix, s.src.Stride, 1., nearest)
-		resizeVertical(pix, stride, s.src.Pix, s.src.Stride, 1., nearest)
+		resize(pix, stride, s.src.Pix, s.src.Stride, 1., nearest)
 	default:
 		fallthrough
 	case FillupGausian:
-		resizeHorizontal(pix, stride, s.src.Pix, s.src.Stride, 1., gausian)
-		resizeVertical(pix, stride, s.src.Pix, s.src.Stride, 1., gausian)
-
+		resize(pix, stride, s.src.Pix, s.src.Stride, 1., gausian)
+		//resizeminGoroutine(pix, stride, s.src.Pix, s.src.Stride, 1., gausian)
 	}
-
 }
 func gausian(x float64) float64 {
 	x = math.Abs(x)
@@ -85,87 +82,108 @@ func nearest(x float64) float64 {
 	return 0
 }
 func filterRange(v, length int, delta, radius float64) (val float64, start, end int) {
-	val = (float64(v)+0.5)*delta - 0.5
-	start, end = int(val - radius + 0.5), int(val + radius)
+	val = float64(v) * delta
+	if val < 0 {
+		val = 0
+	} else if val >= float64(length) {
+		val = float64(length)
+	}
+	start, end = int(val-radius+0.5), int(val+radius)
 	if start < 0 {
 		start = 0
 	}
 	if end >= length {
-		end = length - 1
+		end = length
 	}
 	return
 }
-func resizeHorizontal(dst []uint8, dstStride int, src []uint8, srcStride int, support float64, fn func(x float64) float64) {
+func resize(dst []uint8, dstStride int, src []uint8, srcStride int, support float64, fn func(x float64) float64) {
 	var dstw, dsth = sizeEidtPix(len(dst), dstStride)
-	var srcw, _ = sizeEidtPix(len(src), srcStride)
+	var srcw, srch = sizeEidtPix(len(src), srcStride)
 	var deltaH = float64(srcw) / float64(dstw)
 	var scaleH = math.Max(deltaH, 1.0)
 	var radiusH = math.Ceil(scaleH * support)
-	//
-	for x := 0; x < dstw; x++ {
-		// H : index range setup
-		hval, hstart, hend := filterRange(x, dstw, deltaH, radiusH)
-		for y := 0; y < dsth; y++ {
-			// H : pixel evaluate
-			var r, g, b, a float64
-			var sum float64
-			for kx := hstart; kx <= hend; kx++ {
-				srcoffset := offsetEditPix(kx, y, srcStride)
-				normal := (float64(kx) - hval) / scaleH
-				res := fn(normal)
-				// normalized r, g, b, a and sum
-				r += float64(src[srcoffset+RED]) * res
-				g += float64(src[srcoffset+GREEN]) * res
-				b += float64(src[srcoffset+BLUE]) * res
-				a += float64(src[srcoffset+ALPHA]) * res
-				sum += res
-			}
-			// H : pixel set
-			dstoffset := offsetEditPix(x, y, dstStride)
-			dst[dstoffset+RED] = clamp((r/sum)+0.5, 0, 255)
-			dst[dstoffset+GREEN] = clamp((g/sum)+0.5, 0, 255)
-			dst[dstoffset+BLUE] = clamp((b/sum)+0.5, 0, 255)
-			dst[dstoffset+ALPHA] = clamp((a/sum)+0.5, 0, 255)
-		}
-	}
-
-}
-func resizeVertical(dst []uint8, dstStride int, src []uint8, srcStride int, support float64, fn func(x float64) float64) {
-	var dstw, dsth = sizeEidtPix(len(dst), dstStride)
-	var _, srch = sizeEidtPix(len(src), srcStride)
 	var deltaV = float64(srch) / float64(dsth)
 	var scaleV = math.Max(deltaV, 1.0)
 	var radiusV = math.Ceil(scaleV * support)
+	var wg = new(sync.WaitGroup)
 	//
-	for y := 0; y < dsth; y++ {
-		// V : index range setup
-		vval, vstart, vend := filterRange(y, dsth, deltaV, radiusV)
-		for x := 0; x < dstw; x++ {
-			var r, g, b, a float64
-			var sum float64
-			// V : pixel evaluate
-			for ky := vstart; ky <= vend; ky++ {
-				srcoffset := offsetEditPix(ky, y, srcStride)
-				normal := (float64(ky) - vval) / scaleV
-				res := fn(normal)
-				// normalized r, g, b, a and sum
-				r += float64(src[srcoffset+RED]) * res
-				g += float64(src[srcoffset+GREEN]) * res
-				b += float64(src[srcoffset+BLUE]) * res
-				a += float64(src[srcoffset+ALPHA]) * res
-				sum += res
-			}
-			// V : pixel set
-			dstoffset := offsetEditPix(x, y, dstStride)
-			dst[dstoffset+RED] = clamp((r/sum)+0.5, 0, 255)
-			dst[dstoffset+GREEN] = clamp((g/sum)+0.5, 0, 255)
-			dst[dstoffset+BLUE] = clamp((b/sum)+0.5, 0, 255)
-			dst[dstoffset+ALPHA] = clamp((a/sum)+0.5, 0, 255)
+	var memorizationW = make([]struct {
+		val        float64
+		start, end int
+	}, dstw)
+	for x := 0; x < dstw; x++ {
+		xsrc, hstart, hend := filterRange(x, srcw, deltaH, radiusH)
+		memorizationW[x] = struct {
+			val        float64
+			start, end int
+		}{
+			val:   xsrc,
+			start: hstart,
+			end:   hend,
 		}
-
 	}
+	var memorizationH = make([]struct {
+		val        float64
+		start, end int
+	}, dstw)
+	for y := 0; y < dsth; y++ {
+		ysrc, vstart, vend := filterRange(y, srch, deltaV, radiusV)
+		memorizationH[y] = struct {
+			val        float64
+			start, end int
+		}{
+			val:   ysrc,
+			start: vstart,
+			end:   vend,
+		}
+	}
+	//
+	for x := 0; x < dstw; x++ {
+		wg.Add(1)
+		go func(innerX int) {
+			for y := 0; y < dsth; y++ {
+				var r, g, b, a float64
+				var sum float64
+				//
+				h, v := memorizationW[innerX], memorizationH[y]
+				// H : pixel evaluate
+				for kx := h.start; kx < h.end; kx++ {
+					srcoffset := offsetEditPix(kx, int(v.val), srcStride)
+					normal := (float64(kx) - h.val) / scaleH
+					res := fn(normal)
+					// normalized r, g, b, a and sum
+					r += float64(src[srcoffset+R]) * res
+					g += float64(src[srcoffset+G]) * res
+					b += float64(src[srcoffset+B]) * res
+					a += float64(src[srcoffset+A]) * res
+					sum += res
+				}
+				// V : pixel evaluate
+				for ky := v.start; ky < v.end; ky++ {
+					srcoffset := offsetEditPix(int(h.val), ky, srcStride)
+					normal := (float64(ky) - v.val) / scaleV
+					res := fn(normal)
+					// normalized r, g, b, a and sum
+					r += float64(src[srcoffset+R]) * res
+					g += float64(src[srcoffset+G]) * res
+					b += float64(src[srcoffset+B]) * res
+					a += float64(src[srcoffset+A]) * res
+					sum += res
+				}
+				// pixel set
+				dstoffset := offsetEditPix(innerX, y, dstStride)
+				dst[dstoffset+R] = clamp((r/sum)+0.5, 0, 255)
+				dst[dstoffset+G] = clamp((g/sum)+0.5, 0, 255)
+				dst[dstoffset+B] = clamp((b/sum)+0.5, 0, 255)
+				dst[dstoffset+A] = clamp((a/sum)+0.5, 0, 255)
+			}
+			wg.Done()
+		}(x)
+	}
+	wg.Wait()
 }
-func nearestNeighbor(dst []uint8, dstStride int, src []uint8, srcStride int, width, height int) {
+func resizeNearestNeighbor(dst []uint8, dstStride int, src []uint8, srcStride int, width, height int) {
 	var srcw, srch = sizeEidtPix(len(src), srcStride)
 	var dx = float32(srcw) / float32(width)
 	var dy = float32(srch) / float32(height)
@@ -186,10 +204,10 @@ func nearestNeighbor(dst []uint8, dstStride int, src []uint8, srcStride int, wid
 					srcStride,
 				)
 				// R, G, B, A
-				dst[dstIdx+RED] = src[srcIdx+0]
-				dst[dstIdx+GREEN] = src[srcIdx+1]
-				dst[dstIdx+BLUE] = src[srcIdx+2]
-				dst[dstIdx+ALPHA] = src[srcIdx+3]
+				dst[dstIdx+R] = src[srcIdx+0]
+				dst[dstIdx+G] = src[srcIdx+1]
+				dst[dstIdx+B] = src[srcIdx+2]
+				dst[dstIdx+A] = src[srcIdx+3]
 			}
 			wg.Done()
 		}(y)

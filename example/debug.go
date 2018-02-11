@@ -1,27 +1,28 @@
 package main
 
 import (
-	"image"
-	"github.com/iamGreedy/gumi"
-	"os"
-	"github.com/iamGreedy/gumi/gumre"
 	"fmt"
+	"github.com/iamGreedy/gumi"
 	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/gumre"
+	"image"
+	"os"
+	"runtime"
+	"image/draw"
 )
 
 func main() {
-	r, err := os.Open("./res/square.png")
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	fmt.Println(runtime.GOMAXPROCS(0))
+	//r, err := os.Open("./res/172676.jpg")
+	r, err := os.Open("./res/cubes_512.png")
 	gumre.Assert(err)
 	img, ext, err := image.Decode(r)
 	gumre.Assert(err)
 	fmt.Println(ext)
-	drwer := drawer.NewFillup(img, drawer.FillupGausian)
-	rgba := image.NewRGBA(image.Rect(0,0, 1024,1024))
-	drwer.Draw(rgba)
-	gumi.Capture("out", rgba)
-}
-
-func exper(dst *[]int, src ... int) {
-	*dst = append(*dst, src...)
+	var res = img.(draw.Image)
+	blur := drawer.NewBlur(20, false, drawer.BlurBox)
+	blur.Effect(res)
+	gumi.Capture("out", res)
 }
 
