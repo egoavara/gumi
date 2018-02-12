@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type NSize struct {
@@ -11,11 +12,31 @@ type NSize struct {
 	sz gumre.Size
 }
 
-func (s *NSize) String() string {
-	return fmt.Sprintf("%s(GUMISize:%v)", "NSize", s.sz)
+func (s *NSize) GUMIInfomation(info Information) {
+	s.child.GUMIInfomation(info)
+}
+func (s *NSize) GUMIStyle(style *Style) {
+	s.child.GUMIStyle(style)
+}
+func (s *NSize) GUMIClip(r image.Rectangle) {
+	s.child.GUMIClip(r)
 }
 func (s *NSize) GUMIRender(frame *image.RGBA) {
-	s.child.GUMIRender(frame)
+
+}
+func (s *NSize) GUMIDraw(frame *image.RGBA) {
+	s.child.GUMIDraw(frame)
+}
+
+func (s *NSize) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *NSize) GUMIUpdate() {
+	panic("implement me")
+}
+
+func (s *NSize) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
 func (s *NSize) GUMISize() gumre.Size {
 	temp := s.sz
@@ -40,14 +61,8 @@ func (s *NSize) GUMISize() gumre.Size {
 	}
 	return temp
 }
-func (s *NSize) GUMIClip(r image.Rectangle) {
-	s.child.GUMIClip(r)
-}
-func (s *NSize) GUMIUpdate(info *Information, style *Style) {
-	s.child.GUMIUpdate(info, style)
-}
-func (s *NSize) GUMIHappen(event Event) {
-	s.child.GUMIHappen(event)
+func (s *NSize) String() string {
+	return fmt.Sprintf("%s(GUMISize:%v)", "NSize", s.sz)
 }
 
 func NSize0(sz gumre.Size) *NSize {
@@ -56,10 +71,15 @@ func NSize0(sz gumre.Size) *NSize {
 	}
 }
 
-//
-func (s *NSize) Set(sz gumre.Size) {
-	s.sz = sz
-}
 func (s *NSize) Get() gumre.Size {
+	return s.GetSize()
+}
+func (s *NSize) Set(sz gumre.Size) {
+	s.SetSize(sz)
+}
+func (s *NSize) GetSize() gumre.Size {
 	return s.sz
+}
+func (s *NSize) SetSize(sz gumre.Size) {
+	s.sz = sz
 }

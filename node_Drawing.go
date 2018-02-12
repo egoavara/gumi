@@ -4,6 +4,7 @@ import (
 	"image"
 	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type NDrawing struct {
@@ -14,10 +15,24 @@ type NDrawing struct {
 	afterdraw bool
 	drawfuncs []Drawer
 //
-	di *DrawingInfo
+	di Information
 }
 
+func (s *NDrawing) GUMIInfomation(info Information) {
+	s.di = info
+	s.child.GUMIInfomation(info)
+}
+func (s *NDrawing) GUMIStyle(style *Style) {
+	s.style = style
+	s.child.GUMIStyle(style)
+}
+func (s *NDrawing) GUMIClip(r image.Rectangle) {
+	s.bound = r
+	s.child.GUMIClip(r)
+}
 func (s *NDrawing) GUMIRender(frame *image.RGBA) {
+}
+func (s *NDrawing) GUMIDraw(frame *image.RGBA) {
 	var fn = func(){
 		var ctx = createContextRGBASub(frame, s.bound)
 		for _, f := range s.drawfuncs {
@@ -31,38 +46,25 @@ func (s *NDrawing) GUMIRender(frame *image.RGBA) {
 	}else {
 		defer fn()
 	}
-	s.child.GUMIRender(frame)
+	s.child.GUMIDraw(frame)
+}
+
+func (s *NDrawing) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *NDrawing) GUMIUpdate() {
+	panic("implement me")
+}
+
+func (s *NDrawing) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
 func (s *NDrawing) GUMISize() gumre.Size {
 	return s.child.GUMISize()
 }
-func (s *NDrawing) GUMIClip(r image.Rectangle) {
-	s.bound = r
-	s.child.GUMIClip(r)
-}
-func (s *NDrawing) GUMIUpdate(info *Information, style *Style) {
-	s.style = style
-	s.di = &DrawingInfo{
-		info.Dt,
-	}
-	s.child.GUMIUpdate(info, style)
-}
-func (s *NDrawing) GUMIHappen(event Event) {
-	s.child.GUMIHappen(event)
-}
 func (s *NDrawing) String() string {
 	return fmt.Sprintf("%s(drawing:%d GUMIRender)", "NDrawing", len(s.drawfuncs))
 }
-
-//
-func (s *NDrawing) AfterDraw(on bool) *NDrawing {
-	s.afterdraw = on
-	return s
-}
-func (s *NDrawing) IsAfterDraw() bool {
-	return s.afterdraw
-}
-
 //
 func NDrawing0(beforedraw bool, drawFuncs ...Drawer) *NDrawing {
 	return &NDrawing{
@@ -75,4 +77,12 @@ func NDrawing1(drawFuncs ...Drawer) *NDrawing {
 		afterdraw: true,
 		drawfuncs: drawFuncs,
 	}
+}
+
+func (s *NDrawing) AfterDraw(on bool) *NDrawing {
+	s.afterdraw = on
+	return s
+}
+func (s *NDrawing) IsAfterDraw() bool {
+	return s.afterdraw
 }

@@ -4,6 +4,7 @@ import (
 	"image"
 	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type ASpacer struct {
@@ -13,7 +14,16 @@ type ASpacer struct {
 	horizontal gumre.Length
 }
 
+func (s ASpacer) GUMIInfomation(info Information) {
+}
+func (s ASpacer) GUMIStyle(style *Style) {
+}
+func (ASpacer) GUMIClip(r image.Rectangle) {
+}
 func (ASpacer) GUMIRender(frame *image.RGBA) {
+
+}
+func (s ASpacer) GUMIDraw(frame *image.RGBA) {
 
 }
 func (s *ASpacer) GUMISize() gumre.Size {
@@ -22,9 +32,13 @@ func (s *ASpacer) GUMISize() gumre.Size {
 		Horizontal:s.horizontal,
 	}
 }
-func (ASpacer) GUMIClip(r image.Rectangle) {
+func (s ASpacer) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	// TODO
+	panic("implement me")
 }
-func (ASpacer) GUMIUpdate(info *Information, style *Style) {
+func (s ASpacer) GUMIUpdate() {
+	// TODO
+	panic("implement me")
 }
 func (ASpacer) GUMIHappen(event Event) {
 }

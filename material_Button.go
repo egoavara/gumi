@@ -5,6 +5,7 @@ import (
 	"github.com/fogleman/gg"
 	"image"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 const (
@@ -35,15 +36,23 @@ type MTButton struct {
 type MTButtonFocus func(self *MTButton, focus bool)
 type MTButtonClick func(self *MTButton)
 
-func (s *MTButton) String() string {
-	return fmt.Sprintf("%s", "MTButton")
-}
 func (s *MTButton) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtButtonAnimationLength)
 	s.hover = s.studio.Set(mtButtonAnimationHover, &gumre.Percenting{
 		Delta:gumre.Animation.PercentingByMillis(250),
 		Fn: Material.DefaultAnimation.Button,
 	}).(*gumre.Percenting)
+}
+func (s *MTButton) GUMIInfomation(info Information) {
+	if s.cursorEnter {
+		s.hover.Request(1)
+	} else {
+		s.hover.Request(0)
+	}
+	s.studio.Animate(float64(info.Dt))
+}
+func (s *MTButton) GUMIStyle(style *Style) {
+	s.style = style
 }
 func (s *MTButton) GUMIRender(frame *image.RGBA) {
 	var ctx = createContextRGBASub(frame, s.bound)
@@ -81,6 +90,20 @@ func (s *MTButton) GUMIRender(frame *image.RGBA) {
 		ctx.Stroke()
 	}
 }
+func (s *MTButton) GUMIDraw(frame *image.RGBA) {
+	s.GUMIRender(frame)
+}
+
+func (s *MTButton) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *MTButton) GUMIUpdate() {
+	panic("implement me")
+}
+
+func (s *MTButton) String() string {
+	return fmt.Sprintf("%s", "MTButton")
+}
 func (s *MTButton) GUMISize() gumre.Size {
 
 	s.style.Default.Font.Use()
@@ -94,15 +117,6 @@ func (s *MTButton) GUMISize() gumre.Size {
 }
 func (s *MTButton) GUMIClip(r image.Rectangle) {
 	s.bound = r
-}
-func (s *MTButton) GUMIUpdate(info *Information, style *Style) {
-	s.style = style
-	if s.cursorEnter {
-		s.hover.Request(1)
-	} else {
-		s.hover.Request(0)
-	}
-	s.studio.Animate(float64(info.Dt))
 }
 func (s *MTButton) GUMIHappen(event Event) {
 	switch ev := event.(type) {

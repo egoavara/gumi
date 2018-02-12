@@ -2,7 +2,6 @@ package drawer
 
 import (
 	"image"
-	"image/color"
 	"image/draw"
 )
 
@@ -15,7 +14,6 @@ const (
 )
 
 type RepeatMode uint8
-
 type Repeat struct {
 	src  *image.RGBA
 	Mode RepeatMode
@@ -33,19 +31,9 @@ func NewRepeat(img image.Image, mode RepeatMode) *Repeat {
 		Mode: mode,
 	}
 }
-
-func (s Repeat) ColorModel() color.Model {
-	return s.src.ColorModel()
-}
-
-func (s Repeat) Bounds() image.Rectangle {
+func (s Repeat) Bound() image.Rectangle {
 	return s.src.Bounds()
 }
-
-func (s Repeat) At(x, y int) color.Color {
-	return s.src.At(x, y)
-}
-
 func (s Repeat) Draw(dst draw.Image) {
 	var dstsz = dst.Bounds()
 	var dstw, dsth = dstsz.Dx(), dstsz.Dy()
@@ -68,7 +56,7 @@ func (s Repeat) Draw(dst draw.Image) {
 					),
 					s.src,
 					s.src.Rect.Min,
-					draw.Src,
+					draw.Over,
 				)
 			}
 		}
@@ -84,7 +72,7 @@ func (s Repeat) Draw(dst draw.Image) {
 				),
 				s.src,
 				s.src.Rect.Min,
-				draw.Src,
+				draw.Over,
 			)
 		}
 	case RepeatVertical:
@@ -99,7 +87,7 @@ func (s Repeat) Draw(dst draw.Image) {
 				),
 				s.src,
 				s.src.Rect.Min,
-				draw.Src,
+				draw.Over,
 			)
 		}
 	}

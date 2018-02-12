@@ -51,12 +51,9 @@ func (s *GLUMIFullScreen) Loop(fnBefore, fnAfter func(lumi *GLUMIFullScreen) err
 			break
 		}
 		// GUMI
-		s.screen.Update(&gumi.Information{
+		s.screen.Ready(gumi.Information{
 			Dt: int64(curr.Sub(prev).Seconds() * 1000),
 		}, nil)
-		if loopcount % 8 == 0{
-			s.screen.Ready()
-		}
 		s.screen.Draw()
 		// GLFW
 		s.Render.Upload()

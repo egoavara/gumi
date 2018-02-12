@@ -5,6 +5,7 @@ import (
 	"github.com/fogleman/gg"
 	"image"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 const (
@@ -31,20 +32,30 @@ type MTToggle struct {
 	cursorEnter, active bool
 	onActive            MTToggleActive
 }
-
 // Event Callbacks
 type MTToggleActive func(self *MTToggle, active bool)
 
 // GUMI Structure
-func (s *MTToggle) String() string {
-	return fmt.Sprintf("%s(active:%v)", "MTToggle", s.active)
-}
 func (s *MTToggle) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtToggleAnimationLength)
 	s.onoff = s.studio.Set(mtToggleAnimationOnOff, &gumre.Percenting{
 		Delta: gumre.Animation.PercentingByMillis(mtToggleAnimationOnOffDeltaMillis),
 		Fn:    Material.DefaultAnimation.Toggle,
 	}).(*gumre.Percenting)
+}
+func (s *MTToggle) GUMIInfomation(info Information) {
+	if s.active {
+		s.onoff.Request(1)
+	} else {
+		s.onoff.Request(0)
+	}
+	s.studio.Animate(float64(info.Dt))
+}
+func (s *MTToggle) GUMIStyle(style *Style) {
+	s.style = style
+}
+func (s *MTToggle) GUMIClip(r image.Rectangle) {
+	s.bound = r
 }
 func (s *MTToggle) GUMIRender(frame *image.RGBA) {
 	var ctx = createContextRGBASub(frame, s.bound)
@@ -65,24 +76,17 @@ func (s *MTToggle) GUMIRender(frame *image.RGBA) {
 	ctx.DrawCircle(radius+Scale.Length(w-2*radius, s.onoff.Value()), radius, innerRadius)
 	ctx.Fill()
 }
-func (s *MTToggle) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.MinLength(mtToggleMinHeight),
-		Horizontal: gumre.MinLength(mtToggleMinWidth),
-	}
+func (s *MTToggle) GUMIDraw(frame *image.RGBA) {
+	s.GUMIRender(frame)
 }
-func (s *MTToggle) GUMIClip(r image.Rectangle) {
-	s.bound = r
+
+func (s *MTToggle) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
 }
-func (s *MTToggle) GUMIUpdate(info *Information, style *Style) {
-	s.style = style
-	if s.active {
-		s.onoff.Request(1)
-	} else {
-		s.onoff.Request(0)
-	}
-	s.studio.Animate(float64(info.Dt))
+func (s *MTToggle) GUMIUpdate() {
+	panic("implement me")
 }
+
 func (s *MTToggle) GUMIHappen(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
@@ -104,6 +108,15 @@ func (s *MTToggle) GUMIHappen(event Event) {
 			s.cursorEnter = false
 		}
 	}
+}
+func (s *MTToggle) GUMISize() gumre.Size {
+	return gumre.Size{
+		Vertical:   gumre.MinLength(mtToggleMinHeight),
+		Horizontal: gumre.MinLength(mtToggleMinWidth),
+	}
+}
+func (s *MTToggle) String() string {
+	return fmt.Sprintf("%s(active:%v)", "MTToggle", s.active)
 }
 
 // Constructors

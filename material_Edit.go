@@ -3,8 +3,9 @@ package gumi
 import (
 	"fmt"
 	"github.com/fogleman/gg"
-	"image"
+	"github.com/iamGreedy/gumi/drawer"
 	"github.com/iamGreedy/gumi/gumre"
+	"image"
 )
 
 const (
@@ -47,14 +48,56 @@ type MTEdit struct {
 }
 type MTEditChange func(self *MTEdit, text string)
 
-func (s *MTEdit) String() string {
-	return fmt.Sprintf("%s(text:%s)", "MTEdit", s.text)
-}
 func (s *MTEdit) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtEditAnimationLength)
 	s.textCursor = s.studio.Set(mtEditAnimationTextCursor, &gumre.Switching{
 		Interval: mtEditAnimationTextCursorInterval,
 	}).(*gumre.Switching)
+}
+func (s *MTEdit) GUMIInfomation(info Information) {
+	s.studio.Animate(float64(info.Dt))
+	if s.deleteRequestCount > 0 {
+		if !s.editingNow {
+			if s.ketCTRL {
+				s.text = StringControlBackSpace(s.text)
+			} else {
+				s.text = StringBackSpace(s.text, 1)
+			}
+		} else {
+			if s.editingRune == 0 {
+				s.editingNow = false
+			}
+		}
+		s.deleteRequestCount = 0
+	}
+	s.deleteSum += info.Dt
+	s.deleteTheresholdStack += info.Dt
+	temp := s.deleteSum / mtEditDeleteInterval
+	if temp >= 1 {
+		s.deleteSum -= temp * mtEditDeleteInterval
+		if s.deleteOn && s.deleteTheresholdStack > mtEditDeleteThereshold {
+			if !s.editingNow {
+				for i := int64(0); i < temp; i++ {
+					s.deleteCount += 1
+					if s.ketCTRL {
+						s.text = StringControlBackSpace(s.text)
+					} else {
+						s.text = StringBackSpace(s.text, 1)
+					}
+				}
+			} else {
+				if s.editingRune == 0 {
+					s.editingNow = false
+				}
+			}
+		}
+	}
+}
+func (s *MTEdit) GUMIStyle(style *Style) {
+	s.style = style
+}
+func (s *MTEdit) GUMIClip(r image.Rectangle) {
+	s.bound = r
 }
 func (s *MTEdit) GUMIRender(frame *image.RGBA) {
 	var baseColor, mainColor = s.GetMaterialColor().Color()
@@ -113,58 +156,22 @@ func (s *MTEdit) GUMIRender(frame *image.RGBA) {
 	ctx.DrawString(drawtext, stringposX, stringposY)
 	ctx.Stroke()
 }
+func (s *MTEdit) GUMIDraw(frame *image.RGBA) {
+	s.GUMIRender(frame)
+}
+
+func (s *MTEdit) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *MTEdit) GUMIUpdate() {
+	panic("implement me")
+}
+
 func (s *MTEdit) GUMISize() gumre.Size {
 	return gumre.Size{
-		Vertical:  gumre.MinLength(mtEditMinHeight),
+		Vertical:   gumre.MinLength(mtEditMinHeight),
 		Horizontal: gumre.MinLength(mtEditMinWidth),
 	}
-}
-func (s *MTEdit) GUMIClip(r image.Rectangle) {
-	s.bound = r
-}
-func (s *MTEdit) GUMIUpdate(info *Information, style *Style) {
-	s.style = style
-	//
-	s.studio.Animate(float64(info.Dt))
-	if s.deleteRequestCount >0 {
-		if !s.editingNow{
-			if s.ketCTRL {
-				s.text = StringControlBackSpace(s.text)
-			} else {
-				s.text = StringBackSpace(s.text, 1)
-			}
-		}else {
-			if s.editingRune == 0{
-				s.editingNow = false
-			}
-		}
-		s.deleteRequestCount = 0
-	}
-	s.deleteSum += info.Dt
-	s.deleteTheresholdStack += info.Dt
-	temp := s.deleteSum / mtEditDeleteInterval
-	if temp >= 1 {
-		s.deleteSum -= temp * mtEditDeleteInterval
-		if s.deleteOn && s.deleteTheresholdStack > mtEditDeleteThereshold {
-			if !s.editingNow{
-				for i := int64(0); i < temp; i++ {
-					s.deleteCount += 1
-					if s.ketCTRL {
-						s.text = StringControlBackSpace(s.text)
-					} else {
-						s.text = StringBackSpace(s.text, 1)
-					}
-				}
-			}else {
-				if s.editingRune == 0{
-					s.editingNow = false
-				}
-			}
-		}
-	}
-}
-func (s *MTEdit) deleteRequest(count uint) {
-	s.deleteRequestCount += count
 }
 func (s *MTEdit) GUMIHappen(event Event) {
 	switch ev := event.(type) {
@@ -229,6 +236,14 @@ func (s *MTEdit) GUMIHappen(event Event) {
 	}
 
 }
+func (s *MTEdit) String() string {
+	return fmt.Sprintf("%s(text:%s)", "MTEdit", s.text)
+}
+
+//
+func (s *MTEdit) deleteRequest(count uint) {
+	s.deleteRequestCount += count
+}
 
 // Constructors for MTEdit
 func MTEdit0() *MTEdit {
@@ -270,7 +285,6 @@ func MTEdit3(mcl *MaterialColor, str string, align gumre.Align) *MTEdit {
 	return temp
 }
 
-// ===============================================================================================
 func (s *MTEdit) Set(str string) {
 	s.SetText(str)
 }

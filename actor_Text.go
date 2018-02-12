@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type AText struct {
@@ -18,8 +19,15 @@ type AText struct {
 	//
 }
 
-func (s *AText) String() string {
-	return fmt.Sprintf("%s(text:%s)", "AText", s.text)
+func (s *AText) GUMIInfomation(info Information) {
+}
+
+func (s *AText) GUMIStyle(style *Style) {
+	s.style = style
+}
+
+func (s *AText) GUMIClip(r image.Rectangle) {
+	s.bound = r
 }
 
 func (s *AText) GUMIRender(frame *image.RGBA) {
@@ -48,6 +56,21 @@ func (s *AText) GUMIRender(frame *image.RGBA) {
 	}
 	ctx.DrawString(s.text, drawX, drawY - 1)
 }
+
+func (s *AText) GUMIDraw(frame *image.RGBA) {
+	s.GUMIDraw(frame)
+}
+func (s *AText) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+
+func (s *AText) GUMIUpdate() {
+	panic("implement me")
+}
+
+
+func (s *AText) GUMIHappen(event Event) {
+}
 func (s *AText) GUMISize() gumre.Size {
 	s.style.Default.Font.Use()
 	defer s.style.Default.Font.Release()
@@ -61,14 +84,8 @@ func (s *AText) GUMISize() gumre.Size {
 
 	return temp
 }
-func (s *AText) GUMIClip(r image.Rectangle) {
-	s.bound = r
-}
-func (s *AText) GUMIUpdate(info *Information, style *Style) {
-	s.style = style
-
-}
-func (s *AText) GUMIHappen(event Event) {
+func (s *AText) String() string {
+	return fmt.Sprintf("%s(text:%s)", "AText", s.text)
 }
 
 //

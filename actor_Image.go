@@ -2,46 +2,58 @@ package gumi
 
 import (
 	"image"
-	"image/draw"
 	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type AImage struct {
 	VoidStructure
 	boundStore
 	//
-	img image.Image
+	drawer drawer.Drawer
 }
 
-func (s *AImage) String() string {
-	return fmt.Sprintf("%s", "AImage")
-}
 
+
+func (s *AImage) GUMIInfomation(info Information) {
+}
+func (s *AImage) GUMIStyle(style *Style) {
+}
+func (s *AImage) GUMIClip(rect image.Rectangle) {
+	if s.bound != rect{
+		s.bound = rect
+	}
+}
 func (s *AImage) GUMIRender(frame *image.RGBA) {
-	draw.Draw(frame, s.bound, s.img, s.img.Bounds().Min, draw.Over)
+	s.drawer.Draw(frame)
 }
-
+func (s *AImage) GUMIDraw(frame *image.RGBA) {
+	s.GUMIRender(frame)
+}
 func (s AImage) GUMISize() gumre.Size {
-	bd := s.img.Bounds()
+	bd := s.drawer.Bound()
 	return gumre.Size{
 		Horizontal: gumre.MinLength(uint16(bd.Dx())),
 		Vertical:   gumre.MinLength(uint16(bd.Dy())),
 	}
 }
-func (s *AImage) GUMIClip(rect image.Rectangle) {
-	s.bound = rect
-}
-
-func (s *AImage) GUMIUpdate(info *Information, style *Style) {
-
-}
-
 func (s *AImage) GUMIHappen(event Event) {
 }
+func (s *AImage) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	// TODO
+	panic("implement me")
+}
+func (s *AImage) GUMIUpdate() {
+	// TODO
+	panic("implement me")
+}
+func (s *AImage) String() string {
+	return fmt.Sprintf("%s", "AImage")
+}
 
-func AImage0(img image.Image) *AImage {
+func AImage0(drawer drawer.Drawer) *AImage {
 	return &AImage{
-		img: img,
+		drawer:drawer,
 	}
 }

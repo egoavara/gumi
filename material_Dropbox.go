@@ -3,9 +3,10 @@ package gumi
 import (
 	"fmt"
 	"github.com/fogleman/gg"
+	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/gumre"
 	"image"
 	"math"
-	"github.com/iamGreedy/gumi/gumre"
 )
 
 const (
@@ -51,7 +52,6 @@ type MTDropbox struct {
 	//
 	cursorEnter, active bool
 }
-
 type MTDropboxChange func(self *MTDropbox, selected string)
 
 func (s *MTDropbox) GUMIInit() {
@@ -70,8 +70,17 @@ func (s *MTDropbox) GUMIInit() {
 	}).(*gumre.Reaching)
 
 }
-func (s *MTDropbox) String() string {
-	return fmt.Sprintf("%s(select:%s)", "MTDropbox", s.Elems[s.selected])
+func (s *MTDropbox) GUMIInfomation(info Information) {
+	s.studio.Animate(float64(info.Dt))
+}
+func (s *MTDropbox) GUMIStyle(style *Style) {
+	if s.style != style || s.Elems.needUpdate() {
+		s.Elems.update(style)
+		s.style = style
+	}
+}
+func (s *MTDropbox) GUMIClip(r image.Rectangle) {
+	s.bound = r
 }
 func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 	var baseColor, mainColor = s.GetMaterialColor().Color()
@@ -88,6 +97,7 @@ func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 	var per = s.stretch.Percent()
 	var scr = s.scroll.Value()
 	if val > 0 && s.Elems.Length() > 0 {
+		// TODO : DEFERCALL
 		s.scr.deferRequest(s.deferid, func(rgba *image.RGBA) {
 			var radius = float64(s.bound.Dy()) / 2
 			// selecte, background, scrool
@@ -135,8 +145,8 @@ func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 				}
 				// scroll
 
-				percent := float64(s.boxHeight - s.boxCut) / float64(s.boxHeight)
-				scroolPercent := scr/ float64(s.boxHeight)
+				percent := float64(s.boxHeight-s.boxCut) / float64(s.boxHeight)
+				scroolPercent := scr / float64(s.boxHeight)
 				if percent < 0 {
 					percent = 0
 				}
@@ -144,7 +154,7 @@ func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 					percent = 1
 				}
 
-				ctx.DrawArc(w-radius, radius + (scroolPercent) * (h-radius*2), mtDropboxScroolWidth/2, gg.Radians(180), gg.Radians(360))
+				ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2), mtDropboxScroolWidth/2, gg.Radians(180), gg.Radians(360))
 				ctx.DrawRectangle(w-radius-mtDropboxScroolWidth/2, radius+(scroolPercent)*(h-radius*2), mtDropboxScroolWidth, percent*(h-radius*2))
 				ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2)+percent*(h-radius*2), mtDropboxScroolWidth/2, gg.Radians(0), gg.Radians(180))
 				ctx.Fill()
@@ -196,24 +206,17 @@ func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 		ctx.Fill()
 	}
 }
-func (s *MTDropbox) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.MinLength(mtDropboxMinHeight),
-		Horizontal: gumre.MinLength(mtDropboxMinWidth),
-	}
+func (s *MTDropbox) GUMIDraw(frame *image.RGBA) {
+	s.GUMIRender(frame)
 }
-func (s *MTDropbox) GUMIClip(r image.Rectangle) {
-	s.bound = r
-}
-func (s *MTDropbox) GUMIUpdate(info *Information, style *Style) {
 
-	if s.style != style || s.Elems.needUpdate() {
-		s.Elems.update(style)
-	}
-	s.style = style
-	//
-	s.studio.Animate(float64(info.Dt))
+func (s *MTDropbox) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
 }
+func (s *MTDropbox) GUMIUpdate() {
+	panic("implement me")
+}
+
 func (s *MTDropbox) GUMIHappen(event Event) {
 	if s.inactive {
 		s.cursorEnter = false
@@ -269,12 +272,12 @@ func (s *MTDropbox) GUMIHappen(event Event) {
 		y := int(ev.Y)
 		bd := s.bound
 		if !s.active {
-			if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y){
+			if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 				s.cursorEnter = true
-			}else {
+			} else {
 				s.cursorEnter = false
 			}
-		}else {
+		} else {
 			bd.Max.Y += s.boxHeight - s.boxCut
 			if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 				s.cursorEnter = true
@@ -305,6 +308,16 @@ func (s *MTDropbox) GUMIHappen(event Event) {
 		}
 	}
 }
+func (s *MTDropbox) GUMISize() gumre.Size {
+	return gumre.Size{
+		Vertical:   gumre.MinLength(mtDropboxMinHeight),
+		Horizontal: gumre.MinLength(mtDropboxMinWidth),
+	}
+}
+func (s *MTDropbox) String() string {
+	return fmt.Sprintf("%s(select:%s)", "MTDropbox", s.Elems[s.selected])
+}
+
 //
 func MTDropbox0() *MTDropbox {
 	res := &MTDropbox{
@@ -351,6 +364,7 @@ func MTDropbox3(change MTDropboxChange, elems ...string) *MTDropbox {
 	}
 	return res
 }
+
 func (s *MTDropbox) OnChange(callback MTDropboxChange) {
 	s.onChange = callback
 }

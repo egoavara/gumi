@@ -11,10 +11,11 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
 	"time"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 func main() {
-	var width, height = gumre.DefinedResolutions.Get("FHD")
+	var width, height = gumre.DefinedResolutions.Get("VGA")
 	var err error
 
 	// init go:runtime
@@ -46,7 +47,7 @@ func main() {
 	//
 	modal := gumi.ALModal0()
 	modal.SetModal(gumi.LinkingFrom(
-		gumi.NBackground0(gumi.Material.Pallette.SilluetImage()),
+		gumi.NBackground0(gumi.Material.Pallette.SilluetDrawer()),
 		gumi.LCenter0(gumi.NMinimum0(gumre.AxisBoth, gumi.MTButton0("Modal, Hello!", func(self *gumi.MTButton) {
 			modal.SetShow(!modal.GetShow())
 		}))),
@@ -54,7 +55,7 @@ func main() {
 	scr := gumi.NewScreen(width, height)
 	scr.Root(gumi.LinkingFrom(
 		modal,
-		gumi.NBackground0(gumi.Material.Pallette.BackgroundImage()),
+		gumi.NBackground0(gumi.Material.Pallette.BackgroundDrawer()),
 		gumi.NDrawing1(
 			gumi.Drawing.FPS(),
 			//gumi.Drawing.Ruler.Screen(),
@@ -103,7 +104,7 @@ func main() {
 				gumi.NMargin0(gumre.RegularBlank(gumre.MinLength(4))),
 				gumi.MTEdit0(),
 			),
-			gumi.AImage0(res.ImageHexagon),
+			gumi.AImage0(drawer.NewFillup(res.ImageHexagon, drawer.FillupNearestNeighbor)),
 			gumi.AText1("Hello, World!", gumre.AlignCenter),
 			gumi.AText1("안녕!", gumre.AlignCenter),
 		),

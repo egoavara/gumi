@@ -37,7 +37,6 @@ func (s *Screen) Resize(w, h int) {
 func (s *Screen) Root(root GUMI) {
 	s.root = newGUMIRoot(s, root)
 }
-
 //
 func (s *Screen) Event(event Event) {
 	for _, v := range s._hook {
@@ -50,25 +49,20 @@ func (s *Screen) Event(event Event) {
 	}
 	s.root.GUMIHappen(event)
 }
-
 //
 func (s *Screen) Init() {
 	s.root.GUMIInit()
 }
-func (s *Screen) Update(info *Information, style *Style) {
-	if info == nil {
-		info = DefaultInformation()
-	}
+func (s *Screen) Ready(info Information, style *Style) {
 	if style == nil {
 		style = DefaultStyle()
 	}
-	s.root.GUMIUpdate(info, style)
-}
-func (s *Screen) Ready() {
+	s.root.GUMIInfomation(info)
+	s.root.GUMIStyle(style)
 	s.root.GUMIClip(s.frame.Rect)
 }
 func (s *Screen) Draw() {
-	s.root.GUMIRender(s.frame)
+	s.root.GUMIDraw(s.frame)
 	for _, v := range s._defer {
 		if v != nil {
 			v(s.frame)
@@ -81,7 +75,6 @@ func (s *Screen) Frame() image.Image {
 func (s *Screen) RGBA() *image.RGBA {
 	return s.frame
 }
-
 //
 func (s *Screen) hookReserve() (id uint64) {
 	defer func() {

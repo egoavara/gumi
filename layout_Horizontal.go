@@ -5,6 +5,7 @@ import (
 	"github.com/iamGreedy/gumi/gumre"
 	"image"
 	"sync"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type LHorizontal struct {
@@ -12,32 +13,14 @@ type LHorizontal struct {
 	rule gumre.Distribute
 }
 
-func (s *LHorizontal) String() string {
-	return fmt.Sprintf("%s(childrun:%d)", "LHorizontal", len(s.Childrun()))
-}
-func (s *LHorizontal) GUMIRender(frame *image.RGBA) {
-	wg := new(sync.WaitGroup)
-	wg.Add(len(s.child))
-	defer wg.Wait()
+func (s *LHorizontal) GUMIInfomation(info Information) {
 	for _, v := range s.child {
-		go func(elem GUMI) {
-			elem.GUMIRender(frame)
-			wg.Done()
-		}(v)
+		v.GUMIInfomation(info)
 	}
 }
-func (s *LHorizontal) GUMISize() gumre.Size {
-	var minMax, sum uint16 = 0, 0
+func (s *LHorizontal) GUMIStyle(style *Style) {
 	for _, v := range s.child {
-		sz := v.GUMISize()
-		if sz.Vertical.Min > minMax {
-			minMax = sz.Vertical.Min
-		}
-		sum += sz.Horizontal.Min
-	}
-	return gumre.Size{
-		gumre.MinLength(minMax),
-		gumre.MinLength(sum),
+		v.GUMIStyle(style)
 	}
 }
 func (s *LHorizontal) GUMIClip(r image.Rectangle) {
@@ -63,15 +46,48 @@ func (s *LHorizontal) GUMIClip(r image.Rectangle) {
 		startat += dis[i]
 	}
 }
-func (s *LHorizontal) GUMIUpdate(info *Information, style *Style) {
+func (s *LHorizontal) GUMIRender(frame *image.RGBA) {
+}
+func (s *LHorizontal) GUMIDraw(frame *image.RGBA) {
+	wg := new(sync.WaitGroup)
+	wg.Add(len(s.child))
+	defer wg.Wait()
 	for _, v := range s.child {
-		v.GUMIUpdate(info, style)
+		go func(elem GUMI) {
+			elem.GUMIDraw(frame)
+			wg.Done()
+		}(v)
 	}
 }
+
+func (s *LHorizontal) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *LHorizontal) GUMIUpdate() {
+	panic("implement me")
+}
+
 func (s *LHorizontal) GUMIHappen(event Event) {
 	for _, v := range s.child {
 		v.GUMIHappen(event)
 	}
+}
+func (s *LHorizontal) GUMISize() gumre.Size {
+	var minMax, sum uint16 = 0, 0
+	for _, v := range s.child {
+		sz := v.GUMISize()
+		if sz.Vertical.Min > minMax {
+			minMax = sz.Vertical.Min
+		}
+		sum += sz.Horizontal.Min
+	}
+	return gumre.Size{
+		gumre.MinLength(minMax),
+		gumre.MinLength(sum),
+	}
+}
+func (s *LHorizontal) String() string {
+	return fmt.Sprintf("%s(childrun:%d)", "LHorizontal", len(s.Childrun()))
 }
 
 func LHorizontal0(rule gumre.Distribute, childrun ...GUMI) *LHorizontal {

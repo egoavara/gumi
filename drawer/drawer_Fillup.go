@@ -2,7 +2,6 @@ package drawer
 
 import (
 	"image"
-	"image/color"
 	"image/draw"
 	"math"
 	"sync"
@@ -34,18 +33,10 @@ func NewFillup(img image.Image, mode FillupMode) *Fillup {
 		Mode: mode,
 	}
 }
-func (s Fillup) ColorModel() color.Model {
-	return s.src.ColorModel()
-}
 
-func (s Fillup) Bounds() image.Rectangle {
+func (s Fillup) Bound() image.Rectangle{
 	return s.src.Bounds()
 }
-
-func (s Fillup) At(x, y int) color.Color {
-	return s.src.At(x, y)
-}
-
 func (s Fillup) Draw(dst draw.Image) {
 	var dstSize = dst.Bounds().Size()
 	var pix, stride, startx, starty = startEditPix(dst)

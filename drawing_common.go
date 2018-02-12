@@ -6,16 +6,14 @@ import (
 	"github.com/iamGreedy/gumi/gumre"
 )
 
-type DrawingInfo struct {
-	Dt int64
-}
+
 type Drawer interface {
-	Draw(context *gg.Context, style *Style, di *DrawingInfo)
+	Draw(context *gg.Context, style *Style, di Information)
 }
 type FunctionDrawer struct {
-	fn func(context *gg.Context, style *Style, di *DrawingInfo)
+	fn func(context *gg.Context, style *Style, di Information)
 }
-func (s FunctionDrawer)Draw(context *gg.Context, style *Style, di *DrawingInfo)  {
+func (s FunctionDrawer)Draw(context *gg.Context, style *Style, di Information)  {
 	s.fn(context, style, di)
 }
 
@@ -36,7 +34,7 @@ type fpsDrawer struct {
 	dts [fpsDrawerHistory]float64
 	i int
 }
-func (s *fpsDrawer ) Draw(context *gg.Context, style *Style, di *DrawingInfo)  {
+func (s *fpsDrawer ) Draw(context *gg.Context, style *Style, di Information)  {
 	style.useContext(context)
 	defer style.releaseContext(context)
 	//

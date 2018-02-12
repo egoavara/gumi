@@ -18,7 +18,6 @@ type Event interface {
 type EventCursor struct {
 	X, Y uint16
 }
-
 func (EventCursor) Kind() EventKind {
 	return EVENT_CURSOR
 }
@@ -26,7 +25,6 @@ func (EventCursor) Kind() EventKind {
 type EventScroll struct {
 	X, Y int32
 }
-
 func (EventScroll) Kind() EventKind {
 	return EVENT_SCROLL
 }
@@ -34,7 +32,6 @@ func (EventScroll) Kind() EventKind {
 type EventKeyPress struct {
 	Key GUMIKey
 }
-
 func (EventKeyPress) Kind() EventKind {
 	return EVENT_KEYPRESS
 }
@@ -42,7 +39,6 @@ func (EventKeyPress) Kind() EventKind {
 type EventKeyRelease struct {
 	Key GUMIKey
 }
-
 func (EventKeyRelease) Kind() EventKind {
 	return EVENT_KEYRELEASE
 }
@@ -50,7 +46,6 @@ func (EventKeyRelease) Kind() EventKind {
 type EventRuneComplete struct {
 	Rune rune
 }
-
 func (EventRuneComplete) Kind() EventKind {
 	return EVENT_RUNECOMPLETE
 }
@@ -58,7 +53,6 @@ func (EventRuneComplete) Kind() EventKind {
 type EventRuneEdit struct {
 	Rune rune
 }
-
 func (EventRuneEdit) Kind() EventKind {
 	return EVENT_RUNEEDIT
 }

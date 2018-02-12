@@ -4,6 +4,7 @@ import (
 	"image"
 	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type NStyle struct {
@@ -11,24 +12,36 @@ type NStyle struct {
 	s *Style
 }
 
-func (s *NStyle) String() string {
-	return fmt.Sprintf("%s", "NStyle")
+func (s *NStyle) GUMIInfomation(info Information) {
+	s.child.GUMIInfomation(info)
 }
-
-func (s *NStyle) GUMIRender(frame *image.RGBA) {
-	s.child.GUMIRender(frame)
-}
-func (s *NStyle) GUMISize() gumre.Size {
-	return s.child.GUMISize()
+func (s *NStyle) GUMIStyle(style *Style) {
+	s.child.GUMIStyle(style)
 }
 func (s *NStyle) GUMIClip(r image.Rectangle) {
 	s.child.GUMIClip(r)
 }
-func (s *NStyle) GUMIUpdate(info *Information, style *Style) {
-	s.child.GUMIUpdate(info, s.s)
+func (s *NStyle) GUMIRender(frame *image.RGBA) {
 }
+func (s *NStyle) GUMIDraw(frame *image.RGBA) {
+	s.GUMIDraw(frame)
+}
+
+func (s *NStyle) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *NStyle) GUMIUpdate() {
+	panic("implement me")
+}
+
 func (s *NStyle) GUMIHappen(event Event) {
 	s.child.GUMIHappen(event)
+}
+func (s *NStyle) GUMISize() gumre.Size {
+	return s.child.GUMISize()
+}
+func (s *NStyle) String() string {
+	return fmt.Sprintf("%s", "NStyle")
 }
 
 func NStyle0(s *Style) *NStyle {

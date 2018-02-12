@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type gumiRoot struct {
@@ -11,27 +12,39 @@ type gumiRoot struct {
 	scr *Screen
 }
 
-func (s *gumiRoot) String() string {
-	return fmt.Sprintf("%s", "GUMI Root")
+func (s *gumiRoot) GUMIInfomation(info Information) {
+	s.child.GUMIInfomation(info)
 }
-
-func (s *gumiRoot) GUMIRender(frame *image.RGBA) {
-	s.child.GUMIRender(frame)
-}
-func (s *gumiRoot) GUMISize() gumre.Size {
-	return s.child.GUMISize()
+func (s *gumiRoot) GUMIStyle(style *Style) {
+	s.child.GUMIStyle(style)
 }
 func (s *gumiRoot) GUMIClip(r image.Rectangle) {
 	s.child.GUMIClip(r)
 }
-func (s *gumiRoot) Screen() *Screen {
-	return s.scr
+func (s *gumiRoot) GUMIRender(frame *image.RGBA) {
+
 }
-func (s *gumiRoot) GUMIUpdate(info *Information, style *Style) {
-	s.child.GUMIUpdate(info, style)
+func (s *gumiRoot) GUMIDraw(frame *image.RGBA) {
+	s.child.GUMIDraw(frame)
+}
+func (s *gumiRoot) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *gumiRoot) GUMIUpdate() {
+	panic("implement me")
 }
 func (s *gumiRoot) GUMIHappen(event Event) {
 	s.child.GUMIHappen(event)
+}
+func (s *gumiRoot) GUMISize() gumre.Size {
+	return s.child.GUMISize()
+}
+func (s *gumiRoot) String() string {
+	return fmt.Sprintf("%s", "GUMI Root")
+}
+// GUMIRoot interface
+func (s *gumiRoot) Screen() *Screen {
+	return s.scr
 }
 func newGUMIRoot(scr *Screen, under GUMI) GUMIRoot {
 	temp := &gumiRoot{
@@ -40,7 +53,6 @@ func newGUMIRoot(scr *Screen, under GUMI) GUMIRoot {
 	LinkingFrom(temp, under)
 	return temp
 }
-
 func Root(g GUMI) GUMIRoot {
 	if g == nil{
 		return nil

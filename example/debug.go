@@ -15,14 +15,18 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	fmt.Println(runtime.GOMAXPROCS(0))
 	//r, err := os.Open("./res/172676.jpg")
-	r, err := os.Open("./res/cubes_512.png")
+	r, err := os.Open("./res/172676.jpg")
 	gumre.Assert(err)
 	img, ext, err := image.Decode(r)
 	gumre.Assert(err)
+	rgba := image.NewRGBA(img.Bounds())
+	draw.Draw(rgba, rgba.Rect, img, img.Bounds().Min, draw.Src)
 	fmt.Println(ext)
-	var res = img.(draw.Image)
+
+	noise := drawer.NewNoise(32)
+	noise.Draw(rgba)
 	blur := drawer.NewBlur(20, false, drawer.BlurBox)
-	blur.Effect(res)
-	gumi.Capture("out", res)
+	blur.Draw(rgba)
+	gumi.Capture("out", rgba)
 }
 

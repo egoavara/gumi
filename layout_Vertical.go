@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type LVertical struct {
@@ -12,29 +13,14 @@ type LVertical struct {
 	rule gumre.Distribute
 }
 
-func (s *LVertical) GUMIRender(frame *image.RGBA) {
-	wg := new(sync.WaitGroup)
-	wg.Add(len(s.child))
-	defer wg.Wait()
+func (s *LVertical) GUMIInfomation(info Information) {
 	for _, v := range s.child{
-		go func(elem GUMI) {
-			elem.GUMIRender(frame)
-			wg.Done()
-		}(v)
+		v.GUMIInfomation(info)
 	}
 }
-func (s *LVertical) GUMISize() gumre.Size {
-	var minMax, sum uint16 = 0, 0
+func (s *LVertical) GUMIStyle(style *Style) {
 	for _, v := range s.child{
-		sz := v.GUMISize()
-		if sz.Horizontal.Min > minMax{
-			minMax = sz.Horizontal.Min
-		}
-		sum += sz.Vertical.Min
-	}
-	return gumre.Size{
-		gumre.MinLength(sum),
-		gumre.MinLength(minMax),
+		v.GUMIStyle(style)
 	}
 }
 func (s *LVertical) GUMIClip(r image.Rectangle) {
@@ -59,14 +45,45 @@ func (s *LVertical) GUMIClip(r image.Rectangle) {
 		startat += dis[i]
 	}
 }
-func (s *LVertical) GUMIUpdate(info *Information, style *Style) {
+func (s *LVertical) GUMIRender(frame *image.RGBA) {
+
+}
+func (s *LVertical) GUMIDraw(frame *image.RGBA) {
+	wg := new(sync.WaitGroup)
+	wg.Add(len(s.child))
+	defer wg.Wait()
 	for _, v := range s.child{
-		v.GUMIUpdate(info, style)
+		go func(elem GUMI) {
+			elem.GUMIDraw(frame)
+			wg.Done()
+		}(v)
 	}
 }
+
+func (s *LVertical) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *LVertical) GUMIUpdate() {
+	panic("implement me")
+}
+
 func (s *LVertical) GUMIHappen(event Event) {
 	for _, v := range s.child{
 		go v.GUMIHappen(event)
+	}
+}
+func (s *LVertical) GUMISize() gumre.Size {
+	var minMax, sum uint16 = 0, 0
+	for _, v := range s.child{
+		sz := v.GUMISize()
+		if sz.Horizontal.Min > minMax{
+			minMax = sz.Horizontal.Min
+		}
+		sum += sz.Vertical.Min
+	}
+	return gumre.Size{
+		gumre.MinLength(sum),
+		gumre.MinLength(minMax),
 	}
 }
 func (s *LVertical) String() string{

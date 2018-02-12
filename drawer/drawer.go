@@ -6,6 +6,9 @@ import (
 )
 
 type Drawer interface{
-	image.Image
+	Bound() image.Rectangle
+	Effector
+}
+type Effector interface {
 	Draw(dst draw.Image)
 }

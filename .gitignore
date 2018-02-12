@@ -27,6 +27,7 @@ _testmain.go
 *.prof
 *.png
 *.jpg
+*.svg
 
 debug.go
 example/res/

@@ -4,12 +4,11 @@ import (
 	"image"
 	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type ALModal struct {
 	SingleStructure
-	boundStore
-	styleStore
 	//
 	lastCursorEvent EventCursor
 	//
@@ -21,27 +20,35 @@ func (s *ALModal) GUMIInit() {
 	s.modal.GUMIInit()
 	s.child.GUMIInit()
 }
+func (s *ALModal) GUMIInfomation(info Information) {
+	s.child.GUMIInfomation(info)
+	s.modal.GUMIInfomation(info)
+}
+func (s *ALModal) GUMIStyle(style *Style) {
+	s.child.GUMIStyle(style)
+	s.modal.GUMIStyle(style)
+}
+func (s *ALModal) GUMIClip(r image.Rectangle) {
+	s.child.GUMIClip(r)
+	s.modal.GUMIClip(r)
+}
 func (s *ALModal) GUMIRender(frame *image.RGBA) {
+}
+func (s *ALModal) GUMIDraw(frame *image.RGBA) {
 	s.child.GUMIRender(frame)
 	if s.show{
 		s.modal.GUMIRender(frame)
 	}
 }
+
 func (s *ALModal) GUMISize() gumre.Size {
 	return s.child.GUMISize()
 }
-func (s *ALModal) GUMIClip(r image.Rectangle) {
-	s.bound = r
-	if s.show{
-		s.modal.GUMIClip(r)
-	}else {
-		s.child.GUMIClip(r)
-	}
+func (s *ALModal) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
 }
-func (s *ALModal) GUMIUpdate(info *Information, style *Style) {
-	s.style = style
-	s.child.GUMIUpdate(info, style)
-	s.modal.GUMIUpdate(info, style)
+func (s *ALModal) GUMIUpdate() {
+	panic("implement me")
 }
 func (s *ALModal) GUMIHappen(event Event) {
 	if s.show{

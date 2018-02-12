@@ -4,10 +4,10 @@ import (
 	"image"
 	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type GUMI interface{
-
 	GUMIRenderer
 	GUMIStructure
 	GUMICacher
@@ -21,11 +21,13 @@ type GUMIRoot interface{
 }
 
 type GUMIRenderer interface{
+	GUMIInit()
+	GUMIInfomation(info Information)
+	GUMIStyle(style *Style)
+	GUMIClip(r image.Rectangle)
 	GUMIRender(frame *image.RGBA)
 	GUMISize() gumre.Size
-	GUMIClip(r image.Rectangle)
-	GUMIUpdate(info *Information, style *Style)
-	GUMIInit()
+	GUMIDraw(frame *image.RGBA)
 }
 type GUMIStructure interface{
 	born(gumi GUMI)
@@ -34,8 +36,8 @@ type GUMIStructure interface{
 	Childrun() []GUMI
 }
 type GUMICacher interface{
-	// TODO GUMICacher
-	//Changed()
+	GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode)
+	GUMIUpdate()
 }
 type GUMIEventer interface{
 	GUMIHappen(event Event)

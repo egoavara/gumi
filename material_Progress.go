@@ -5,6 +5,7 @@ import (
 	"github.com/fogleman/gg"
 	"image"
 	"github.com/iamGreedy/gumi/gumre"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 const (
@@ -34,15 +35,29 @@ type MTProgress struct {
 }
 type MTProgressChange func(self *MTProgress, percent float64)
 
-func (s *MTProgress) String() string {
-	return fmt.Sprintf("%s(axis: %v, percent:%.2f%%)", "MTProgress", s.axis, s.GetPercent()*100)
-}
 func (s *MTProgress) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtProgressAnimationLength)
 	s.progress = s.studio.Set(mtProgressAnimationProgress, &gumre.Percenting{
 		Fn: Material.DefaultAnimation.Progress,
 	}).(*gumre.Percenting)
 
+}
+func (s *MTProgress) GUMIInfomation(info Information) {
+	s.studio.Animate(float64(info.Dt))
+}
+func (s *MTProgress) GUMIStyle(style *Style) {
+	s.style = style
+}
+func (s *MTProgress) GUMIClip(r image.Rectangle) {
+	s.bound = r
+	switch s.axis {
+	default:
+		fallthrough
+	case gumre.AxisHorizontal:
+		s.progress.Delta = gumre.Animation.ReachingBySpeed(float64(s.bound.Dx()), mtProgressAnimationProgressPixelPerSecond)
+	case gumre.AxisVertical:
+		s.progress.Delta = gumre.Animation.ReachingBySpeed(float64(s.bound.Dy()), mtProgressAnimationProgressPixelPerSecond)
+	}
 }
 func (s *MTProgress) GUMIRender(frame *image.RGBA) {
 	var baseColor0, mainColor0 = s.GetFromMaterialColor().Color()
@@ -89,29 +104,28 @@ func (s *MTProgress) GUMIRender(frame *image.RGBA) {
 		ctx.Fill()
 	}
 }
+func (s *MTProgress) GUMIDraw(frame *image.RGBA) {
+	s.GUMIRender(frame)
+}
+
+func (s *MTProgress) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	panic("implement me")
+}
+func (s *MTProgress) GUMIUpdate() {
+	panic("implement me")
+}
+
+func (s *MTProgress) GUMIHappen(event Event) {
+
+}
 func (s *MTProgress) GUMISize() gumre.Size {
 	return gumre.Size{
 		gumre.MinLength(mtProgressMin),
 		gumre.MinLength(mtProgressMin),
 	}
 }
-func (s *MTProgress) GUMIClip(r image.Rectangle) {
-	s.bound = r
-	switch s.axis {
-	default:
-		fallthrough
-	case gumre.AxisHorizontal:
-		s.progress.Delta = gumre.Animation.ReachingBySpeed(float64(s.bound.Dx()), mtProgressAnimationProgressPixelPerSecond)
-	case gumre.AxisVertical:
-		s.progress.Delta = gumre.Animation.ReachingBySpeed(float64(s.bound.Dy()), mtProgressAnimationProgressPixelPerSecond)
-	}
-}
-func (s *MTProgress) GUMIUpdate(info *Information, style *Style) {
-	s.style = style
-	s.studio.Animate(float64(info.Dt))
-}
-func (s *MTProgress) GUMIHappen(event Event) {
-
+func (s *MTProgress) String() string {
+	return fmt.Sprintf("%s(axis: %v, percent:%.2f%%)", "MTProgress", s.axis, s.GetPercent()*100)
 }
 
 //
