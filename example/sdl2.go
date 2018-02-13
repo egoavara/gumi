@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	var width, height = gumre.DefinedResolutions.Get("VGA")
+	var width, height = gumre.DefinedResolutions.Get("HD")
 	var err error
 
 	// init go:runtime
@@ -58,7 +58,6 @@ func main() {
 		gumi.NBackground0(gumi.Material.Pallette.BackgroundDrawer()),
 		gumi.NDrawing1(
 			gumi.Drawing.FPS(),
-			//gumi.Drawing.Ruler.Screen(),
 			gumi.Drawing.Ruler.Graduation.Vertical(10),
 			gumi.Drawing.Ruler.Graduation.Horizontal(10),
 			gumi.Drawing.Ruler.Hint.Vertical(100),
@@ -69,9 +68,8 @@ func main() {
 			gumi.Tool.MarginMinRegular(4, gumi.MTButton1(gumi.Material.Pallette.Red, "Close", func(self *gumi.MTButton) {
 				err = glumi.Stop
 			})),
-			//
 			gumi.ASpacer2(gumre.MinLength(20)),
-			//
+		//	//
 			gumi.LVertical1(ToggleProgress...),
 			gumi.LHorizontal1(Radios...),
 			//
@@ -104,6 +102,7 @@ func main() {
 				gumi.NMargin0(gumre.RegularBlank(gumre.MinLength(4))),
 				gumi.MTEdit0(),
 			),
+			//gumi.AImage0(drawer.NewFixed(res.ImageHexagon)),
 			gumi.AImage0(drawer.NewFillup(res.ImageHexagon, drawer.FillupNearestNeighbor)),
 			gumi.AText1("Hello, World!", gumre.AlignCenter),
 			gumi.AText1("안녕!", gumre.AlignCenter),

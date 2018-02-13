@@ -26,7 +26,8 @@ func (s *AImage) GUMIClip(rect image.Rectangle) {
 	}
 }
 func (s *AImage) GUMIRender(frame *image.RGBA) {
-	s.drawer.Draw(frame)
+
+	s.drawer.Draw(frame.SubImage(s.bound).(*image.RGBA))
 }
 func (s *AImage) GUMIDraw(frame *image.RGBA) {
 	s.GUMIRender(frame)

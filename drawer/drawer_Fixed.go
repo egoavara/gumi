@@ -25,5 +25,5 @@ func (s Fixed) Bound() image.Rectangle {
 	return s.src.Bounds()
 }
 func (s Fixed) Draw(dst draw.Image) {
-	draw.Draw(dst, dst.Bounds().Intersect(s.src.Rect), s.src, s.src.Rect.Min, draw.Over)
+	draw.Draw(dst, dst.Bounds(), s.src, s.src.Rect.Min, draw.Over)
 }

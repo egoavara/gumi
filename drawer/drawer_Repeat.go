@@ -39,7 +39,6 @@ func (s Repeat) Draw(dst draw.Image) {
 	var dstw, dsth = dstsz.Dx(), dstsz.Dy()
 	var srcw, srch = s.src.Rect.Dx(), s.src.Rect.Dy()
 	var rcnth, rcntv = dstw/srcw + 1, dsth/srch + 1
-	//var lefth, leftv = dstw % srcw, dsth % srch
 	switch s.Mode {
 	default:
 		fallthrough

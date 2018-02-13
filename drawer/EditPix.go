@@ -2,7 +2,6 @@ package drawer
 
 import (
 	"image"
-	"image/color"
 	"image/draw"
 )
 
@@ -14,92 +13,39 @@ const (
 	STRIDECOUNT = 4
 )
 
-func startEditPix(src image.Image) (pix []uint8, stride, startX, startY int) {
+func startEdit(src image.Image) (rgba *image.RGBA) {
 	if v, ok := src.(*image.RGBA); ok {
-		return v.Pix, v.Stride, v.Rect.Min.X, v.Rect.Min.Y
+		return v
 	}
-	var imageSize = src.Bounds().Size()
-	stride = imageSize.X * STRIDECOUNT
-	var pixlen = stride * imageSize.Y
-	startX = src.Bounds().Min.X
-	startY = src.Bounds().Min.Y
-
-	pix = make([]uint8, pixlen)
-	// src Copy to pix
-	for x := 0; x < imageSize.X; x++ {
-		for y := 0; y < imageSize.Y; y++ {
-			r, g, b, a := src.At(x, y).RGBA()
-			offset := offsetEditPix(x, y, stride)
-			pix[offset+R] = uint8(r >> 8)
-			pix[offset+G] = uint8(g >> 8)
-			pix[offset+B] = uint8(b >> 8)
-			pix[offset+A] = uint8(a >> 8)
-		}
-	}
-	return
+	rgba = image.NewRGBA(src.Bounds())
+	draw.Draw(rgba, rgba.Rect, src, src.Bounds().Min, draw.Src)
+	return rgba
 }
-func endEditPix(dst draw.Image, pix []uint8, stride int, startX, startY int) {
+func endEdit(dst draw.Image, rgba *image.RGBA) {
 	if _, ok := dst.(*image.RGBA); ok {
 		return
 	}
-	var w, h = sizeEidtPix(len(pix), stride)
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			offset := offsetEditPix(x, y, stride)
-			dst.Set(startX+x, startY+y, color.RGBA{
-				pix[offset+R],
-				pix[offset+G],
-				pix[offset+B],
-				pix[offset+A],
-			})
-		}
-	}
+	draw.Draw(dst, dst.Bounds(), rgba, rgba.Rect.Min, draw.Src)
 }
 
 //
-func createEditPix(w, h int) (pix []uint8, stride int) {
-	stride = w * STRIDECOUNT
-	pixlen := stride * h
-	pix = make([]uint8, pixlen)
-	return
-}
-func makeImageFromPix(pix []uint8, stride int) *image.RGBA {
-	w, h := sizeEidtPix(len(pix), stride)
-	return &image.RGBA{
-		Pix:    pix,
-		Stride: stride,
-		Rect:   image.Rect(0, 0, w, h),
-	}
-}
 
 //
-func sizeEidtPix(length, stride int) (w, h int) {
-	return stride / STRIDECOUNT, length / stride
+func sizeEidt(rgba *image.RGBA) (w, h int) {
+	sz := rgba.Rect.Size()
+	return sz.X, sz.Y
 }
-func offsetEditPix(x, y, stride int) int {
-	return x*STRIDECOUNT + y*stride
-}
-
 //
-func paddingEmpty(src []uint8, srcStride int, padW, padH int) (dst []uint8, dstStride int) {
-	var w, h = sizeEidtPix(len(src), srcStride)
-	var dstW, dstH = w + padW*2, h + padH*2
-	dst, dstStride = createEditPix(dstW, dstH)
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			dstOffset := offsetEditPix(padW+x, padH+y, dstStride)
-			srcOffset := offsetEditPix(x, y, srcStride)
-			dst[dstOffset+R] = src[srcOffset+R]
-			dst[dstOffset+G] = src[srcOffset+G]
-			dst[dstOffset+B] = src[srcOffset+B]
-			dst[dstOffset+A] = src[srcOffset+A]
-		}
-	}
-	return dst, dstStride
+func paddingEmpty(src *image.RGBA, padW, padH int) (dst * image.RGBA) {
+	var srcw, srch = sizeEidt(src)
+	var dstW, dstH = srcw + padW*2, srch + padH*2
+	dst = image.NewRGBA(image.Rect(0,0,dstW, dstH))
+	draw.Draw(dst, image.Rect(padW, padH, padW + srcw, padH + srch), src, image.ZP, draw.Src)
+	return dst
 }
-func paddingExtend(src []uint8, srcStride int, padW, padH int) (dst []uint8, dstStride int) {
-	dst, dstStride = paddingEmpty(src, srcStride, padW, padH)
-	dstW, dstH := sizeEidtPix(len(dst), dstStride)
+func paddingExtend(src * image.RGBA, padW, padH int) (dst * image.RGBA) {
+	dst = paddingEmpty(src, padW, padH)
+	dstW, dstH := sizeEidt(dst)
 	for y := 0; y < dstH; y++ {
 		iy := y
 		if iy < padH {
@@ -120,13 +66,13 @@ func paddingExtend(src []uint8, srcStride int, padW, padH int) (dst []uint8, dst
 				x = dstW - padW - 1
 				continue
 			}
-			dstOffset := offsetEditPix(x, y, dstStride)
-			edgeOffset := offsetEditPix(ix, iy, dstStride)
-			dst[dstOffset+R] = dst[edgeOffset+R]
-			dst[dstOffset+G] = dst[edgeOffset+G]
-			dst[dstOffset+B] = dst[edgeOffset+B]
-			dst[dstOffset+A] = dst[edgeOffset+A]
+			dstOffset := dst.PixOffset(x, y,)
+			edgeOffset := dst.PixOffset(ix, iy)
+			dst.Pix[dstOffset+R] = dst.Pix[edgeOffset+R]
+			dst.Pix[dstOffset+G] = dst.Pix[edgeOffset+G]
+			dst.Pix[dstOffset+B] = dst.Pix[edgeOffset+B]
+			dst.Pix[dstOffset+A] = dst.Pix[edgeOffset+A]
 		}
 	}
-	return dst, dstStride
+	return dst
 }

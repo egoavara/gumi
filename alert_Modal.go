@@ -35,9 +35,9 @@ func (s *ALModal) GUMIClip(r image.Rectangle) {
 func (s *ALModal) GUMIRender(frame *image.RGBA) {
 }
 func (s *ALModal) GUMIDraw(frame *image.RGBA) {
-	s.child.GUMIRender(frame)
+	s.child.GUMIDraw(frame)
 	if s.show{
-		s.modal.GUMIRender(frame)
+		s.modal.GUMIDraw(frame)
 	}
 }
 

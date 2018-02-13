@@ -11,7 +11,7 @@ var ImageHexagon image.Image
 func init() {
 	ctx := gg.NewContext(120, 120)
 	//
-	ctx.SetRGB(0,0,0)
+	ctx.SetRGBA(0,0,0, 0)
 	ctx.SetColor(color.White)
 	centerX, centerY := float64(ctx.Width()) / 2, float64(ctx.Height()) / 2
 	radius := 40.

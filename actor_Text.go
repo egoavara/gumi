@@ -58,7 +58,7 @@ func (s *AText) GUMIRender(frame *image.RGBA) {
 }
 
 func (s *AText) GUMIDraw(frame *image.RGBA) {
-	s.GUMIDraw(frame)
+	s.GUMIRender(frame)
 }
 func (s *AText) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
 	panic("implement me")
