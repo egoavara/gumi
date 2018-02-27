@@ -7,45 +7,83 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 
+// _::Root
+//
+// gumiRoot is Special case. private struct
 type gumiRoot struct {
-	SingleStructure
+	SingleNode
 	scr *Screen
 }
 
+// GUMIFunction / GUMIInit 					-> SingleNode::Default
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *gumiRoot) GUMIInfomation(info Information) {
 	s.child.GUMIInfomation(info)
 }
+
+// GUMIFunction / GUMIStyle 			-> Define
 func (s *gumiRoot) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
+
+// GUMIFunction / GUMIClip 			-> Define
 func (s *gumiRoot) GUMIClip(r image.Rectangle) {
 	s.child.GUMIClip(r)
 }
+
+// GUMIFunction / GUMIRender 			-> Define
 func (s *gumiRoot) GUMIRender(frame *image.RGBA) {
 
 }
-func (s *gumiRoot) GUMIDraw(frame *image.RGBA) {
-	s.child.GUMIDraw(frame)
-}
-func (s *gumiRoot) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *gumiRoot) GUMIUpdate() {
-	panic("implement me")
-}
-func (s *gumiRoot) GUMIHappen(event Event) {
-	s.child.GUMIHappen(event)
-}
+
+// GUMIFunction / GUMISize 			-> Define
 func (s *gumiRoot) GUMISize() gumre.Size {
 	return s.child.GUMISize()
 }
+
+
+// GUMITree / born 							-> SingleNode::Default
+
+// GUMITree / breed 						-> SingleNode::Default
+
+// GUMITree / Parent()						-> SingleNode::Default
+
+// GUMITree / Childrun()					-> SingleNode::Default
+
+
+// GUMIRenderer / GUMIRenderSetup			-> Define::Empty
+func (s *gumiRoot) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+
+}
+
+// GUMIRenderer / GUMIRenderSetup			-> Define
+func (s *gumiRoot) GUMIDraw() {
+	s.child.GUMIDraw()
+}
+
+// GUMIRenderer / GUMIRenderSetup			-> Define
+func (s *gumiRoot) GUMIUpdate() {
+	// TODO
+	panic("implement me")
+}
+
+// GUMIEventor
+func (s *gumiRoot) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
+}
+
+
 func (s *gumiRoot) String() string {
 	return fmt.Sprintf("%s", "GUMI Root")
 }
-// GUMIRoot interface
+
+// GUMIRoot / Screen
 func (s *gumiRoot) Screen() *Screen {
 	return s.scr
 }
+
+// Constructor
 func newGUMIRoot(scr *Screen, under GUMI) GUMIRoot {
 	temp := &gumiRoot{
 		scr: scr,
@@ -53,6 +91,8 @@ func newGUMIRoot(scr *Screen, under GUMI) GUMIRoot {
 	LinkingFrom(temp, under)
 	return temp
 }
+
+// Utility Function
 func Root(g GUMI) GUMIRoot {
 	if g == nil{
 		return nil

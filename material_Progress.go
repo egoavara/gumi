@@ -19,7 +19,7 @@ const (
 )
 
 type MTProgress struct {
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
 	//

@@ -4,6 +4,7 @@ import (
 	"github.com/fogleman/gg"
 	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
+	"math"
 )
 
 
@@ -42,16 +43,11 @@ func (s *fpsDrawer ) Draw(context *gg.Context, style *Style, di Information)  {
 	s.i = (s.i + 1) % fpsDrawerHistory
 	//
 	context.SetColor(rulerColor)
-	avg := ifZeroBelowToOne(gumre.Average(s.dts[:]))
+
+	avg := Clamp(gumre.Average(s.dts[:]), 0.001, math.MaxFloat64)
 	txt := fmt.Sprintf("FPS : %.2f - AVG : %2.5f", 1000 / float64(avg), avg)
 	w := float64(context.Width())
 	mw, mh := context.MeasureString(txt)
 	context.DrawString(txt, w - FPSPos - mw, FPSPos + mh)
 	context.Stroke()
-}
-func ifZeroBelowToOne(i float64) float64 {
-	if i < 0{
-		return 1
-	}
-	return i
 }

@@ -21,7 +21,7 @@ const (
 )
 type MTToggle struct {
 	//
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
 	//

@@ -8,10 +8,14 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 
+// Actor::Text
+//
+// AText use for render text
 type AText struct {
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
+	frameStore
 	//
 	align     gumre.Align
 	text      string
@@ -19,17 +23,21 @@ type AText struct {
 	//
 }
 
+// GUMIFunction / GUMIInfomation 			-> Define::Empty
 func (s *AText) GUMIInfomation(info Information) {
 }
 
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *AText) GUMIStyle(style *Style) {
 	s.style = style
 }
 
+// GUMIFunction / GUMIClip 					-> Define
 func (s *AText) GUMIClip(r image.Rectangle) {
 	s.bound = r
 }
 
+// GUMIFunction / GUMIRender 				-> Define
 func (s *AText) GUMIRender(frame *image.RGBA) {
 	ctx := createContextRGBASub(frame, s.bound)
 	s.style.useContext(ctx)
@@ -57,20 +65,7 @@ func (s *AText) GUMIRender(frame *image.RGBA) {
 	ctx.DrawString(s.text, drawX, drawY - 1)
 }
 
-func (s *AText) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
-}
-func (s *AText) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-
-func (s *AText) GUMIUpdate() {
-	panic("implement me")
-}
-
-
-func (s *AText) GUMIHappen(event Event) {
-}
+// GUMIFunction / GUMISize 					-> Define
 func (s *AText) GUMISize() gumre.Size {
 	s.style.Default.Font.Use()
 	defer s.style.Default.Font.Release()
@@ -84,54 +79,104 @@ func (s *AText) GUMISize() gumre.Size {
 
 	return temp
 }
+
+// GUMITree / born 							-> VoidNode::Default
+
+// GUMITree / breed 						-> VoidNode::Default
+
+// GUMITree / Parent()						-> VoidNode::Default
+
+// GUMITree / Childrun()					-> VoidNode::Default
+
+// GUMIRenderer / GUMIRenderSetup			-> Define
+func (s *AText) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.frame = frame
+	// TODO : Cache
+}
+
+// GUMIRenderer / GUMIDraw					-> Define
+func (s *AText) GUMIDraw() {
+	s.GUMIRender(s.frame)
+}
+
+// GUMIRenderer / GUMIUpdate				-> Define
+func (s *AText) GUMIUpdate() {
+	// TODO
+	panic("implement me")
+}
+
+// GUMIEventer / GUMIHappen					-> Define
+func (s *AText) GUMIHappen(event Event) {
+}
+
+// fmt.Stringer / String					-> Define
 func (s *AText) String() string {
 	return fmt.Sprintf("%s(text:%s)", "AText", s.text)
 }
 
-//
+// Constructor 0
 func AText0(str string) *AText {
-	return &AText{
-		text:      str,
-		align:     gumre.AlignCenter,
-		textColor: color.White,
-	}
-}
-func AText1(str string, align gumre.Align) *AText {
-	return &AText{
-		text:      str,
-		align:     align,
-		textColor: color.White,
-	}
-}
-func AText2(str string, align gumre.Align, textColor color.Color) *AText {
-	return &AText{
-		text:      str,
-		align:     align,
-		textColor: textColor,
-	}
+	temp := &AText{}
+	temp.SetText(str)
+	temp.SetAlign(gumre.AlignCenter)
+	temp.SetColor(color.White)
+	return temp
 }
 
+// Constructor 1
+func AText1(str string, align gumre.Align) *AText {
+	temp := &AText{}
+	temp.SetText(str)
+	temp.SetAlign(align)
+	temp.SetColor(color.White)
+	return temp
+}
+
+// Constructor 2
+func AText2(str string, align gumre.Align, textColor color.Color) *AText {
+	temp := &AText{}
+	temp.SetText(str)
+	temp.SetAlign(align)
+	temp.SetColor(textColor)
+	return temp
+}
+
+// Method / Set -> SetText(...)
 func (s *AText) Set(text string) {
 	s.SetText(text)
 }
+
+// Method / Get -> GetText()
 func (s *AText) Get() string {
 	return s.GetText()
 }
+
+// Method / SetText
 func (s *AText) SetText(text string) {
 	s.text = text
 }
+
+// Method / GetText
 func (s *AText) GetText() string {
 	return s.text
 }
+
+// Method / SetAlign
 func (s *AText) SetAlign(align gumre.Align) {
 	s.align = align
 }
+
+// Method / GetAlign
 func (s *AText) GetAlign() gumre.Align {
 	return s.align
 }
+
+// Method / SetColor
 func (s *AText) SetColor(textColor color.Color) {
 	s.textColor = textColor
 }
+
+// Method / GetColor
 func (s *AText) GetColor() color.Color {
 	return s.textColor
 }

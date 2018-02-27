@@ -2,15 +2,19 @@ package gumi
 
 import (
 	"fmt"
+	"github.com/iamGreedy/gumi/drawer"
 	"github.com/iamGreedy/gumi/gumre"
 	"image"
-	"github.com/iamGreedy/gumi/drawer"
 )
 
+// Actor::Canvas
+//
+// ACanvas using for render Vector image
 type ACanvas struct {
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
+	frameStore
 	//
 	w, h uint16
 	fn   Drawer
@@ -18,43 +22,71 @@ type ACanvas struct {
 	di Information
 }
 
+// GUMIFunction / GUMIInit 					-> VoidNode::Default
+
+// GUMIFunction / GUMIInfomation
 func (s *ACanvas) GUMIInfomation(info Information) {
 	s.di = info
 }
+
+// GUMIFunction / GUMIStyle					-> Define
 func (s *ACanvas) GUMIStyle(style *Style) {
 	s.style = style
 
 }
+
+// GUMIFunction / GUMIClip					-> Define
 func (s *ACanvas) GUMIClip(rect image.Rectangle) {
 	s.bound = rect
 }
+
+// GUMIFunction / GUMIRender				-> Define
 func (s *ACanvas) GUMIRender(frame *image.RGBA) {
 	ctx := createContextRGBASub(frame, s.bound)
 	s.fn.Draw(ctx, s.style, s.di)
 }
-func (s *ACanvas) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
-}
+
+// GUMIFunction / GUMISize					-> Define
 func (s ACanvas) GUMISize() gumre.Size {
 	return gumre.Size{
 		Horizontal: gumre.FixLength(uint16(s.w)),
 		Vertical:   gumre.FixLength(uint16(s.h)),
 	}
 }
-func (s *ACanvas) GUMIHappen(event Event) {
-}
-func (s *ACanvas) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+
+// GUMITree / born 							-> VoidNode::Default
+
+// GUMITree / breed 						-> VoidNode::Default
+
+// GUMITree / Parent()						-> VoidNode::Default
+
+// GUMITree / Childrun()					-> VoidNode::Default
+
+// GUMIRenderer / GUMIRenderSetup			-> Define
+func (s *ACanvas) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.frame = frame
 	// TODO : Cache
-	panic("implement me")
 }
-func (s *ACanvas) GUMIUpdate() {
+// GUMIRenderer / GUMIRenderSetup			-> Define
+func (s *ACanvas) GUMIDraw() {
+	s.GUMIRender(s.frame)
+}
+// GUMIRenderer / GUMIRenderSetup			-> Define
+func (s *ACanvas ) GUMIUpdate()  {
 	// TODO : Cache
-	panic("implement me")
 }
 
+// GUMIEventer / GUMIHappen					-> Define
+func (s *ACanvas) GUMIHappen(event Event) {
+}
+
+// fmt.Stringer / String					-> Define
 func (s *ACanvas) String() string {
 	return fmt.Sprintf("%s", "ACanvas")
 }
+
+
+// Constructor
 func ACanvas0(w, h uint16, fn Drawer) *ACanvas {
 	return &ACanvas{
 		w:  w,

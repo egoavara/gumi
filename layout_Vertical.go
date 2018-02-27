@@ -9,7 +9,7 @@ import (
 )
 
 type LVertical struct {
-	MultipleStructure
+	MultipleNode
 	rule gumre.Distribute
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 type NBackground struct {
-	SingleStructure
+	SingleNode
 	boundStore
 	//
 	drawer drawer.Drawer

@@ -8,7 +8,7 @@ import (
 )
 
 type NSize struct {
-	SingleStructure
+	SingleNode
 	sz gumre.Size
 }
 

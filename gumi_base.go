@@ -1,49 +1,68 @@
+// Existing structs for ease of development
+//
 package gumi
 
 import "image"
 
-type SingleStructure struct {
+type VoidNode struct {
+	parent GUMI
+}
+func (s *VoidNode) GUMIInit() {
+}
+func (s *VoidNode) born(gumi GUMI) {
+	s.parent = gumi
+}
+func (s *VoidNode) breed(gumi []GUMI) {
+}
+func (s *VoidNode) Parent() GUMI {
+	return s.parent
+}
+func (s *VoidNode) Childrun() []GUMI {
+	return nil
+}
+
+type SingleNode struct {
 	parent GUMI
 	child  GUMI
 }
-func (s *SingleStructure) GUMIInit() {
+func (s *SingleNode) GUMIInit() {
 	s.child.GUMIInit()
 }
-func (s *SingleStructure) born(gumi GUMI) {
+func (s *SingleNode) born(gumi GUMI) {
 	s.parent = gumi
 }
-func (s *SingleStructure) breed(gumi []GUMI) {
+func (s *SingleNode) breed(gumi []GUMI) {
 	if len(gumi) > 0 {
 		s.child = gumi[0]
 	}
 }
-func (s *SingleStructure) Parent() GUMI {
+func (s *SingleNode) Parent() GUMI {
 	return s.parent
 }
-func (s *SingleStructure) Childrun() []GUMI {
+func (s *SingleNode) Childrun() []GUMI {
 	return []GUMI{s.child}
 }
 
-type MultipleStructure struct {
+type MultipleNode struct {
 	parent GUMI
 	child  []GUMI
 }
 
-func (s *MultipleStructure) GUMIInit() {
+func (s *MultipleNode) GUMIInit() {
 	for _ , v := range s.child{
 		v.GUMIInit()
 	}
 }
-func (s *MultipleStructure) born(gumi GUMI) {
+func (s *MultipleNode) born(gumi GUMI) {
 	s.parent = gumi
 }
-func (s *MultipleStructure) breed(gumi []GUMI) {
+func (s *MultipleNode) breed(gumi []GUMI) {
 	s.child = gumi
 }
-func (s *MultipleStructure) Parent() GUMI {
+func (s *MultipleNode) Parent() GUMI {
 	return s.parent
 }
-func (s *MultipleStructure) Childrun() []GUMI {
+func (s *MultipleNode) Childrun() []GUMI {
 	res := make([]GUMI, len(s.child))
 	for i, v := range s.child {
 		res[i] = v
@@ -51,26 +70,14 @@ func (s *MultipleStructure) Childrun() []GUMI {
 	return res
 }
 
-type VoidStructure struct {
-	parent GUMI
-}
-func (s *VoidStructure) GUMIInit() {
-}
-func (s *VoidStructure) born(gumi GUMI) {
-	s.parent = gumi
-}
-func (s *VoidStructure) breed(gumi []GUMI) {
-}
-func (s *VoidStructure) Parent() GUMI {
-	return s.parent
-}
-func (s *VoidStructure) Childrun() []GUMI {
-	return nil
-}
+
 
 type boundStore struct {
 	bound image.Rectangle
 }
 type styleStore struct {
 	style *Style
+}
+type frameStore struct {
+	frame *image.RGBA
 }

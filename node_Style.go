@@ -8,7 +8,7 @@ import (
 )
 
 type NStyle struct {
-	SingleStructure
+	SingleNode
 	s *Style
 }
 

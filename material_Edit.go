@@ -23,7 +23,7 @@ const (
 
 type MTEdit struct {
 	//
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
 	//

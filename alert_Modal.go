@@ -7,8 +7,11 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 
+// ALert::Modal
+//
+//
 type ALModal struct {
-	SingleStructure
+	SingleNode
 	//
 	lastCursorEvent EventCursor
 	//
@@ -16,40 +19,66 @@ type ALModal struct {
 	show bool
 }
 
+// GUMIFunction / GUMIInit 					-> Define
 func (s *ALModal) GUMIInit() {
 	s.modal.GUMIInit()
 	s.child.GUMIInit()
 }
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *ALModal) GUMIInfomation(info Information) {
 	s.child.GUMIInfomation(info)
 	s.modal.GUMIInfomation(info)
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *ALModal) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 	s.modal.GUMIStyle(style)
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *ALModal) GUMIClip(r image.Rectangle) {
 	s.child.GUMIClip(r)
 	s.modal.GUMIClip(r)
 }
+
+// GUMIFunction / GUMIRender 				-> Define::Empty
 func (s *ALModal) GUMIRender(frame *image.RGBA) {
 }
-func (s *ALModal) GUMIDraw(frame *image.RGBA) {
-	s.child.GUMIDraw(frame)
-	if s.show{
-		s.modal.GUMIDraw(frame)
-	}
-}
 
+// GUMIFunction / GUMISize 					-> Define
 func (s *ALModal) GUMISize() gumre.Size {
 	return s.child.GUMISize()
 }
-func (s *ALModal) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+
+// GUMITree / born 							-> SingleNode::Default
+
+// GUMITree / breed 						-> SingleNode::Default
+
+// GUMITree / Parent()						-> SingleNode::Default
+
+// GUMITree / Childrun()					-> SingleNode::Default
+
+// GUMIRenderer / GUMIRenderSetup			-> Define
+func (s *ALModal) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
 	panic("implement me")
 }
+
+// GUMIRenderer / GUMIUpdate			-> Define
 func (s *ALModal) GUMIUpdate() {
 	panic("implement me")
 }
+
+// GUMIRenderer / GUMIDraw			-> Define
+func (s *ALModal) GUMIDraw() {
+	s.child.GUMIDraw()
+	if s.show{
+		s.modal.GUMIDraw()
+	}
+}
+
+// GUMIEventer / GUMIHappen					-> Define
 func (s *ALModal) GUMIHappen(event Event) {
 	if s.show{
 		s.modal.GUMIHappen(event)
@@ -60,14 +89,19 @@ func (s *ALModal) GUMIHappen(event Event) {
 		s.child.GUMIHappen(event)
 	}
 }
+
+// fmt.Stringer / String				-> Define
 func (s *ALModal) String() string {
 	return fmt.Sprintf("%s", "ALModal")
 }
-//
+
+// Constructor 0
 func ALModal0() *ALModal {
 	temp := &ALModal{}
 	return temp
 }
+
+// Constructor 1
 func ALModal1(modal GUMI) *ALModal {
 	temp := &ALModal{
 		modal:modal,
@@ -76,18 +110,34 @@ func ALModal1(modal GUMI) *ALModal {
 	return temp
 }
 
-//
+// Method / SetShow
+func (s *ALModal ) Set(show bool)  {
+	s.SetShow(show)
+}
+
+// Method / GetShow
+func (s *ALModal ) Get() bool {
+	return s.GetShow()
+}
+
+// Method / SetModal
 func (s *ALModal ) SetModal(modal GUMI)  {
 	s.modal = modal
 	s.modal.born(s)
 }
+
+// Method / GetModal
 func (s *ALModal ) GetModal() GUMI {
 	return s.modal
 }
+
+// Method / SetShow
 func (s *ALModal ) SetShow(show bool)  {
 	s.show = show
 	s.modal.GUMIHappen(s.lastCursorEvent)
 }
+
+// Method / GetShow
 func (s *ALModal ) GetShow() bool {
 	return s.show
 }

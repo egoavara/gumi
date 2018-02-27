@@ -6,6 +6,7 @@
 1. `node_` is kind of Elements
 1. `material_` is kind of Elements
 # Kinds
+## Actor
 ## Length
 * Always horizontal first, vertical follow
 ## Size

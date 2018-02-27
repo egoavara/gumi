@@ -8,7 +8,7 @@ import (
 )
 
 type NMargin struct {
-	SingleStructure
+	SingleNode
 	b gumre.Blank
 }
 

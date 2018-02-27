@@ -8,7 +8,7 @@ import (
 )
 
 type LCenter struct {
-	SingleStructure
+	SingleNode
 }
 
 func (s *LCenter) GUMIInfomation(info Information) {

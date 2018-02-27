@@ -7,7 +7,7 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 type NMinimum struct {
-	SingleStructure
+	SingleNode
 	axis gumre.Axis
 }
 

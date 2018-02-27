@@ -7,7 +7,7 @@ import (
 )
 
 type Test struct {
-	gumi.VoidStructure
+	gumi.VoidNode
 }
 
 func (s *Test) draw(frame *image.RGBA) {

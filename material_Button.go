@@ -19,7 +19,7 @@ const (
 
 type MTButton struct {
 	//
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
 	//

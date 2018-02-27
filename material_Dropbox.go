@@ -26,7 +26,7 @@ const (
 )
 
 type MTDropbox struct {
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
 	//

@@ -21,7 +21,7 @@ const (
 
 type MTRadio struct {
 	//
-	VoidStructure
+	VoidNode
 	boundStore
 	styleStore
 	//

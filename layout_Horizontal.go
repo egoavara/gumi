@@ -9,7 +9,7 @@ import (
 )
 
 type LHorizontal struct {
-	MultipleStructure
+	MultipleNode
 	rule gumre.Distribute
 }
 
