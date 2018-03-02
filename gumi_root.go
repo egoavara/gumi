@@ -22,22 +22,22 @@ func (s *gumiRoot) GUMIInfomation(info Information) {
 	s.child.GUMIInfomation(info)
 }
 
-// GUMIFunction / GUMIStyle 			-> Define
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *gumiRoot) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
 
-// GUMIFunction / GUMIClip 			-> Define
+// GUMIFunction / GUMIClip 					-> Define
 func (s *gumiRoot) GUMIClip(r image.Rectangle) {
 	s.child.GUMIClip(r)
 }
 
-// GUMIFunction / GUMIRender 			-> Define
+// GUMIFunction / GUMIRender 				-> Define
 func (s *gumiRoot) GUMIRender(frame *image.RGBA) {
 
 }
 
-// GUMIFunction / GUMISize 			-> Define
+// GUMIFunction / GUMISize 					-> Define
 func (s *gumiRoot) GUMISize() gumre.Size {
 	return s.child.GUMISize()
 }
