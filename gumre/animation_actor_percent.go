@@ -21,9 +21,9 @@ func (s *Percenting) Request(to float64) {
 		s.To = to
 	}
 }
-func (s *Percenting) Animate(delta float64) {
+func (s *Percenting) Animate(delta float64) bool {
 	if s.Current == s.To {
-		return
+		return false
 	}
 
 	if s.To > s.From {
@@ -37,6 +37,7 @@ func (s *Percenting) Animate(delta float64) {
 			s.Current = s.To
 		}
 	}
+	return true
 }
 func (s *Percenting) Value() float64 {
 	if s.From == s.To {

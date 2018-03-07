@@ -24,7 +24,7 @@ type _Ruler struct {
 type Graduation struct{}
 
 func (Graduation) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -35,7 +35,7 @@ func (Graduation) Vertical(pivot float64) Drawer {
 	}}
 }
 func (Graduation) Horizontal(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -49,7 +49,7 @@ func (Graduation) Horizontal(pivot float64) Drawer {
 type Grid struct{}
 
 func (Grid) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -60,7 +60,7 @@ func (Grid) Vertical(pivot float64) Drawer {
 	}}
 }
 func (Grid) Horizontal(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style){
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -74,7 +74,7 @@ func (Grid) Horizontal(pivot float64) Drawer {
 type Hint struct{}
 
 func (Hint) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -88,7 +88,7 @@ func (Hint) Vertical(pivot float64) Drawer {
 }
 func (Hint) Horizontal(pivot float64) Drawer {
 
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -103,7 +103,7 @@ func (Hint) Horizontal(pivot float64) Drawer {
 type Dashgrid struct{}
 
 func (Dashgrid) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -116,7 +116,7 @@ func (Dashgrid) Vertical(pivot float64) Drawer {
 	}}
 }
 func (Dashgrid) Horizontal(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -129,7 +129,7 @@ func (Dashgrid) Horizontal(pivot float64) Drawer {
 }
 
 func (_Ruler) Size() Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -155,7 +155,7 @@ func (_Ruler) Size() Drawer {
 	}}
 }
 func (_Ruler) Proportion() Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -173,7 +173,7 @@ func (_Ruler) Proportion() Drawer {
 	}}
 }
 func (_Ruler) Screen() Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -186,7 +186,7 @@ func (_Ruler) Screen() Drawer {
 	}}
 }
 func (_Ruler) Dots(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style, di Information) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)

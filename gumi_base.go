@@ -2,7 +2,9 @@
 //
 package gumi
 
-import "image"
+import (
+	"github.com/iamGreedy/gumi/drawer"
+)
 
 type VoidNode struct {
 	parent GUMI
@@ -72,12 +74,10 @@ func (s *MultipleNode) Childrun() []GUMI {
 
 
 
-type boundStore struct {
-	bound image.Rectangle
-}
 type styleStore struct {
 	style *Style
 }
-type frameStore struct {
-	frame *image.RGBA
+type rendererStore struct {
+	rtree *drawer.RenderTree
+	rnode *drawer.RenderNode
 }

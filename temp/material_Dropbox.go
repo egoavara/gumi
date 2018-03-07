@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 	"math"
 )
 
+// MTDropbox Default Values
 const (
 	mtDropboxMinWidth              = 80
 	mtDropboxMinHeight             = 20
@@ -19,16 +20,22 @@ const (
 	mtDropboxScroolSpeedPerSecond  = 200
 	mtDropboxScroolModify          = 16
 )
+
+// MTDropbox Animations
 const (
 	mtDropboxAnimationStreching = iota
 	mtDropboxAnimationScroll
 	mtDropboxAnimationLength
 )
 
+// Material::Dropbox
+//
+// Material theme Dropbox(Combo Box)
 type MTDropbox struct {
 	VoidNode
 	boundStore
 	styleStore
+	rendererStore
 	//
 	scr     *Screen
 	deferid uint64
@@ -52,8 +59,13 @@ type MTDropbox struct {
 	//
 	cursorEnter, active bool
 }
+
+// Material::Dropbox<Callback> -> Change
+//
+// When changed selected, it occur
 type MTDropboxChange func(self *MTDropbox, selected string)
 
+// GUMIFunction / GUMIInit 					-> Define
 func (s *MTDropbox) GUMIInit() {
 	s.scr = Root(s).Screen()
 	s.deferid = s.scr.deferReserve()
@@ -70,18 +82,26 @@ func (s *MTDropbox) GUMIInit() {
 	}).(*gumre.Reaching)
 
 }
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *MTDropbox) GUMIInfomation(info Information) {
 	s.studio.Animate(float64(info.Dt))
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *MTDropbox) GUMIStyle(style *Style) {
 	if s.style != style || s.Elems.needUpdate() {
 		s.Elems.update(style)
 		s.style = style
 	}
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *MTDropbox) GUMIClip(r image.Rectangle) {
 	s.bound = r
 }
+
+// GUMIFunction / GUMIRender 				-> Define
 func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 	var baseColor, mainColor = s.GetMaterialColor().Color()
 	s.boxCut = 0
@@ -206,17 +226,40 @@ func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 		ctx.Fill()
 	}
 }
-func (s *MTDropbox) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
+
+// GUMIFunction / GUMISize 					-> Define
+func (s *MTDropbox) GUMISize() gumre.Size {
+	return gumre.Size{
+		Vertical:   gumre.MinLength(mtDropboxMinHeight),
+		Horizontal: gumre.MinLength(mtDropboxMinWidth),
+	}
 }
 
-func (s *MTDropbox) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
+// GUMITree / born 							-> VoidNode::Default
+
+// GUMITree / breed 						-> VoidNode::Default
+
+// GUMITree / parent()						-> VoidNode::Default
+
+// GUMITree / childrun()					-> VoidNode::Default
+
+// GUMIRenderer / GUMIRenderSetup 			-> Define
+func (s *MTDropbox) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.frame = frame
 }
+
+// GUMIRenderer / GUMIUpdate 				-> Define
 func (s *MTDropbox) GUMIUpdate() {
+	// TODO
 	panic("implement me")
 }
 
+// GUMIRenderer / GUMIDraw 					-> Define
+func (s *MTDropbox) GUMIDraw() {
+	s.GUMIRender(s.frame)
+}
+
+// GUMIEventer / GUMIHappen					-> Define
 func (s *MTDropbox) GUMIHappen(event Event) {
 	if s.inactive {
 		s.cursorEnter = false
@@ -308,17 +351,13 @@ func (s *MTDropbox) GUMIHappen(event Event) {
 		}
 	}
 }
-func (s *MTDropbox) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.MinLength(mtDropboxMinHeight),
-		Horizontal: gumre.MinLength(mtDropboxMinWidth),
-	}
-}
+
+// fmt.Stringer / String					-> Define
 func (s *MTDropbox) String() string {
 	return fmt.Sprintf("%s(select:%s)", "MTDropbox", s.Elems[s.selected])
 }
 
-//
+// Constructor 0
 func MTDropbox0() *MTDropbox {
 	res := &MTDropbox{
 		Elems:      mtDropboxElemList{},
@@ -329,6 +368,8 @@ func MTDropbox0() *MTDropbox {
 	res.SetMaterialColor(Material.Pallette.White)
 	return res
 }
+
+// Constructor 1
 func MTDropbox1(maxboxlen uint16) *MTDropbox {
 	res := &MTDropbox{
 		Elems:      mtDropboxElemList{},
@@ -339,6 +380,8 @@ func MTDropbox1(maxboxlen uint16) *MTDropbox {
 	res.SetMaterialColor(Material.Pallette.White)
 	return res
 }
+
+// Constructor 2
 func MTDropbox2(change MTDropboxChange) *MTDropbox {
 	res := &MTDropbox{
 		Elems:      mtDropboxElemList{},
@@ -350,6 +393,8 @@ func MTDropbox2(change MTDropboxChange) *MTDropbox {
 	res.OnChange(change)
 	return res
 }
+
+// Constructor 3
 func MTDropbox3(change MTDropboxChange, elems ...string) *MTDropbox {
 	res := &MTDropbox{
 		Elems:      mtDropboxElemList{},
@@ -365,15 +410,24 @@ func MTDropbox3(change MTDropboxChange, elems ...string) *MTDropbox {
 	return res
 }
 
-func (s *MTDropbox) OnChange(callback MTDropboxChange) {
-	s.onChange = callback
-}
-func (s *MTDropbox) ReferChange() MTDropboxChange {
-	return s.onChange
-}
+// Elems -> Method
+
+// Method / Get
 func (s *MTDropbox) GetMaxboxLength() uint16 {
 	return uint16(s.boxMaximum)
 }
+
+// Method / Set
 func (s *MTDropbox) SetMaxboxLength(l uint16) {
 	s.boxMaximum = int(l)
+}
+
+// Method / Get Callback
+func (s *MTDropbox) OnChange(callback MTDropboxChange) {
+	s.onChange = callback
+}
+
+// Method / Get Callback
+func (s *MTDropbox) ReferChange() MTDropboxChange {
+	return s.onChange
 }

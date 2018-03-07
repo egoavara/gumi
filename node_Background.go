@@ -9,7 +9,7 @@ import (
 
 type NBackground struct {
 	SingleNode
-	boundStore
+	rendererStore
 	//
 	drawer drawer.Drawer
 }
@@ -21,31 +21,38 @@ func (s *NBackground) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
 func (s *NBackground) GUMIClip(rect image.Rectangle) {
-	s.bound = rect
+	s.rnode.SetRect(rect)
 	s.child.GUMIClip(rect)
 }
 func (s *NBackground) GUMIRender(frame *image.RGBA) {
-	s.drawer.Draw(frame.SubImage(s.bound).(*image.RGBA))
+	s.drawer.Draw(frame)
 
 }
-func (s *NBackground) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
-	s.child.GUMIDraw(frame)
+func (s NBackground) GUMISize() gumre.Size {
+	return s.child.GUMISize()
 }
 
-func (s *NBackground) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
+func (s *NBackground) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.rtree = tree
+	s.rnode = parentnode
+	s.child.GUMIRenderSetup(tree, s.rnode)
 }
 func (s *NBackground) GUMIUpdate() {
-	panic("implement me")
+	if s.rnode.Check(){
+		if s.rnode.ValidCache(){
+			s.rnode.PopCache()
+		}else {
+			s.GUMIRender(s.rnode.SubImage())
+			s.rnode.PushCache()
+		}
+	}
+	s.child.GUMIUpdate()
 }
 
 func (s *NBackground) GUMIHappen(event Event) {
 	s.child.GUMIHappen(event)
 }
-func (s NBackground) GUMISize() gumre.Size {
-	return s.child.GUMISize()
-}
+
 func (s *NBackground) String() string {
 	return fmt.Sprintf("%s", "NBackground")
 }
@@ -54,4 +61,19 @@ func NBackground0(draw drawer.Drawer) *NBackground {
 	return &NBackground{
 		drawer:draw,
 	}
+}
+
+func (s *NBackground) Set(dw drawer.Drawer) {
+	s.SetDrawer(dw)
+}
+func (s *NBackground) Get() drawer.Drawer {
+	return s.GetDrawer()
+}
+
+func (s *NBackground) SetDrawer(dw drawer.Drawer) {
+	s.drawer = dw
+}
+
+func (s *NBackground) GetDrawer() drawer.Drawer {
+	return s.drawer
 }

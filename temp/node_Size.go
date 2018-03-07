@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -24,20 +24,6 @@ func (s *NSize) GUMIClip(r image.Rectangle) {
 func (s *NSize) GUMIRender(frame *image.RGBA) {
 
 }
-func (s *NSize) GUMIDraw(frame *image.RGBA) {
-	s.child.GUMIDraw(frame)
-}
-
-func (s *NSize) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *NSize) GUMIUpdate() {
-	panic("implement me")
-}
-
-func (s *NSize) GUMIHappen(event Event) {
-	s.child.GUMIHappen(event)
-}
 func (s *NSize) GUMISize() gumre.Size {
 	temp := s.sz
 	c := s.child.GUMISize()
@@ -60,6 +46,20 @@ func (s *NSize) GUMISize() gumre.Size {
 		temp.Horizontal.Min = c.Horizontal.Max
 	}
 	return temp
+}
+
+func (s *NSize) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+
+}
+func (s *NSize) GUMIUpdate() {
+	panic("implement me")
+}
+func (s *NSize) GUMIDraw() {
+	s.child.GUMIDraw()
+}
+
+func (s *NSize) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
 func (s *NSize) String() string {
 	return fmt.Sprintf("%s(GUMISize:%v)", "NSize", s.sz)

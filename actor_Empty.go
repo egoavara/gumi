@@ -40,12 +40,12 @@ func (AEmpty) GUMISize() gumre.Size {
 
 // GUMITree / breed 						-> VoidNode::Default
 
-// GUMITree / Parent()						-> VoidNode::Default
+// GUMITree / parent()						-> VoidNode::Default
 
-// GUMITree / Childrun()					-> VoidNode::Default
+// GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
-func (s AEmpty) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s AEmpty) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
 }
 
 // GUMIRenderer / GUMIRender				-> Define::Empty

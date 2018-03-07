@@ -25,12 +25,12 @@ func (s *Reaching) Reset() {
 func (s *Reaching) Function(Fn AnimationFunction) {
 	s.Fn = Fn
 }
-func (s *Reaching) Animate(delta float64) {
+func (s *Reaching) Animate(delta float64) bool {
 	if s.off {
-		return
+		return false
 	}
 	if s.Current == s.To {
-		return
+		return false
 	}
 	if s.Current < s.To {
 		s.Current += s.Delta * delta / 1000
@@ -43,7 +43,7 @@ func (s *Reaching) Animate(delta float64) {
 			s.Current = s.To
 		}
 	}
-
+	return true
 }
 func (s *Reaching) Value() float64 {
 	if s.Range == 0 || s.Current == 0 {

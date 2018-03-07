@@ -56,7 +56,7 @@ func main() {
 	scr.Init()
 
 	scr.Update(nil, nil)
-	scr.Ready()
+	scr.Update()
 	scr.Draw()
 	gumi.Capture("out", scr.Frame())
 }

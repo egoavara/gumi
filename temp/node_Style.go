@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"image"
@@ -23,23 +23,22 @@ func (s *NStyle) GUMIClip(r image.Rectangle) {
 }
 func (s *NStyle) GUMIRender(frame *image.RGBA) {
 }
-func (s *NStyle) GUMIDraw(frame *image.RGBA) {
-	s.GUMIDraw(frame)
+func (s *NStyle) GUMISize() gumre.Size {
+	return s.child.GUMISize()
 }
 
-func (s *NStyle) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
+func (s *NStyle) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
 }
 func (s *NStyle) GUMIUpdate() {
 	panic("implement me")
 }
-
+func (s *NStyle) GUMIDraw(frame *image.RGBA) {
+	s.GUMIDraw(frame)
+}
 func (s *NStyle) GUMIHappen(event Event) {
 	s.child.GUMIHappen(event)
 }
-func (s *NStyle) GUMISize() gumre.Size {
-	return s.child.GUMISize()
-}
+
 func (s *NStyle) String() string {
 	return fmt.Sprintf("%s", "NStyle")
 }

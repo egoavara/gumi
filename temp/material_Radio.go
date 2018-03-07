@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 
+// MTRadio Default Values
 const (
 	mtRadioMinWidth                  = 20
 	mtRadioMinHeight                 = 20
@@ -14,16 +15,22 @@ const (
 	mtRadioInnerRadiusDifference = 3
 )
 
+// MTRadio Animations
 const (
 	mtRadioAnimationOnOff  = iota
+	//
 	mtRadioAnimationLength = iota
 )
 
+// Material::Radio
+//
+// Material theme radio button(kind of toggle button)
 type MTRadio struct {
 	//
 	VoidNode
 	boundStore
 	styleStore
+	rendererStore
 	//
 	mtColorFromTo
 	studio *gumre.Studio
@@ -32,8 +39,13 @@ type MTRadio struct {
 	cursorEnter, active bool
 	onActive            MTRadioActive
 }
+
+// Material::Radio<Callback> -> Focus
+//
+// Click this occur it
 type MTRadioActive func(self *MTRadio, active bool)
 
+// GUMIFunction / GUMIInit 					-> Define
 func (s *MTRadio) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtRadioAnimationLength)
 	s.onoff = s.studio.Set(mtRadioAnimationOnOff, &gumre.Percenting{
@@ -41,6 +53,8 @@ func (s *MTRadio) GUMIInit() {
 		Fn:    Material.DefaultAnimation.Radio,
 	}).(*gumre.Percenting)
 }
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *MTRadio) GUMIInfomation(info Information) {
 	if s.active {
 		s.onoff.Request(1)
@@ -49,12 +63,18 @@ func (s *MTRadio) GUMIInfomation(info Information) {
 	}
 	s.studio.Animate(float64(info.Dt))
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *MTRadio) GUMIStyle(style *Style) {
 	s.style = style
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *MTRadio) GUMIClip(r image.Rectangle) {
 	s.bound = r
 }
+
+// GUMIFunction / GUMIRender 				-> Define
 func (s *MTRadio) GUMIRender(frame *image.RGBA) {
 	var ctx = createContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
@@ -71,17 +91,39 @@ func (s *MTRadio) GUMIRender(frame *image.RGBA) {
 	ctx.DrawCircle(w/2, h/2, innerRadius)
 	ctx.Fill()
 }
-func (s *MTRadio) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
+
+// GUMIFunction / GUMISize 					-> Define
+func (s *MTRadio) GUMISize() gumre.Size {
+	return gumre.Size{
+		Vertical:   gumre.FixLength(mtRadioMinHeight),
+		Horizontal: gumre.FixLength(mtRadioMinWidth),
+	}
 }
 
-func (s *MTRadio) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
+// GUMITree / born 							-> VoidNode::Default
+
+// GUMITree / breed 						-> VoidNode::Default
+
+// GUMITree / parent()						-> VoidNode::Default
+
+// GUMITree / childrun()					-> VoidNode::Default
+
+// GUMIRenderer / GUMIRenderSetup 			-> Define
+func (s *MTRadio) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.frame = frame
 }
+
+// GUMIRenderer / GUMIUpdate 				-> Define
 func (s *MTRadio) GUMIUpdate() {
 	panic("implement me")
 }
 
+// GUMIRenderer / GUMIDraw 					-> Define
+func (s *MTRadio) GUMIDraw() {
+	s.GUMIRender(frame)
+}
+
+// GUMIEventer / GUMIHappen					-> Define
 func (s *MTRadio) GUMIHappen(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
@@ -104,17 +146,13 @@ func (s *MTRadio) GUMIHappen(event Event) {
 		}
 	}
 }
-func (s *MTRadio) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.FixLength(mtRadioMinHeight),
-		Horizontal: gumre.FixLength(mtRadioMinWidth),
-	}
-}
+
+// fmt.Stringer / String					-> Define
 func (s *MTRadio) String() string {
 	return fmt.Sprintf("%s(active:%v)", "MTRadio", s.active)
 }
 
-//
+// Constructor 0
 func MTRadio0(active MTRadioActive) *MTRadio {
 	temp := &MTRadio{
 		onActive: active,
@@ -123,6 +161,8 @@ func MTRadio0(active MTRadioActive) *MTRadio {
 	temp.SetToMaterialColor(Material.Pallette.White)
 	return temp
 }
+
+// Constructor 1
 func MTRadio1(from, to *MaterialColor, active MTRadioActive) *MTRadio {
 	temp := &MTRadio{
 		onActive: active,
@@ -132,21 +172,32 @@ func MTRadio1(from, to *MaterialColor, active MTRadioActive) *MTRadio {
 	return temp
 }
 
+// Method / Get -> GetActive()
 func (s *MTRadio) Get() bool {
 	return s.GetActive()
 }
+
+// Method / Set -> SetActive()
 func (s *MTRadio) Set(active bool) {
 	s.SetActive(active)
 }
+
+// Method / Get
 func (s *MTRadio) GetActive() bool {
 	return s.active
 }
+
+// Method / Set
 func (s *MTRadio) SetActive(active bool) {
 	s.active = active
 }
+
+// Method / Set Callback
 func (s *MTRadio) OnActive(callback MTRadioActive) {
 	s.onActive = callback
 }
+
+// Method / Get Callback
 func (s *MTRadio) ReferActive() MTRadioActive {
 	return s.onActive
 }

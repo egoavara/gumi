@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 
+
+// MTToggle Default Values
 const (
 	mtToggleMinWidth                  = 45
 	mtToggleMinHeight                 = 20
@@ -15,15 +17,21 @@ const (
 	mtToggleInnerRadiusDifference = 3
 )
 
+// MTToggle Animations
 const (
 	mtToggleAnimationOnOff  = iota
 	mtToggleAnimationLength = iota
 )
+
+// Material::Toggle
+//
+// Material theme toggle
 type MTToggle struct {
 	//
 	VoidNode
 	boundStore
 	styleStore
+	rendererStore
 	//
 	mtColorFromTo
 	studio *gumre.Studio
@@ -32,10 +40,13 @@ type MTToggle struct {
 	cursorEnter, active bool
 	onActive            MTToggleActive
 }
-// Event Callbacks
+
+// Material::Toggle<Callback> -> Active
+//
+// Click this occur it
 type MTToggleActive func(self *MTToggle, active bool)
 
-// GUMI Structure
+// GUMIFunction / GUMIInit 					-> Define
 func (s *MTToggle) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtToggleAnimationLength)
 	s.onoff = s.studio.Set(mtToggleAnimationOnOff, &gumre.Percenting{
@@ -43,6 +54,8 @@ func (s *MTToggle) GUMIInit() {
 		Fn:    Material.DefaultAnimation.Toggle,
 	}).(*gumre.Percenting)
 }
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *MTToggle) GUMIInfomation(info Information) {
 	if s.active {
 		s.onoff.Request(1)
@@ -51,12 +64,18 @@ func (s *MTToggle) GUMIInfomation(info Information) {
 	}
 	s.studio.Animate(float64(info.Dt))
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *MTToggle) GUMIStyle(style *Style) {
 	s.style = style
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *MTToggle) GUMIClip(r image.Rectangle) {
 	s.bound = r
 }
+
+// GUMIFunction / GUMIRender 				-> Define
 func (s *MTToggle) GUMIRender(frame *image.RGBA) {
 	var ctx = createContextRGBASub(frame, s.bound)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
@@ -76,17 +95,39 @@ func (s *MTToggle) GUMIRender(frame *image.RGBA) {
 	ctx.DrawCircle(radius+Scale.Length(w-2*radius, s.onoff.Value()), radius, innerRadius)
 	ctx.Fill()
 }
-func (s *MTToggle) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
+
+// GUMIFunction / GUMISize 					-> Define
+func (s *MTToggle) GUMISize() gumre.Size {
+	return gumre.Size{
+		Vertical:   gumre.MinLength(mtToggleMinHeight),
+		Horizontal: gumre.MinLength(mtToggleMinWidth),
+	}
 }
 
-func (s *MTToggle) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
+// GUMITree / born 							-> VoidNode::Default
+
+// GUMITree / breed 						-> VoidNode::Default
+
+// GUMITree / parent()						-> VoidNode::Default
+
+// GUMITree / childrun()					-> VoidNode::Default
+
+// GUMIRenderer / GUMIRenderSetup 			-> Define
+func (s *MTToggle) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.frame = frame
 }
+
+// GUMIRenderer / GUMIUpdate 				-> Define
 func (s *MTToggle) GUMIUpdate() {
 	panic("implement me")
 }
 
+// GUMIRenderer / GUMIDraw 					-> Define
+func (s *MTToggle) GUMIDraw() {
+	s.GUMIRender(s.frame)
+}
+
+// GUMIEventer / GUMIHappen					-> Define
 func (s *MTToggle) GUMIHappen(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
@@ -109,17 +150,13 @@ func (s *MTToggle) GUMIHappen(event Event) {
 		}
 	}
 }
-func (s *MTToggle) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.MinLength(mtToggleMinHeight),
-		Horizontal: gumre.MinLength(mtToggleMinWidth),
-	}
-}
+
+// fmt.Stringer / String					-> Define
 func (s *MTToggle) String() string {
 	return fmt.Sprintf("%s(active:%v)", "MTToggle", s.active)
 }
 
-// Constructors
+// Constructor 0
 func MTToggle0(active MTToggleActive) *MTToggle {
 	temp := &MTToggle{
 		onActive: active,
@@ -128,6 +165,8 @@ func MTToggle0(active MTToggleActive) *MTToggle {
 	temp.SetToMaterialColor(Material.Pallette.White)
 	return temp
 }
+
+// Constructor 1
 func MTToggle1(from, to *MaterialColor, active MTToggleActive) *MTToggle {
 	temp := &MTToggle{
 		onActive: active,
@@ -138,22 +177,32 @@ func MTToggle1(from, to *MaterialColor, active MTToggleActive) *MTToggle {
 }
 
 
-// Element Property
+// Method / Get -> GetActive
 func (s *MTToggle) Get() bool {
 	return s.GetActive()
 }
+
+// Method / Set -> SetActive
 func (s *MTToggle) Set(active bool) {
 	s.SetActive(active)
 }
+
+// Method / Get
 func (s *MTToggle) GetActive() bool {
 	return s.active
 }
+
+// Method / Set
 func (s *MTToggle) SetActive(active bool) {
 	s.active = active
 }
+
+// Method / Set Callback
 func (s *MTToggle) OnActive(callback MTToggleActive) {
 	s.onActive = callback
 }
+
+// Method / Get Callback
 func (s *MTToggle) ReferActive() MTToggleActive {
 	return s.onActive
 }

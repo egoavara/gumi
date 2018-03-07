@@ -13,8 +13,7 @@ import (
 // The image uses iamGreedy / drawer.Drawer rather than image.Image
 type AImage struct {
 	VoidNode
-	boundStore
-	frameStore
+	rendererStore
 	//
 	drawer drawer.Drawer
 }
@@ -31,14 +30,12 @@ func (s *AImage) GUMIStyle(style *Style) {
 
 // GUMIFunction / GUMIClip 			-> Define
 func (s *AImage) GUMIClip(rect image.Rectangle) {
-	if s.bound != rect {
-		s.bound = rect
-	}
+	s.rnode.SetRect(rect)
 }
 
 // GUMIFunction / GUMIRender 		-> Define
 func (s *AImage) GUMIRender(frame *image.RGBA) {
-	s.drawer.Draw(frame.SubImage(s.bound).(*image.RGBA))
+	s.drawer.Draw(frame)
 }
 
 // GUMIFunction / GUMISize 		-> Define
@@ -54,25 +51,27 @@ func (s AImage) GUMISize() gumre.Size {
 
 // GUMITree / breed 						-> VoidNode::Default
 
-// GUMITree / Parent()						-> VoidNode::Default
+// GUMITree / parent()						-> VoidNode::Default
 
-// GUMITree / Childrun()					-> VoidNode::Default
+// GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *AImage) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.frame = frame
-	// TODO : Cache
+func (s *AImage) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.rtree = tree
+	s.rnode = tree.New(parentnode)
 }
 
 // GUMIRenderer / GUMIDraw					-> Define
 func (s *AImage) GUMIDraw() {
-	s.GUMIRender(s.frame)
+	s.GUMIRender(s.rnode.SubImage())
+	s.rnode.Complete()
 }
 
 // GUMIRenderer / GUMIUpdate					-> Define
 func (s *AImage) GUMIUpdate() {
-	// TODO
-	panic("implement me")
+	if s.rnode.Check(){
+		s.GUMIDraw()
+	}
 }
 
 // GUMIEventer / GUMIHappen					-> Define

@@ -22,13 +22,15 @@ func (s *Studio) Reset() {
 		v.Reset()
 	}
 }
-func (s *Studio) Animate(delta float64) {
+func (s *Studio) Animate(delta float64) bool {
+	ch := false
 	for _, v := range s.ani {
-		v.Animate(delta)
+		ch = ch || v.Animate(delta)
 	}
+	return ch
 }
 
 type Actor interface {
 	Reset()
-	Animate(delta float64)
+	Animate(delta float64) bool
 }

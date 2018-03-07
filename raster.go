@@ -5,9 +5,12 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func createContextRGBASub(rgba *image.RGBA, rect image.Rectangle) (*gg.Context) {
-	sub := rgba.SubImage(rect).(*image.RGBA)
-	sub.Rect = image.Rect(0,0, sub.Rect.Dx(), sub.Rect.Dy())
-	ctx := gg.NewContextForRGBA(sub)
+func createContext(rgba *image.RGBA) (*gg.Context) {
+	temp := &image.RGBA{
+		Rect:image.Rect(0,0, rgba.Rect.Dx(), rgba.Rect.Dy()),
+		Pix:rgba.Pix,
+		Stride:rgba.Stride,
+	}
+	ctx := gg.NewContextForRGBA(temp)
 	return ctx
 }

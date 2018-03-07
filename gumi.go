@@ -46,9 +46,8 @@ type GUMITree interface {
 	Childrun() []GUMI
 }
 type GUMIRenderer interface {
-	GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode)
+	GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode)
 	GUMIUpdate()
-	GUMIDraw()
 }
 type GUMIEventer interface {
 	GUMIHappen(event Event)

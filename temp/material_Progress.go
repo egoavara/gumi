@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -8,20 +8,27 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 
+// MTProgress Default Values
 const (
 	mtProgressMin                        = 8
 	mtProgressAnimationProgressPixelPerSecond = 512
 )
+
+// MTProgress Animations
 const (
 	mtProgressAnimationProgress = iota
 	//
 	mtProgressAnimationLength
 )
 
+// Material::Progress
+//
+// Material theme progress bar
 type MTProgress struct {
 	VoidNode
 	boundStore
 	styleStore
+	rendererStore
 	//
 	mtColorFromTo
 	studio   *gumre.Studio
@@ -33,8 +40,13 @@ type MTProgress struct {
 	//
 	cursorEnter, active bool
 }
+
+// Material::Progress<Callback> -> Change
+//
+// If percentage changed, it happen
 type MTProgressChange func(self *MTProgress, percent float64)
 
+// GUMIFunction / GUMIInit 					-> Define
 func (s *MTProgress) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtProgressAnimationLength)
 	s.progress = s.studio.Set(mtProgressAnimationProgress, &gumre.Percenting{
@@ -42,12 +54,18 @@ func (s *MTProgress) GUMIInit() {
 	}).(*gumre.Percenting)
 
 }
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *MTProgress) GUMIInfomation(info Information) {
 	s.studio.Animate(float64(info.Dt))
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *MTProgress) GUMIStyle(style *Style) {
 	s.style = style
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *MTProgress) GUMIClip(r image.Rectangle) {
 	s.bound = r
 	switch s.axis {
@@ -59,6 +77,8 @@ func (s *MTProgress) GUMIClip(r image.Rectangle) {
 		s.progress.Delta = gumre.Animation.ReachingBySpeed(float64(s.bound.Dy()), mtProgressAnimationProgressPixelPerSecond)
 	}
 }
+
+// GUMIFunction / GUMIRender 				-> Define
 func (s *MTProgress) GUMIRender(frame *image.RGBA) {
 	var baseColor0, mainColor0 = s.GetFromMaterialColor().Color()
 	var baseColor1, mainColor1 = s.GetToMaterialColor().Color()
@@ -104,31 +124,49 @@ func (s *MTProgress) GUMIRender(frame *image.RGBA) {
 		ctx.Fill()
 	}
 }
-func (s *MTProgress) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
-}
 
-func (s *MTProgress) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *MTProgress) GUMIUpdate() {
-	panic("implement me")
-}
-
-func (s *MTProgress) GUMIHappen(event Event) {
-
-}
+// GUMIFunction / GUMISize 					-> Define
 func (s *MTProgress) GUMISize() gumre.Size {
 	return gumre.Size{
 		gumre.MinLength(mtProgressMin),
 		gumre.MinLength(mtProgressMin),
 	}
 }
+
+// GUMITree / born 							-> VoidNode::Default
+
+// GUMITree / breed 						-> VoidNode::Default
+
+// GUMITree / parent()						-> VoidNode::Default
+
+// GUMITree / childrun()					-> VoidNode::Default
+
+// GUMIRenderer / GUMIRenderSetup 			-> Define
+func (s *MTProgress) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.frame = frame
+}
+
+// GUMIRenderer / GUMIUpdate 				-> Define
+func (s *MTProgress) GUMIUpdate() {
+	panic("implement me")
+}
+
+// GUMIRenderer / GUMIDraw 				-> Define
+func (s *MTProgress) GUMIDraw() {
+	s.GUMIRender(s.frame)
+}
+
+// GUMIEventer / GUMIHappen					-> Define
+func (s *MTProgress) GUMIHappen(event Event) {
+
+}
+
+// fmt.Stringer / String					-> Define
 func (s *MTProgress) String() string {
 	return fmt.Sprintf("%s(axis: %v, percent:%.2f%%)", "MTProgress", s.axis, s.GetPercent()*100)
 }
 
-//
+// Constructor 0
 func MTProgress0(mcl *MaterialColor) *MTProgress {
 	temp := &MTProgress{
 		axis:gumre.AxisHorizontal,
@@ -137,6 +175,8 @@ func MTProgress0(mcl *MaterialColor) *MTProgress {
 	temp.SetToMaterialColor(mcl)
 	return temp
 }
+
+// Constructor 1
 func MTProgress1(from, to *MaterialColor) *MTProgress {
 	temp := &MTProgress{
 		axis:gumre.AxisHorizontal,
@@ -145,6 +185,8 @@ func MTProgress1(from, to *MaterialColor) *MTProgress {
 	temp.SetToMaterialColor(to)
 	return temp
 }
+
+// Constructor 2
 func MTProgress2(from, to *MaterialColor, axis gumre.Axis) *MTProgress {
 	temp := &MTProgress{
 		axis:axis,
@@ -154,31 +196,46 @@ func MTProgress2(from, to *MaterialColor, axis gumre.Axis) *MTProgress {
 	return temp
 }
 
-//
+
+// Method / Get -> GetPercent
 func (s *MTProgress) Get() float64 {
 	return s.GetPercent()
 }
+
+// Method / Set -> SetPercent
 func (s *MTProgress) Set(percent float64) {
 	s.SetPercent(percent)
 }
+
+// Method / Get
 func (s *MTProgress) GetPercent() float64 {
 	return s.progress.To
 }
+
+// Method / Set
 func (s *MTProgress) SetPercent(percent float64) {
 	s.progress.Request(percent)
 	if s.onChange != nil {
 		s.onChange(s, percent)
 	}
 }
+
+// Method / Get
 func (s *MTProgress) GetAxis() gumre.Axis {
 	return s.axis
 }
+
+// Method / Set
 func (s *MTProgress) SetAxis(axis gumre.Axis) {
 	s.axis = axis
 }
+
+// Method / Set Callback
 func (s *MTProgress) OnChange(callback MTProgressChange) {
 	s.onChange = callback
 }
+
+// Method / Get Callback
 func (s *MTProgress) ReferChange() MTProgressChange {
 	return s.onChange
 }

@@ -34,20 +34,6 @@ func (s *NMargin) GUMIClip(rect image.Rectangle) {
 func (s *NMargin) GUMIRender(frame *image.RGBA) {
 
 }
-func (s *NMargin) GUMIDraw(frame *image.RGBA) {
-	s.child.GUMIDraw(frame)
-}
-
-func (s *NMargin) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *NMargin) GUMIUpdate() {
-	panic("implement me")
-}
-
-func (s *NMargin) GUMIHappen(event Event) {
-	s.child.GUMIHappen(event)
-}
 func (s *NMargin) GUMISize() gumre.Size {
 	sz := s.child.GUMISize()
 
@@ -71,6 +57,18 @@ func (s *NMargin) GUMISize() gumre.Size {
 		gumre.Length{vmin, vmax},
 		gumre.Length{hmin, hmax},
 	}
+}
+
+func (s *NMargin) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.child.GUMIRenderSetup(tree, parentnode)
+}
+
+func (s *NMargin) GUMIUpdate() {
+	s.child.GUMIUpdate()
+}
+
+func (s *NMargin) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
 }
 func (s *NMargin) String() string {
 	return fmt.Sprintf("%s(margin:%v)", "NMargin", s.b)

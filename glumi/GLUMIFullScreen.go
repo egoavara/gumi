@@ -3,6 +3,7 @@ package glumi
 import (
 	"github.com/iamGreedy/gumi"
 	"time"
+	"fmt"
 )
 
 type GLUMIFullScreen struct {
@@ -28,7 +29,12 @@ func (s *GLUMIFullScreen) Init(fps int) error {
 		return err
 	}
 	s.screen.Init()
-	s.fps.SetInterval((1000 * time.Millisecond) / time.Duration(fps) / 8)
+	if fps == 0{
+		s.fps = &LimitlessFPS{}
+	}else {
+		s.fps = &IntervalFPS{interval:(1000 * time.Millisecond) / time.Duration(fps) / 8}
+	}
+
 	return nil
 }
 func (s *GLUMIFullScreen) SetScreen(screen *gumi.Screen) {
@@ -42,18 +48,20 @@ func (s *GLUMIFullScreen) Loop(fnBefore, fnAfter func(lumi *GLUMIFullScreen) err
 	s.fps.Start()
 	defer s.fps.Stop()
 	var prev, curr time.Time
-
+	var loopcount uint64 = 0
+	var startAt time.Time
 	prev = s.fps.Wait()
-	for loopcount:=0;true;loopcount++{
+	startAt = prev
+	for ;true;loopcount++{
 		curr = s.fps.Wait()
 		err = fnBefore(s)
 		if err != nil{
 			break
 		}
 		// GUMI
-		s.screen.Ready(gumi.Information{
+		s.screen.Update(gumi.Information{
 			Dt: int64(curr.Sub(prev).Seconds() * 1000),
-		}, nil)
+		})
 		s.screen.Draw()
 		// GLFW
 		s.Render.Upload()
@@ -64,6 +72,8 @@ func (s *GLUMIFullScreen) Loop(fnBefore, fnAfter func(lumi *GLUMIFullScreen) err
 		}
 		prev = curr
 	}
+	avgupdate := time.Now().Sub(startAt).Seconds()/float64(loopcount)
+	fmt.Println(avgupdate)
 	if err == Stop{
 		return nil
 	}

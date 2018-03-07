@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"image"
 )
 
+// MTEdit Default Values
 const (
 	mtEditMinWidth                    = 80
 	mtEditMinHeight                   = 20
@@ -15,17 +16,24 @@ const (
 	mtEditDeleteInterval              = 50
 	mtEditDeleteThereshold            = 200
 )
+
+
+// MTEdit Animations
 const (
 	mtEditAnimationTextCursor = iota
 	//
 	mtEditAnimationLength = iota
 )
 
+// Material::Edit
+//
+// Material theme editable text
 type MTEdit struct {
 	//
 	VoidNode
 	boundStore
 	styleStore
+	rendererStore
 	//
 	mtColorSingle
 	studio                *gumre.Studio
@@ -35,7 +43,7 @@ type MTEdit struct {
 	deleteCount           int
 	deleteTheresholdStack int64
 	deleteRequestCount    uint
-	ketCTRL               bool
+	keyCTRL               bool
 	editingRune           rune
 	editingNow            bool
 	//
@@ -46,19 +54,28 @@ type MTEdit struct {
 	onChange            MTEditChange
 	cursorEnter, active bool
 }
+
+// Material::Edit<Callback> -> Change
+//
+// If text changed it occur
+// TODO : CJK Editing change
 type MTEditChange func(self *MTEdit, text string)
 
+
+// GUMIFunction / GUMIInit 					-> Define
 func (s *MTEdit) GUMIInit() {
 	s.studio = gumre.Animation.Studio(mtEditAnimationLength)
 	s.textCursor = s.studio.Set(mtEditAnimationTextCursor, &gumre.Switching{
 		Interval: mtEditAnimationTextCursorInterval,
 	}).(*gumre.Switching)
 }
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *MTEdit) GUMIInfomation(info Information) {
 	s.studio.Animate(float64(info.Dt))
 	if s.deleteRequestCount > 0 {
 		if !s.editingNow {
-			if s.ketCTRL {
+			if s.keyCTRL {
 				s.text = StringControlBackSpace(s.text)
 			} else {
 				s.text = StringBackSpace(s.text, 1)
@@ -79,7 +96,7 @@ func (s *MTEdit) GUMIInfomation(info Information) {
 			if !s.editingNow {
 				for i := int64(0); i < temp; i++ {
 					s.deleteCount += 1
-					if s.ketCTRL {
+					if s.keyCTRL {
 						s.text = StringControlBackSpace(s.text)
 					} else {
 						s.text = StringBackSpace(s.text, 1)
@@ -93,12 +110,18 @@ func (s *MTEdit) GUMIInfomation(info Information) {
 		}
 	}
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *MTEdit) GUMIStyle(style *Style) {
 	s.style = style
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *MTEdit) GUMIClip(r image.Rectangle) {
 	s.bound = r
 }
+
+// GUMIFunction / GUMIRender 				-> Define
 func (s *MTEdit) GUMIRender(frame *image.RGBA) {
 	var baseColor, mainColor = s.GetMaterialColor().Color()
 	var ctx = createContextRGBASub(frame, s.bound)
@@ -156,29 +179,46 @@ func (s *MTEdit) GUMIRender(frame *image.RGBA) {
 	ctx.DrawString(drawtext, stringposX, stringposY)
 	ctx.Stroke()
 }
-func (s *MTEdit) GUMIDraw(frame *image.RGBA) {
-	s.GUMIRender(frame)
-}
 
-func (s *MTEdit) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *MTEdit) GUMIUpdate() {
-	panic("implement me")
-}
-
+// GUMIFunction / GUMISize 					-> Define
 func (s *MTEdit) GUMISize() gumre.Size {
 	return gumre.Size{
 		Vertical:   gumre.MinLength(mtEditMinHeight),
 		Horizontal: gumre.MinLength(mtEditMinWidth),
 	}
 }
+
+// GUMITree / born 							-> VoidNode::Default
+
+// GUMITree / breed 						-> VoidNode::Default
+
+// GUMITree / parent()						-> VoidNode::Default
+
+// GUMITree / childrun()					-> VoidNode::Default
+
+// GUMIRenderer / GUMIRenderSetup 			-> Define
+func (s *MTEdit) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.frame = frame
+}
+
+// GUMIRenderer / GUMIUpdate 				-> Define
+func (s *MTEdit) GUMIUpdate() {
+	// TODO
+	panic("implement me")
+}
+
+// GUMIRenderer / GUMIDraw 					-> Define
+func (s *MTEdit) GUMIDraw() {
+	s.GUMIRender(s.frame)
+}
+
+// GUMIEventer / GUMIHappen					-> Define
 func (s *MTEdit) GUMIHappen(event Event) {
 	switch ev := event.(type) {
 	case EventKeyPress:
 		switch ev.Key {
 		case KEY_CONTROL:
-			s.ketCTRL = true
+			s.keyCTRL = true
 		case KEY_BACKSPACE:
 			if s.active {
 				s.deleteOn = true
@@ -189,7 +229,7 @@ func (s *MTEdit) GUMIHappen(event Event) {
 	case EventKeyRelease:
 		switch ev.Key {
 		case KEY_CONTROL:
-			s.ketCTRL = false
+			s.keyCTRL = false
 		case KEY_BACKSPACE:
 			if s.active {
 				if s.deleteCount == 0 {
@@ -236,6 +276,8 @@ func (s *MTEdit) GUMIHappen(event Event) {
 	}
 
 }
+
+// fmt.Stringer / String					-> Define
 func (s *MTEdit) String() string {
 	return fmt.Sprintf("%s(text:%s)", "MTEdit", s.text)
 }
@@ -245,7 +287,7 @@ func (s *MTEdit) deleteRequest(count uint) {
 	s.deleteRequestCount += count
 }
 
-// Constructors for MTEdit
+// Constructors 0
 func MTEdit0() *MTEdit {
 	temp := &MTEdit{
 		text:  "",
@@ -255,7 +297,7 @@ func MTEdit0() *MTEdit {
 	return temp
 }
 
-// Constructors for MTEdit
+// Constructors 1
 func MTEdit1(str string) *MTEdit {
 	temp := &MTEdit{
 		text:  str,
@@ -265,7 +307,7 @@ func MTEdit1(str string) *MTEdit {
 	return temp
 }
 
-// Constructors for MTEdit
+// Constructors 2
 func MTEdit2(str string, align gumre.Align) *MTEdit {
 	temp := &MTEdit{
 		text:  str,
@@ -275,7 +317,7 @@ func MTEdit2(str string, align gumre.Align) *MTEdit {
 	return temp
 }
 
-// Constructors for MTEdit
+// Constructors 3
 func MTEdit3(mcl *MaterialColor, str string, align gumre.Align) *MTEdit {
 	temp := &MTEdit{
 		text:  str,
@@ -285,36 +327,55 @@ func MTEdit3(mcl *MaterialColor, str string, align gumre.Align) *MTEdit {
 	return temp
 }
 
+// Method / Set -> SetText
 func (s *MTEdit) Set(str string) {
 	s.SetText(str)
 }
+
+// Method / Get -> GetText
 func (s *MTEdit) Get() string {
 	return s.GetText()
 }
+
+// Method / Set
 func (s *MTEdit) SetText(str string) {
 	s.text = str
 	if s.onChange != nil {
 		s.onChange(s, s.text)
 	}
 }
+
+// Method / Get
 func (s *MTEdit) GetText() string {
 	return s.text
 }
+
+// Method / Set
 func (s *MTEdit) SetAlign(align gumre.Align) {
 	s.align = align
 }
+
+// Method / Get
 func (s *MTEdit) GetAlign() gumre.Align {
 	return s.align
 }
-func (s *MTEdit) GetActive() bool {
-	return !s.inactive
-}
+
+// Method / Set
 func (s *MTEdit) SetActive(active bool) {
 	s.inactive = !active
 }
+
+// Method / Get
+func (s *MTEdit) GetActive() bool {
+	return !s.inactive
+}
+
+// Method / Get Callback
 func (s *MTEdit) OnChange(callback MTEditChange) {
 	s.onChange = callback
 }
+
+// Method / Get Callback
 func (s *MTEdit) ReferChange() MTEditChange {
 	return s.onChange
 }

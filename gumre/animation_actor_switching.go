@@ -10,7 +10,12 @@ func (s *Switching) Reset() {
 	s.Switch = false
 	s.Current = 0
 }
-func (s *Switching) Animate(delta float64) {
+func (s *Switching) Animate(delta float64) bool {
 	s.Current += delta
-	s.Switch = (int(s.Current)/int(s.Interval))%2 == 1
+	temp := (int(s.Current)/int(s.Interval))%2 == 1
+	if temp != s.Switch{
+		return true
+		s.Switch = temp
+	}
+	return false
 }

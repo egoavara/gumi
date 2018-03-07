@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -22,20 +22,6 @@ func (s *NMinimum) GUMIClip(r image.Rectangle) {
 }
 func (s *NMinimum) GUMIRender(frame *image.RGBA) {
 }
-func (s *NMinimum) GUMIDraw(frame *image.RGBA) {
-	s.child.GUMIDraw(frame)
-}
-
-func (s *NMinimum) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *NMinimum) GUMIUpdate() {
-	panic("implement me")
-}
-
-func (s *NMinimum) GUMIHappen(event Event) {
-	s.child.GUMIHappen(event)
-}
 func (s *NMinimum) GUMISize() gumre.Size {
 	sz := s.child.GUMISize()
 	if gumre.AxisVertical == gumre.AxisVertical & s.axis{
@@ -46,6 +32,21 @@ func (s *NMinimum) GUMISize() gumre.Size {
 	}
 	return sz
 }
+
+
+func (s *NMinimum) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+}
+func (s *NMinimum) GUMIDraw() {
+	s.child.GUMIDraw()
+}
+func (s *NMinimum) GUMIUpdate() {
+	panic("implement me")
+}
+
+func (s *NMinimum) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
+}
+
 func (s *NMinimum) String() string {
 	return fmt.Sprintf("%s", "NMinimum")
 }

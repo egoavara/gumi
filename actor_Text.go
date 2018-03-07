@@ -13,9 +13,8 @@ import (
 // AText use for render text
 type AText struct {
 	VoidNode
-	boundStore
 	styleStore
-	frameStore
+	rendererStore
 	//
 	align     gumre.Align
 	text      string
@@ -34,12 +33,12 @@ func (s *AText) GUMIStyle(style *Style) {
 
 // GUMIFunction / GUMIClip 					-> Define
 func (s *AText) GUMIClip(r image.Rectangle) {
-	s.bound = r
+	s.rnode.SetRect(r)
 }
 
 // GUMIFunction / GUMIRender 				-> Define
 func (s *AText) GUMIRender(frame *image.RGBA) {
-	ctx := createContextRGBASub(frame, s.bound)
+	ctx := createContext(frame)
 	s.style.useContext(ctx)
 	defer s.style.releaseContext(ctx)
 	ctx.SetColor(s.textColor)
@@ -48,17 +47,17 @@ func (s *AText) GUMIRender(frame *image.RGBA) {
 	var drawX, drawY float64
 	switch v {
 	case gumre.AlignBottom:
-		drawY = float64(s.bound.Dy())
+		drawY = float64(ctx.Height())
 	case gumre.AlignVertical:
-		drawY = float64(s.bound.Dy())/2 + expecth/2
+		drawY = float64(ctx.Height())/2 + expecth/2
 	case gumre.AlignTop:
 		drawY = expecth
 	}
 	switch h {
 	case gumre.AlignRight:
-		drawX = float64(s.bound.Dx()) - expectw
+		drawX = float64(ctx.Width()) - expectw
 	case gumre.AlignHorizontal:
-		drawX = float64(s.bound.Dx())/2 - expectw/2
+		drawX = float64(ctx.Width())/2 - expectw/2
 	case gumre.AlignLeft:
 		drawX = 0
 	}
@@ -84,25 +83,23 @@ func (s *AText) GUMISize() gumre.Size {
 
 // GUMITree / breed 						-> VoidNode::Default
 
-// GUMITree / Parent()						-> VoidNode::Default
+// GUMITree / parent()						-> VoidNode::Default
 
-// GUMITree / Childrun()					-> VoidNode::Default
+// GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *AText) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.frame = frame
-	// TODO : Cache
+func (s *AText) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.rtree = tree
+	s.rnode = tree.New(parentnode)
 }
 
-// GUMIRenderer / GUMIDraw					-> Define
-func (s *AText) GUMIDraw() {
-	s.GUMIRender(s.frame)
-}
 
 // GUMIRenderer / GUMIUpdate				-> Define
 func (s *AText) GUMIUpdate() {
-	// TODO
-	panic("implement me")
+	if s.rnode.Check(){
+		s.GUMIRender(s.rnode.SubImage())
+		s.rnode.Complete()
+	}
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -116,28 +113,31 @@ func (s *AText) String() string {
 
 // Constructor 0
 func AText0(str string) *AText {
-	temp := &AText{}
-	temp.SetText(str)
-	temp.SetAlign(gumre.AlignCenter)
-	temp.SetColor(color.White)
+	temp := &AText{
+		text:str,
+		align:gumre.AlignCenter,
+		textColor:color.White,
+	}
 	return temp
 }
 
 // Constructor 1
 func AText1(str string, align gumre.Align) *AText {
-	temp := &AText{}
-	temp.SetText(str)
-	temp.SetAlign(align)
-	temp.SetColor(color.White)
+	temp := &AText{
+		text:str,
+		align:align,
+		textColor:color.White,
+	}
 	return temp
 }
 
 // Constructor 2
 func AText2(str string, align gumre.Align, textColor color.Color) *AText {
-	temp := &AText{}
-	temp.SetText(str)
-	temp.SetAlign(align)
-	temp.SetColor(textColor)
+	temp := &AText{
+		text:str,
+		align:align,
+		textColor:textColor,
+	}
 	return temp
 }
 
@@ -153,7 +153,10 @@ func (s *AText) Get() string {
 
 // Method / SetText
 func (s *AText) SetText(text string) {
-	s.text = text
+	if s.text != text{
+		s.text = text
+		s.rnode.Require()
+	}
 }
 
 // Method / GetText
@@ -163,7 +166,10 @@ func (s *AText) GetText() string {
 
 // Method / SetAlign
 func (s *AText) SetAlign(align gumre.Align) {
-	s.align = align
+	if s.align != align{
+		s.align = align
+		s.rnode.Require()
+	}
 }
 
 // Method / GetAlign
@@ -173,7 +179,12 @@ func (s *AText) GetAlign() gumre.Align {
 
 // Method / SetColor
 func (s *AText) SetColor(textColor color.Color) {
-	s.textColor = textColor
+	r1,g1,b1,a1 := s.textColor.RGBA()
+	r2,g2,b2,a2 := textColor.RGBA()
+	if r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2{
+		s.textColor = textColor
+		s.rnode.Require()
+	}
 }
 
 // Method / GetColor

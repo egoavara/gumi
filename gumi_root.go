@@ -47,25 +47,19 @@ func (s *gumiRoot) GUMISize() gumre.Size {
 
 // GUMITree / breed 						-> SingleNode::Default
 
-// GUMITree / Parent()						-> SingleNode::Default
+// GUMITree / parent()						-> SingleNode::Default
 
-// GUMITree / Childrun()					-> SingleNode::Default
+// GUMITree / childrun()					-> SingleNode::Default
 
 
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
-func (s *gumiRoot) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-
-}
-
-// GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *gumiRoot) GUMIDraw() {
-	s.child.GUMIDraw()
+func (s *gumiRoot) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.child.GUMIRenderSetup(tree, parentnode)
 }
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
 func (s *gumiRoot) GUMIUpdate() {
-	// TODO
-	panic("implement me")
+	s.child.GUMIUpdate()
 }
 
 // GUMIEventor

@@ -2,20 +2,24 @@ package gumi
 
 import (
 	"github.com/fogleman/gg"
-	"fmt"
 	"github.com/iamGreedy/gumi/gumre"
 	"math"
+	"fmt"
 )
 
 
 type Drawer interface {
-	Draw(context *gg.Context, style *Style, di Information)
+	Draw(context *gg.Context, style *Style)
+}
+type DrawerWithInformation interface {
+	Drawer
+	Inform(info Information) (changed bool)
 }
 type FunctionDrawer struct {
-	fn func(context *gg.Context, style *Style, di Information)
+	fn func(context *gg.Context, style *Style)
 }
-func (s FunctionDrawer)Draw(context *gg.Context, style *Style, di Information)  {
-	s.fn(context, style, di)
+func (s FunctionDrawer)Draw(context *gg.Context, style *Style)  {
+	s.fn(context, style)
 }
 
 var Drawing _Drawing
@@ -24,23 +28,19 @@ type _Drawing struct {
 }
 
 const FPSPos = 10
-
 func (_Drawing) FPS() Drawer {
 	return &fpsDrawer{}
 }
 
-const fpsDrawerHistory = 16
+const fpsDrawerHistory = 32
 
 type fpsDrawer struct {
 	dts [fpsDrawerHistory]float64
 	i int
 }
-func (s *fpsDrawer ) Draw(context *gg.Context, style *Style, di Information)  {
+func (s *fpsDrawer ) Draw(context *gg.Context, style *Style)  {
 	style.useContext(context)
 	defer style.releaseContext(context)
-	//
-	s.dts[s.i] = float64(di.Dt)
-	s.i = (s.i + 1) % fpsDrawerHistory
 	//
 	context.SetColor(rulerColor)
 
@@ -50,4 +50,12 @@ func (s *fpsDrawer ) Draw(context *gg.Context, style *Style, di Information)  {
 	mw, mh := context.MeasureString(txt)
 	context.DrawString(txt, w - FPSPos - mw, FPSPos + mh)
 	context.Stroke()
+}
+func (s *fpsDrawer) Inform(info Information) (changed bool) {
+	s.dts[s.i] = float64(info.Dt)
+	s.i = (s.i + 1) % fpsDrawerHistory
+	if s.i == 0{
+		return true
+	}
+	return false
 }

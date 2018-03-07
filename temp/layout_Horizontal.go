@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -8,21 +8,31 @@ import (
 	"github.com/iamGreedy/gumi/drawer"
 )
 
+// Layout::Horizontal
+//
+// Horizontal align
 type LHorizontal struct {
 	MultipleNode
 	rule gumre.Distribute
 }
 
+// GUMIFunction / GUMIInit 					-> SingleNode::Default
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *LHorizontal) GUMIInfomation(info Information) {
 	for _, v := range s.child {
 		v.GUMIInfomation(info)
 	}
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *LHorizontal) GUMIStyle(style *Style) {
 	for _, v := range s.child {
 		v.GUMIStyle(style)
 	}
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *LHorizontal) GUMIClip(r image.Rectangle) {
 	//
 	var tempVert = make([]gumre.Length, len(s.child))
@@ -46,32 +56,12 @@ func (s *LHorizontal) GUMIClip(r image.Rectangle) {
 		startat += dis[i]
 	}
 }
+
+// GUMIFunction / GUMIRender 				-> Define::Empty
 func (s *LHorizontal) GUMIRender(frame *image.RGBA) {
 }
-func (s *LHorizontal) GUMIDraw(frame *image.RGBA) {
-	wg := new(sync.WaitGroup)
-	wg.Add(len(s.child))
-	defer wg.Wait()
-	for _, v := range s.child {
-		go func(elem GUMI) {
-			elem.GUMIDraw(frame)
-			wg.Done()
-		}(v)
-	}
-}
 
-func (s *LHorizontal) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *LHorizontal) GUMIUpdate() {
-	panic("implement me")
-}
-
-func (s *LHorizontal) GUMIHappen(event Event) {
-	for _, v := range s.child {
-		v.GUMIHappen(event)
-	}
-}
+// GUMIFunction / GUMISize 					-> Define
 func (s *LHorizontal) GUMISize() gumre.Size {
 	var minMax, sum uint16 = 0, 0
 	for _, v := range s.child {
@@ -86,10 +76,54 @@ func (s *LHorizontal) GUMISize() gumre.Size {
 		gumre.MinLength(sum),
 	}
 }
+
+// GUMITree / born 							-> MultipleNode::Default
+
+// GUMITree / breed 						-> MultipleNode::Default
+
+// GUMITree / parent()						-> MultipleNode::Default
+
+// GUMITree / childrun()					-> MultipleNode::Default
+
+// GUMIRenderer / GUMIRenderSetup 			-> Define
+func (s *LHorizontal) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	for _, v := range s.child {
+		v.GUMIRenderSetup(frame, tree, parentnode)
+	}
+}
+
+// GUMIRenderer / GUMIDraw 					-> Define
+func (s *LHorizontal) GUMIDraw() {
+	wg := new(sync.WaitGroup)
+	wg.Add(len(s.child))
+	defer wg.Wait()
+	for _, v := range s.child {
+		go func(elem GUMI) {
+			elem.GUMIDraw()
+			wg.Done()
+		}(v)
+	}
+}
+
+// GUMIRenderer / GUMIUpdate				-> Define
+func (s *LHorizontal) GUMIUpdate() {
+	panic("implement me")
+}
+
+// GUMIEventer / GUMIHappen					-> Define
+func (s *LHorizontal) GUMIHappen(event Event) {
+	for _, v := range s.child {
+		v.GUMIHappen(event)
+	}
+}
+
+// fmt.Stringer / String					-> Define
 func (s *LHorizontal) String() string {
 	return fmt.Sprintf("%s(childrun:%d)", "LHorizontal", len(s.Childrun()))
 }
 
+
+// Constructor 0
 func LHorizontal0(rule gumre.Distribute, childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
 		rule: rule,
@@ -100,6 +134,8 @@ func LHorizontal0(rule gumre.Distribute, childrun ...GUMI) *LHorizontal {
 	s.breed(childrun)
 	return s
 }
+
+// Constructor 1
 func LHorizontal1(childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
 		rule: gumre.Distribution.Minimalize,

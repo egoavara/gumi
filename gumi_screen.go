@@ -3,36 +3,39 @@ package gumi
 import (
 	"image"
 	"math/rand"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 type Screen struct {
-	frame *image.RGBA
+	rtree  *drawer.RenderTree
+	rstyle *Style
 	//
 	_hook  map[uint64]func(event Event) Event
 	_defer map[uint64]func(rgba *image.RGBA)
+	//
+
 	//
 	root GUMIRoot
 }
 
 func NewScreen(w, h int) *Screen {
 	res := &Screen{
-		frame:  image.NewRGBA(image.Rect(0, 0, w, h)),
+		rtree: drawer.NewRenderTree(image.NewRGBA(image.Rect(0, 0, w, h))),
+		rstyle: DefaultStyle(),
 		_hook:  make(map[uint64]func(event Event) Event),
 		_defer: make(map[uint64]func(rgba *image.RGBA)),
 	}
 	return res
 }
+
 func (s *Screen) Width() int {
-	return s.frame.Rect.Dx()
+	return s.rtree.Rect().Dx()
 }
 func (s *Screen) Height() int {
-	return s.frame.Rect.Dy()
+	return s.rtree.Rect().Dy()
 }
 func (s *Screen) Size() (width, height int) {
 	return s.Width(), s.Height()
-}
-func (s *Screen) Resize(w, h int) {
-	s.frame = image.NewRGBA(image.Rect(0, 0, w, h))
 }
 func (s *Screen) Root(root GUMI) {
 	s.root = newGUMIRoot(s, root)
@@ -52,28 +55,27 @@ func (s *Screen) Event(event Event) {
 //
 func (s *Screen) Init() {
 	s.root.GUMIInit()
+	s.root.GUMIRenderSetup(s.rtree, s.rtree.New(nil))
+	//
+	s.root.GUMIStyle(s.rstyle)
+	s.root.GUMIClip(s.rtree.Rect())
 }
-func (s *Screen) Ready(info Information, style *Style) {
-	if style == nil {
-		style = DefaultStyle()
-	}
+func (s *Screen) Update(info Information) {
 	s.root.GUMIInfomation(info)
-	s.root.GUMIStyle(style)
-	s.root.GUMIClip(s.frame.Rect)
 }
 func (s *Screen) Draw() {
-	s.root.GUMIDraw(s.frame)
+	s.root.GUMIUpdate()
 	for _, v := range s._defer {
 		if v != nil {
-			v(s.frame)
+			v(s.rtree.Frame())
 		}
 	}
 }
 func (s *Screen) Frame() image.Image {
-	return s.frame
+	return s.rtree.Frame()
 }
 func (s *Screen) RGBA() *image.RGBA {
-	return s.frame
+	return s.rtree.Frame()
 }
 //
 func (s *Screen) hookReserve() (id uint64) {

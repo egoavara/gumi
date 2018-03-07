@@ -2,23 +2,39 @@ package glumi
 
 import "time"
 
-type FPS struct {
+type FPS interface {
+	Start()
+	Wait() time.Time
+	Stop()
+} 
+type IntervalFPS  struct {
 	interval time.Duration
 	ticker   *time.Ticker
 }
-func (s *FPS) Start()  {
+func (s *IntervalFPS) Start()  {
 	s.ticker = time.NewTicker(s.interval)
 }
-func (s *FPS) Wait() time.Time {
+func (s *IntervalFPS) Wait() time.Time {
 	return <- s.ticker.C
 }
-func (s *FPS) Stop()  {
+func (s *IntervalFPS) Stop()  {
 	s.ticker.Stop()
 	s.ticker = nil
 }
-func (s *FPS) SetInterval(interval time.Duration)  {
+func (s *IntervalFPS) SetInterval(interval time.Duration)  {
 	s.interval = interval
 }
-func (s *FPS) GetInterval()(interval time.Duration)  {
+func (s *IntervalFPS) GetInterval()(interval time.Duration)  {
 	return s.interval
+}
+
+type LimitlessFPS struct {
+
+}
+func (s *LimitlessFPS) Start()  {
+}
+func (s *LimitlessFPS) Wait() time.Time {
+	return time.Now()
+}
+func (s *LimitlessFPS) Stop()  {
 }

@@ -7,16 +7,28 @@ import (
 	"image"
 )
 
+// Layout::Center
+//
+// Make all child center
 type LCenter struct {
 	SingleNode
+	//
+
 }
 
+// GUMIFunction / GUMIInit 					-> SingleNode::Default
+
+// GUMIFunction / GUMIInfomation 			-> Define
 func (s *LCenter) GUMIInfomation(info Information) {
 	s.child.GUMIInfomation(info)
 }
+
+// GUMIFunction / GUMIStyle 				-> Define
 func (s *LCenter) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
+
+// GUMIFunction / GUMIClip 					-> Define
 func (s *LCenter) GUMIClip(r image.Rectangle) {
 	sz := s.child.GUMISize()
 	var vert, hori int
@@ -42,29 +54,46 @@ func (s *LCenter) GUMIClip(r image.Rectangle) {
 	top := (r.Dy()-vert)/2 + r.Min.Y
 	s.child.GUMIClip(image.Rect(left, top, left+hori, top+vert))
 }
+
+// GUMIFunction / GUMIRender 				-> Define::Empty
 func (s *LCenter) GUMIRender(frame *image.RGBA) {
 }
-func (s *LCenter) GUMIDraw(frame *image.RGBA) {
-	s.child.GUMIDraw(frame)
-}
 
-func (s *LCenter) GUMIRenderTree(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
-}
-func (s *LCenter) GUMIUpdate() {
-	panic("implement me")
-}
-
-func (s *LCenter) GUMIHappen(event Event) {
-	s.child.GUMIHappen(event)
-}
+// GUMIFunction / GUMISize 					-> Define
 func (s *LCenter) GUMISize() gumre.Size {
 	return s.child.GUMISize()
 }
+
+// GUMITree / born 							-> SingleNode::Default
+
+// GUMITree / breed 						-> SingleNode::Default
+
+// GUMITree / parent()						-> SingleNode::Default
+
+// GUMITree / childrun()					-> SingleNode::Default
+
+// GUMIRenderer / GUMIRenderSetup 			-> Define::Empty
+func (s *LCenter) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.child.GUMIRenderSetup(tree, parentnode)
+}
+
+// GUMIRenderer / GUMIUpdate 				-> Define
+func (s *LCenter) GUMIUpdate() {
+	s.child.GUMIUpdate()
+}
+
+
+// GUMIEventer / GUMIHappen					-> Define
+func (s *LCenter) GUMIHappen(event Event) {
+	s.child.GUMIHappen(event)
+}
+
+// fmt.Stringer / String					-> Define
 func (s *LCenter) String() string {
 	return fmt.Sprintf("%s", "LCenter")
 }
 
+// Constructor 0
 func LCenter0(elem GUMI) *LCenter {
 	temp := &LCenter{}
 	elem.born(temp)
@@ -72,9 +101,12 @@ func LCenter0(elem GUMI) *LCenter {
 	return temp
 }
 
+// Get Elements
 func (s *LCenter) LoadElement() GUMI {
 	return s.child
 }
+
+// Set Elements
 func (s *LCenter) SaveElement(elem GUMI) {
 	s.child = elem
 }

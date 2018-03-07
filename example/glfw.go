@@ -77,7 +77,7 @@ package main
 //			gumi.ASpacer2(gumi.MinLength(20)),
 //			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Reset", func(self *gumi.MTButton) {
 //				for _, v := range VerticalProgress {
-//					v.Childrun()[0].(*gumi.MTProgress).Set(0)
+//					v.childrun()[0].(*gumi.MTProgress).Set(0)
 //				}
 //			})),
 //			gumi.Tool.MarginMinRegular(4, gumi.MTButton0("Run", func(self *gumi.MTButton) {
@@ -86,7 +86,7 @@ package main
 //						t := time.NewTimer(200 * time.Millisecond * time.Duration(index))
 //						defer t.Stop()
 //						<- t.C
-//						g.Childrun()[0].(*gumi.MTProgress).Set(1)
+//						g.childrun()[0].(*gumi.MTProgress).Set(1)
 //					}(i, v)
 //				}
 //			})),
@@ -133,7 +133,7 @@ package main
 //	gumi.Tool.MarginMinRegular(4,
 //		gumi.LHorizontal1(
 //			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.White, func(self *gumi.MTToggle, active bool) {
-//				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+//				pbar := self.parent().childrun()[1].childrun()[0].childrun()[0].childrun()[0].(*gumi.MTProgress)
 //				if active {
 //					pbar.Set(1)
 //				} else {
@@ -155,7 +155,7 @@ package main
 //	gumi.Tool.MarginMinRegular(4,
 //		gumi.LHorizontal1(
 //			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Red, func(self *gumi.MTToggle, active bool) {
-//				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+//				pbar := self.parent().childrun()[1].childrun()[0].childrun()[0].childrun()[0].(*gumi.MTProgress)
 //				if active {
 //					pbar.Set(1)
 //				} else {
@@ -177,7 +177,7 @@ package main
 //	gumi.Tool.MarginMinRegular(4,
 //		gumi.LHorizontal1(
 //			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Green, func(self *gumi.MTToggle, active bool) {
-//				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+//				pbar := self.parent().childrun()[1].childrun()[0].childrun()[0].childrun()[0].(*gumi.MTProgress)
 //				if active {
 //					pbar.Set(1)
 //				} else {
@@ -199,7 +199,7 @@ package main
 //	gumi.Tool.MarginMinRegular(4,
 //		gumi.LHorizontal1(
 //			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Blue, func(self *gumi.MTToggle, active bool) {
-//				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+//				pbar := self.parent().childrun()[1].childrun()[0].childrun()[0].childrun()[0].(*gumi.MTProgress)
 //				if active {
 //					pbar.Set(1)
 //				} else {
@@ -221,7 +221,7 @@ package main
 //	gumi.Tool.MarginMinRegular(4,
 //		gumi.LHorizontal1(
 //			gumi.MTToggle1(gumi.Material.Pallette.White, gumi.Material.Pallette.Yellow, func(self *gumi.MTToggle, active bool) {
-//				pbar := self.Parent().Childrun()[1].Childrun()[0].Childrun()[0].Childrun()[0].(*gumi.MTProgress)
+//				pbar := self.parent().childrun()[1].childrun()[0].childrun()[0].childrun()[0].(*gumi.MTProgress)
 //				if active {
 //					pbar.Set(1)
 //				} else {

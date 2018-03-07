@@ -50,12 +50,12 @@ func (s *ASpacer) GUMISize() gumre.Size {
 
 // GUMITree / breed 						-> VoidNode::Default
 
-// GUMITree / Parent						-> VoidNode::Default
+// GUMITree / parent						-> VoidNode::Default
 
-// GUMITree / Childrun						-> VoidNode::Default
+// GUMITree / childrun						-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s ASpacer) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s ASpacer) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
 }
 
 // GUMIRenderer / GUMIDraw					-> Define

@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"image"
@@ -56,25 +56,23 @@ func (s *ALModal) GUMISize() gumre.Size {
 
 // GUMITree / breed 						-> SingleNode::Default
 
-// GUMITree / Parent()						-> SingleNode::Default
+// GUMITree / parent()						-> SingleNode::Default
 
-// GUMITree / Childrun()					-> SingleNode::Default
+// GUMITree / childrun()					-> SingleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
 func (s *ALModal) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	panic("implement me")
+	s.child.GUMIRenderSetup(tree, parentnode)
+	s.modal.GUMIRenderSetup(tree, parentnode)
 }
 
 // GUMIRenderer / GUMIUpdate			-> Define
 func (s *ALModal) GUMIUpdate() {
-	panic("implement me")
-}
-
-// GUMIRenderer / GUMIDraw			-> Define
-func (s *ALModal) GUMIDraw() {
-	s.child.GUMIDraw()
 	if s.show{
-		s.modal.GUMIDraw()
+		s.child.GUMIUpdate()
+		s.modal.GUMIUpdate()
+	}else {
+		s.child.GUMIUpdate()
 	}
 }
 

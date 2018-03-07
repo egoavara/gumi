@@ -1,4 +1,4 @@
-package gumi
+package temp
 
 import (
 	"fmt"
@@ -12,38 +12,36 @@ import (
 // ACanvas using for render Vector image
 type ACanvas struct {
 	VoidNode
-	boundStore
 	styleStore
-	frameStore
+	rendererStore
 	//
 	w, h uint16
 	fn   Drawer
-	//
-	di Information
 }
 
 // GUMIFunction / GUMIInit 					-> VoidNode::Default
 
-// GUMIFunction / GUMIInfomation
+// GUMIFunction / GUMIInfomation			-> Define
 func (s *ACanvas) GUMIInfomation(info Information) {
-	s.di = info
 }
 
 // GUMIFunction / GUMIStyle					-> Define
 func (s *ACanvas) GUMIStyle(style *Style) {
-	s.style = style
-
+	if s.style != style{
+		s.style = style
+		s.rnode.Require()
+	}
 }
 
 // GUMIFunction / GUMIClip					-> Define
 func (s *ACanvas) GUMIClip(rect image.Rectangle) {
-	s.bound = rect
+	s.rnode.ChangeRect(rect)
 }
 
 // GUMIFunction / GUMIRender				-> Define
 func (s *ACanvas) GUMIRender(frame *image.RGBA) {
-	ctx := createContextRGBASub(frame, s.bound)
-	s.fn.Draw(ctx, s.style, s.di)
+	ctx := createContext(frame)
+	s.fn.Draw(ctx, s.style)
 }
 
 // GUMIFunction / GUMISize					-> Define
@@ -58,22 +56,28 @@ func (s ACanvas) GUMISize() gumre.Size {
 
 // GUMITree / breed 						-> VoidNode::Default
 
-// GUMITree / Parent()						-> VoidNode::Default
+// GUMITree / parent()						-> VoidNode::Default
 
-// GUMITree / Childrun()					-> VoidNode::Default
+// GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *ACanvas) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.frame = frame
-	// TODO : Cache
+func (s *ACanvas) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+	s.rtree = tree
+	s.rnode = tree.New(parentnode)
 }
+
 // GUMIRenderer / GUMIRenderSetup			-> Define
 func (s *ACanvas) GUMIDraw() {
-	s.GUMIRender(s.frame)
+	sub := s.rnode.SubImage()
+	s.GUMIRender(sub)
+	s.rnode.Complete()
 }
+
 // GUMIRenderer / GUMIRenderSetup			-> Define
 func (s *ACanvas ) GUMIUpdate()  {
-	// TODO : Cache
+	if s.rnode.Check(){
+		s.GUMIDraw()
+	}
 }
 
 // GUMIEventer / GUMIHappen					-> Define
