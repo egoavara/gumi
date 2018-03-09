@@ -3,7 +3,7 @@
 package gumi
 
 import (
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
 )
 
 type VoidNode struct {
@@ -78,6 +78,6 @@ type styleStore struct {
 	style *Style
 }
 type rendererStore struct {
-	rtree *drawer.RenderTree
-	rnode *drawer.RenderNode
+	rmana *renderline.Manager
+	rnode *renderline.Node
 }

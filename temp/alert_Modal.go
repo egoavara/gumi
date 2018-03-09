@@ -48,7 +48,7 @@ func (s *ALModal) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *ALModal) GUMISize() gumre.Size {
+func (s *ALModal) GUMISize() gcore.Size {
 	return s.child.GUMISize()
 }
 
@@ -61,7 +61,7 @@ func (s *ALModal) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> SingleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *ALModal) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *ALModal) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 	s.child.GUMIRenderSetup(tree, parentnode)
 	s.modal.GUMIRenderSetup(tree, parentnode)
 }

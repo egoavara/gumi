@@ -3,11 +3,11 @@ package gumi
 import (
 	"image"
 	"math/rand"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
 )
 
 type Screen struct {
-	rtree  *drawer.RenderTree
+	rline *renderline.Manager
 	rstyle *Style
 	//
 	_hook  map[uint64]func(event Event) Event
@@ -20,7 +20,7 @@ type Screen struct {
 
 func NewScreen(w, h int) *Screen {
 	res := &Screen{
-		rtree: drawer.NewRenderTree(image.NewRGBA(image.Rect(0, 0, w, h))),
+		rline: renderline.NewManager(w, h),
 		rstyle: DefaultStyle(),
 		_hook:  make(map[uint64]func(event Event) Event),
 		_defer: make(map[uint64]func(rgba *image.RGBA)),
@@ -29,13 +29,13 @@ func NewScreen(w, h int) *Screen {
 }
 
 func (s *Screen) Width() int {
-	return s.rtree.Rect().Dx()
+	return s.rline.Width()
 }
 func (s *Screen) Height() int {
-	return s.rtree.Rect().Dy()
+	return s.rline.Height()
 }
 func (s *Screen) Size() (width, height int) {
-	return s.Width(), s.Height()
+	return s.rline.Size()
 }
 func (s *Screen) Root(root GUMI) {
 	s.root = newGUMIRoot(s, root)
@@ -55,27 +55,23 @@ func (s *Screen) Event(event Event) {
 //
 func (s *Screen) Init() {
 	s.root.GUMIInit()
-	s.root.GUMIRenderSetup(s.rtree, s.rtree.New(nil))
-	//
 	s.root.GUMIStyle(s.rstyle)
-	s.root.GUMIClip(s.rtree.Rect())
+
+	// renderline은 렌더 트리를 완성시킨 이후 셋업해야 함 따라서 GUMIRenderSetup 이후 Setup을 함
+	s.root.GUMIRenderSetup(s.rline, s.rline.New(nil))
+	s.rline.Setup()
 }
 func (s *Screen) Update(info Information) {
 	s.root.GUMIInfomation(info)
 }
 func (s *Screen) Draw() {
-	s.root.GUMIUpdate()
-	for _, v := range s._defer {
-		if v != nil {
-			v(s.rtree.Frame())
-		}
-	}
+	s.rline.Render()
 }
 func (s *Screen) Frame() image.Image {
-	return s.rtree.Frame()
+	return s.rline.Image()
 }
 func (s *Screen) RGBA() *image.RGBA {
-	return s.rtree.Frame()
+	return s.rline.Image()
 }
 //
 func (s *Screen) hookReserve() (id uint64) {

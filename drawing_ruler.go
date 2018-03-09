@@ -3,9 +3,9 @@ package gumi
 import (
 	"fmt"
 	"github.com/fogleman/gg"
-	"github.com/iamGreedy/gumi/gumre"
 	"image/color"
 	"strconv"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 var (
@@ -163,7 +163,7 @@ func (_Ruler) Proportion() Drawer {
 		w := context.Width()
 		h := context.Height()
 		//
-		gcd := int(gumre.GCD(int64(w), int64(h)))
+		gcd := int(gcore.GCD(int64(w), int64(h)))
 		txt := fmt.Sprintf("%d : %d", w/gcd, h/gcd)
 		//
 		context.DrawLine(0, 0, float64(w), float64(h))
@@ -177,7 +177,7 @@ func (_Ruler) Screen() Drawer {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
-		for _, v := range gumre.DefinedResolutions.Smaller(context.Width(), context.Height()) {
+		for _, v := range DefinedResolutions.Smaller(context.Width(), context.Height()) {
 			context.DrawRectangle(0, 0, float64(v.Width), float64(v.Height))
 			w, _ := context.MeasureString(v.Name[0])
 			context.DrawString(v.Name[0], float64(v.Width)-w-5, float64(v.Height)-5)

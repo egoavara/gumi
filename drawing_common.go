@@ -2,9 +2,9 @@ package gumi
 
 import (
 	"github.com/fogleman/gg"
-	"github.com/iamGreedy/gumi/gumre"
 	"math"
 	"fmt"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 
@@ -44,7 +44,7 @@ func (s *fpsDrawer ) Draw(context *gg.Context, style *Style)  {
 	//
 	context.SetColor(rulerColor)
 
-	avg := Clamp(gumre.Average(s.dts[:]), 0.001, math.MaxFloat64)
+	avg := Clamp(gcore.Average(s.dts[:]), 0.001, math.MaxFloat64)
 	txt := fmt.Sprintf("FPS : %.2f - AVG : %2.5f", 1000 / float64(avg), avg)
 	w := float64(context.Width())
 	mw, mh := context.MeasureString(txt)

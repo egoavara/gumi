@@ -2,9 +2,8 @@ package gumi
 
 import (
 	"fmt"
-	"image"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // _::Root
@@ -27,18 +26,8 @@ func (s *gumiRoot) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *gumiRoot) GUMIClip(r image.Rectangle) {
-	s.child.GUMIClip(r)
-}
-
-// GUMIFunction / GUMIRender 				-> Define
-func (s *gumiRoot) GUMIRender(frame *image.RGBA) {
-
-}
-
 // GUMIFunction / GUMISize 					-> Define
-func (s *gumiRoot) GUMISize() gumre.Size {
+func (s *gumiRoot) GUMISize() gcore.Size {
 	return s.child.GUMISize()
 }
 
@@ -53,13 +42,8 @@ func (s *gumiRoot) GUMISize() gumre.Size {
 
 
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
-func (s *gumiRoot) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.child.GUMIRenderSetup(tree, parentnode)
-}
-
-// GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *gumiRoot) GUMIUpdate() {
-	s.child.GUMIUpdate()
+func (s *gumiRoot) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.child.GUMIRenderSetup(man, parent)
 }
 
 // GUMIEventor

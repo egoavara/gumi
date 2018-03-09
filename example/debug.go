@@ -1,33 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"github.com/iamGreedy/gumi"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
 	"image"
-	"os"
 	"runtime"
-	"image/draw"
+	"image/jpeg"
+	"bytes"
+	"github.com/iamGreedy/gumi/example/sdl2example/asset"
+	"github.com/iamGreedy/gumi/drawer"
 )
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	fmt.Println(runtime.GOMAXPROCS(0))
-	r, err := os.Open("./res/cubes_512.png")
-	//r, err := os.Open("./res/172676.jpg")
-	gumre.Assert(err)
-	img, ext, err := image.Decode(r)
-	gumre.Assert(err)
-	rgba := image.NewRGBA(image.Rect(0,0,1024, 1024))
-	draw.Draw(rgba, rgba.Rect, img, img.Bounds().Min, draw.Src)
-	fmt.Println(ext)
-	resizer := drawer.NewFillup(img, drawer.FillupNearest)
-	resizer.Draw(rgba)
-	//noise := drawer.NewNoise(32)
-	//noise.Draw(rgba)
-	//blur := drawer.NewBlur(20, false, drawer.BlurBox)
-	//blur.Draw(rgba)
-	gumi.Capture("out", rgba)
-}
+	img, err := jpeg.Decode(bytes.NewBuffer(asset.MustAsset("helloImage.jpg")))
+	if err != nil {
+		panic(err)
+	}
+	drw := media.NewFillup(img, media.FillupNearest)
 
+	save := image.NewRGBA(image.Rect(0,0,800, 600))
+	sub := save.SubImage(image.Rect(100, 100, 700, 500)).(*image.RGBA)
+	//
+	drw.Draw(sub)
+	gumi.Capture("out", save)
+
+}

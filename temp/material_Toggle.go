@@ -34,8 +34,8 @@ type MTToggle struct {
 	rendererStore
 	//
 	mtColorFromTo
-	studio *gumre.Studio
-	onoff *gumre.Percenting
+	studio *gcore.Studio
+	onoff *gcore.Percenting
 	//
 	cursorEnter, active bool
 	onActive            MTToggleActive
@@ -48,11 +48,11 @@ type MTToggleActive func(self *MTToggle, active bool)
 
 // GUMIFunction / GUMIInit 					-> Define
 func (s *MTToggle) GUMIInit() {
-	s.studio = gumre.Animation.Studio(mtToggleAnimationLength)
-	s.onoff = s.studio.Set(mtToggleAnimationOnOff, &gumre.Percenting{
-		Delta: gumre.Animation.PercentingByMillis(mtToggleAnimationOnOffDeltaMillis),
+	s.studio = gcore.Animation.Studio(mtToggleAnimationLength)
+	s.onoff = s.studio.Set(mtToggleAnimationOnOff, &gcore.Percenting{
+		Delta: gcore.Animation.PercentingByMillis(mtToggleAnimationOnOffDeltaMillis),
 		Fn:    Material.DefaultAnimation.Toggle,
-	}).(*gumre.Percenting)
+	}).(*gcore.Percenting)
 }
 
 // GUMIFunction / GUMIInfomation 			-> Define
@@ -97,10 +97,10 @@ func (s *MTToggle) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *MTToggle) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.MinLength(mtToggleMinHeight),
-		Horizontal: gumre.MinLength(mtToggleMinWidth),
+func (s *MTToggle) GUMISize() gcore.Size {
+	return gcore.Size{
+		Vertical:   gcore.MinLength(mtToggleMinHeight),
+		Horizontal: gcore.MinLength(mtToggleMinWidth),
 	}
 }
 
@@ -113,7 +113,7 @@ func (s *MTToggle) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTToggle) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *MTToggle) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 	s.frame = frame
 }
 

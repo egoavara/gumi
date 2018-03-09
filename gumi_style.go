@@ -3,10 +3,10 @@ package gumi
 import (
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype"
-	"github.com/iamGreedy/gumi/gumre"
 	"golang.org/x/image/font/gofont/goregular"
 	"sync"
 	"github.com/golang/freetype/truetype"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 type Style struct {
@@ -42,7 +42,7 @@ func (s *Style) releaseContext(ctx *gg.Context) {
 }
 
 type StyleDefault struct {
-	Font *gumre.Font
+	Font *gcore.Font
 	//
 	LineWidth float64
 }
@@ -59,7 +59,7 @@ func DefaultStyle() *Style {
 		f, _ := freetype.ParseFont(goregular.TTF)
 		temp := &Style{
 			Default: StyleDefault{
-				Font:      gumre.NewFont(f, 12),
+				Font:      gcore.NewFont(f, 12),
 				LineWidth: 1,
 			},
 			Map: map[string]interface{}{
@@ -79,7 +79,7 @@ func ModifyDefaultStyle(font *truetype.Font, size float64) {
 	if defaultStyleSingleton == nil {
 		temp := &Style{
 			Default: StyleDefault{
-				Font:      gumre.NewFont(font, size),
+				Font:      gcore.NewFont(font, size),
 				LineWidth: 1,
 			},
 			Map: map[string]interface{}{
@@ -88,6 +88,6 @@ func ModifyDefaultStyle(font *truetype.Font, size float64) {
 		}
 		defaultStyleSingleton = temp
 	} else {
-		defaultStyleSingleton.Default.Font = gumre.NewFont(font, size)
+		defaultStyleSingleton.Default.Font = gcore.NewFont(font, size)
 	}
 }

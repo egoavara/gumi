@@ -2,9 +2,8 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
-	"image"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // Actor::Spacer
@@ -15,8 +14,8 @@ import (
 type ASpacer struct {
 	VoidNode
 	//
-	verical    gumre.Length
-	horizontal gumre.Length
+	verical    gcore.Length
+	horizontal gcore.Length
 }
 
 // GUMIFunction / GUMIInit 					-> VoidNode::Default
@@ -29,18 +28,9 @@ func (s ASpacer) GUMIInfomation(info Information) {
 func (s ASpacer) GUMIStyle(style *Style) {
 }
 
-// GUMIFunction / GUMIClip 				-> Define::Empty
-func (ASpacer) GUMIClip(r image.Rectangle) {
-}
-
-// GUMIFunction / GUMIRender 			-> Define::Empty
-func (ASpacer) GUMIRender(frame *image.RGBA) {
-
-}
-
 // GUMIFunction / GUMISize 				-> Define
-func (s *ASpacer) GUMISize() gumre.Size {
-	return gumre.Size{
+func (s *ASpacer) GUMISize() gcore.Size {
+	return gcore.Size{
 		Vertical:   s.verical,
 		Horizontal: s.horizontal,
 	}
@@ -55,16 +45,7 @@ func (s *ASpacer) GUMISize() gumre.Size {
 // GUMITree / childrun						-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s ASpacer) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-}
-
-// GUMIRenderer / GUMIDraw					-> Define
-func (s ASpacer) GUMIDraw() {
-
-}
-
-// GUMIRenderer / GUMIUpdate				-> Define
-func (s ASpacer) GUMIUpdate() {
+func (s ASpacer) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -77,52 +58,52 @@ func (ASpacer) String() string {
 }
 
 // Constructor 0
-func ASpacer0(horizontal, vertical gumre.Length) *ASpacer {
+func ASpacer0(horizontal, vertical gcore.Length) *ASpacer {
 	temp := &ASpacer{}
 	temp.Set(horizontal, vertical)
 	return temp
 }
 
 // Constructor 1
-func ASpacer1(horizontal gumre.Length) *ASpacer {
+func ASpacer1(horizontal gcore.Length) *ASpacer {
 	temp := &ASpacer{}
-	temp.Set(horizontal, gumre.AUTOLENGTH)
+	temp.Set(horizontal, gcore.AUTOLENGTH)
 	return temp
 }
 
 // Constructor 2
-func ASpacer2(vertical gumre.Length) *ASpacer {
+func ASpacer2(vertical gcore.Length) *ASpacer {
 	temp := &ASpacer{}
-	temp.Set(gumre.AUTOLENGTH, vertical)
+	temp.Set(gcore.AUTOLENGTH, vertical)
 	return temp
 }
 
 // Method / Get -> GetHorizontal(), GetVertical()
-func (s *ASpacer) Get() (horizontal, vertical gumre.Length) {
+func (s *ASpacer) Get() (horizontal, vertical gcore.Length) {
 	return s.horizontal, s.verical
 }
 
 // Method / Set -> SetHorizontal(...), SetVertical(...)
-func (s *ASpacer) Set(horizontal, vertical gumre.Length) {
+func (s *ASpacer) Set(horizontal, vertical gcore.Length) {
 	s.horizontal, s.verical = horizontal, vertical
 }
 
 // Method / GetHorizontal
-func (s *ASpacer) GetHorizontal() gumre.Length {
+func (s *ASpacer) GetHorizontal() gcore.Length {
 	return s.horizontal
 }
 
 // Method / SetHorizontal
-func (s *ASpacer) SetHorizontal(horizontal gumre.Length) {
+func (s *ASpacer) SetHorizontal(horizontal gcore.Length) {
 	s.horizontal = horizontal
 }
 
 // Method / GetVertical
-func (s *ASpacer) GetVertical() gumre.Length {
+func (s *ASpacer) GetVertical() gcore.Length {
 	return s.verical
 }
 
 // Method / SetVertical
-func (s *ASpacer) SetVertical(vertical gumre.Length) {
+func (s *ASpacer) SetVertical(vertical gcore.Length) {
 	s.verical = vertical
 }

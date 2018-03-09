@@ -30,4 +30,5 @@ _testmain.go
 *.svg
 
 debug.go
+assets.go
 example/res/

@@ -2,15 +2,16 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
 	"image"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // Layout::Center
 //
 // Make all child center
 type LCenter struct {
+	rendererStore
 	SingleNode
 	//
 
@@ -28,8 +29,8 @@ func (s *LCenter) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *LCenter) GUMIClip(r image.Rectangle) {
+
+func (s *LCenter) clipsize(r image.Rectangle) image.Rectangle{
 	sz := s.child.GUMISize()
 	var vert, hori int
 	if int(sz.Vertical.Max) < r.Dy() {
@@ -52,7 +53,7 @@ func (s *LCenter) GUMIClip(r image.Rectangle) {
 	}
 	left := (r.Dx()-hori)/2 + r.Min.X
 	top := (r.Dy()-vert)/2 + r.Min.Y
-	s.child.GUMIClip(image.Rect(left, top, left+hori, top+vert))
+	return image.Rect(left, top, left+hori, top+vert)
 }
 
 // GUMIFunction / GUMIRender 				-> Define::Empty
@@ -60,7 +61,7 @@ func (s *LCenter) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *LCenter) GUMISize() gumre.Size {
+func (s *LCenter) GUMISize() gcore.Size {
 	return s.child.GUMISize()
 }
 
@@ -73,15 +74,12 @@ func (s *LCenter) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> SingleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define::Empty
-func (s *LCenter) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.child.GUMIRenderSetup(tree, parentnode)
+func (s *LCenter) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent)
+	s.rnode.Allocation = s.clipsize(s.rnode.Allocation)
+	s.child.GUMIRenderSetup(s.rmana, s.rnode)
 }
-
-// GUMIRenderer / GUMIUpdate 				-> Define
-func (s *LCenter) GUMIUpdate() {
-	s.child.GUMIUpdate()
-}
-
 
 // GUMIEventer / GUMIHappen					-> Define
 func (s *LCenter) GUMIHappen(event Event) {

@@ -36,8 +36,8 @@ type MTEdit struct {
 	rendererStore
 	//
 	mtColorSingle
-	studio                *gumre.Studio
-	textCursor            *gumre.Switching
+	studio                *gcore.Studio
+	textCursor            *gcore.Switching
 	deleteSum             int64
 	deleteOn              bool
 	deleteCount           int
@@ -47,7 +47,7 @@ type MTEdit struct {
 	editingRune           rune
 	editingNow            bool
 	//
-	align    gumre.Align
+	align    gcore.Align
 	text     string
 	inactive bool
 	//
@@ -64,10 +64,10 @@ type MTEditChange func(self *MTEdit, text string)
 
 // GUMIFunction / GUMIInit 					-> Define
 func (s *MTEdit) GUMIInit() {
-	s.studio = gumre.Animation.Studio(mtEditAnimationLength)
-	s.textCursor = s.studio.Set(mtEditAnimationTextCursor, &gumre.Switching{
+	s.studio = gcore.Animation.Studio(mtEditAnimationLength)
+	s.textCursor = s.studio.Set(mtEditAnimationTextCursor, &gcore.Switching{
 		Interval: mtEditAnimationTextCursorInterval,
-	}).(*gumre.Switching)
+	}).(*gcore.Switching)
 }
 
 // GUMIFunction / GUMIInfomation 			-> Define
@@ -142,22 +142,22 @@ func (s *MTEdit) GUMIRender(frame *image.RGBA) {
 
 	var expectw, expecth = ctx.MeasureString(drawtext)
 	var stringposX, stringposY float64
-	var vert, hori = gumre.ParseAlign(s.align)
+	var vert, hori = gcore.ParseAlign(s.align)
 
 	switch vert {
-	case gumre.AlignBottom:
+	case gcore.AlignBottom:
 		stringposY = h
-	case gumre.AlignVertical:
+	case gcore.AlignVertical:
 		stringposY = h/2 + expecth/2
-	case gumre.AlignTop:
+	case gcore.AlignTop:
 		stringposY = 0 + expecth
 	}
 	switch hori {
-	case gumre.AlignRight:
+	case gcore.AlignRight:
 		stringposX = w - radius - expectw
-	case gumre.AlignHorizontal:
+	case gcore.AlignHorizontal:
 		stringposX = w/2 - expectw/2
-	case gumre.AlignLeft:
+	case gcore.AlignLeft:
 		stringposX = radius
 	}
 	//
@@ -181,10 +181,10 @@ func (s *MTEdit) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *MTEdit) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.MinLength(mtEditMinHeight),
-		Horizontal: gumre.MinLength(mtEditMinWidth),
+func (s *MTEdit) GUMISize() gcore.Size {
+	return gcore.Size{
+		Vertical:   gcore.MinLength(mtEditMinHeight),
+		Horizontal: gcore.MinLength(mtEditMinWidth),
 	}
 }
 
@@ -197,7 +197,7 @@ func (s *MTEdit) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTEdit) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *MTEdit) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 	s.frame = frame
 }
 
@@ -291,7 +291,7 @@ func (s *MTEdit) deleteRequest(count uint) {
 func MTEdit0() *MTEdit {
 	temp := &MTEdit{
 		text:  "",
-		align: gumre.AlignLeft | gumre.AlignVertical,
+		align: gcore.AlignLeft | gcore.AlignVertical,
 	}
 	temp.SetMaterialColor(Material.Pallette.White)
 	return temp
@@ -301,14 +301,14 @@ func MTEdit0() *MTEdit {
 func MTEdit1(str string) *MTEdit {
 	temp := &MTEdit{
 		text:  str,
-		align: gumre.AlignLeft | gumre.AlignVertical,
+		align: gcore.AlignLeft | gcore.AlignVertical,
 	}
 	temp.SetMaterialColor(Material.Pallette.White)
 	return temp
 }
 
 // Constructors 2
-func MTEdit2(str string, align gumre.Align) *MTEdit {
+func MTEdit2(str string, align gcore.Align) *MTEdit {
 	temp := &MTEdit{
 		text:  str,
 		align: align,
@@ -318,7 +318,7 @@ func MTEdit2(str string, align gumre.Align) *MTEdit {
 }
 
 // Constructors 3
-func MTEdit3(mcl *MaterialColor, str string, align gumre.Align) *MTEdit {
+func MTEdit3(mcl *MaterialColor, str string, align gcore.Align) *MTEdit {
 	temp := &MTEdit{
 		text:  str,
 		align: align,
@@ -351,12 +351,12 @@ func (s *MTEdit) GetText() string {
 }
 
 // Method / Set
-func (s *MTEdit) SetAlign(align gumre.Align) {
+func (s *MTEdit) SetAlign(align gcore.Align) {
 	s.align = align
 }
 
 // Method / Get
-func (s *MTEdit) GetAlign() gumre.Align {
+func (s *MTEdit) GetAlign() gcore.Align {
 	return s.align
 }
 

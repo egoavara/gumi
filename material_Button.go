@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/fogleman/gg"
 	"image"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // MTButton Default Values
@@ -24,64 +24,34 @@ const (
 // Material::Button
 //
 // Material theme button
-type MTButton struct {
-	//
-	VoidNode
-	styleStore
-	rendererStore
-	//
-	mtColorSingle
-	studio *gumre.Studio
-	hover *gumre.Percenting
-	//
-	text string
-	//
-	cursorEnter, active bool
-	onClick             MTButtonClick
-	onFocus             MTButtonFocus
-}
-
-
-
-// Material::Button<Callback> -> Focus
-//
-// When Cursor enter, leave this Elem call this function
-type MTButtonFocus func(self *MTButton, focus bool)
-
-// Material::Button<Callback> -> Click
-//
-// When Cursor click occur this
-type MTButtonClick func(self *MTButton)
-
-
-// GUMIFunction / GUMIInit 					-> Define
-func (s *MTButton) GUMIInit() {
-	s.studio = gumre.Animation.Studio(mtButtonAnimationLength)
-	s.hover = s.studio.Set(mtButtonAnimationHover, &gumre.Percenting{
-		Delta:gumre.Animation.PercentingByMillis(mtButtonAnimDeltaMillis),
-		Fn: Material.DefaultAnimation.Button,
-	}).(*gumre.Percenting)
-}
-
-// GUMIFunction / GUMIInfomation 			-> Define
-func (s *MTButton) GUMIInfomation(info Information) {
-	if s.studio.Animate(float64(info.Dt)){
-		s.rnode.Require()
+type (
+	MTButton struct {
+		//
+		VoidNode
+		styleStore
+		rendererStore
+		//
+		mtColorSingle
+		studio *gcore.Studio
+		hover *gcore.Percenting
+		//
+		text string
+		//
+		cursorEnter, active bool
+		onClick             MTButtonClick
+		onFocus             MTButtonFocus
 	}
-}
 
-// GUMIFunction / GUMIStyle 				-> Define
-func (s *MTButton) GUMIStyle(style *Style) {
-	s.style = style
-}
+	// When Cursor enter, leave this Elem call this function
+	MTButtonFocus func(self *MTButton, focus bool)
+	// When Cursor click occur this
+	MTButtonClick func(self *MTButton)
+)
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *MTButton) GUMIClip(r image.Rectangle) {
-	s.rnode.SetRect(r)
-}
-// GUMIFunction / GUMIRender 				-> Define
-func (s *MTButton) GUMIRender(frame *image.RGBA) {
-	var ctx = createContext(frame)
+
+
+func (s *MTButton) BaseRender(subimg *image.RGBA) {
+	var ctx = createContext(subimg)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var baseColor, mainColor = s.GetMaterialColor().Color()
 	radius := h / 2
@@ -117,16 +87,43 @@ func (s *MTButton) GUMIRender(frame *image.RGBA) {
 	}
 }
 
+func (s *MTButton) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	return image.ZR
+}
+
+// GUMIFunction / GUMIInit 					-> Define
+func (s *MTButton) GUMIInit() {
+	s.studio = gcore.Animation.Studio(mtButtonAnimationLength)
+	s.hover = s.studio.Set(mtButtonAnimationHover, &gcore.Percenting{
+		Delta: gcore.Animation.PercentingByMillis(mtButtonAnimDeltaMillis),
+		Fn:    Material.DefaultAnimation.Button,
+	}).(*gcore.Percenting)
+}
+
+// GUMIFunction / GUMIInfomation 			-> Define
+func (s *MTButton) GUMIInfomation(info Information) {
+	if s.studio.Animate(float64(info.Dt)){
+		s.rnode.ThrowCache()
+	}
+}
+
+// GUMIFunction / GUMIStyle 				-> Define
+func (s *MTButton) GUMIStyle(style *Style) {
+	s.style = style
+}
+
+
+
 // GUMIFunction / GUMISize 					-> Define
-func (s *MTButton) GUMISize() gumre.Size {
+func (s *MTButton) GUMISize() gcore.Size {
 
 	s.style.Default.Font.Use()
 	defer s.style.Default.Font.Release()
 	var hori, vert = s.style.Default.Font.CalculateSize(s.text)
 	//
-	return gumre.Size{
-		Vertical:   gumre.MinLength(uint16(vert + mtButtonMinPadding*2)),
-		Horizontal: gumre.MinLength(uint16(hori + mtButtonMinPadding*2)),
+	return gcore.Size{
+		Vertical:   gcore.MinLength(uint16(vert + mtButtonMinPadding*2)),
+		Horizontal: gcore.MinLength(uint16(hori + mtButtonMinPadding*2)),
 	}
 }
 
@@ -139,19 +136,12 @@ func (s *MTButton) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTButton) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.rtree = tree
-	s.rnode = tree.New(parentnode)
+func (s *MTButton) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent)
+	s.rnode.Do = s
 }
 
-// GUMIRenderer / GUMIUpdate 				-> Define
-func (s *MTButton) GUMIUpdate() {
-	if s.rnode.Check(){
-		s.GUMIRender(s.rnode.SubImage())
-		s.rnode.Complete()
-	}
-
-}
 
 // GUMIEventer / GUMIHappen					-> Define
 func (s *MTButton) GUMIHappen(event Event) {
@@ -160,7 +150,7 @@ func (s *MTButton) GUMIHappen(event Event) {
 		if ev.Key == KEY_MOUSE1 {
 			if s.cursorEnter {
 				s.active = true
-				s.rnode.Require()
+				s.rnode.ThrowCache()
 			}
 		}
 	case EventKeyRelease:
@@ -170,26 +160,26 @@ func (s *MTButton) GUMIHappen(event Event) {
 					s.onClick(s)
 				}
 				s.active = false
-				s.rnode.Require()
+				s.rnode.ThrowCache()
 			}
 		}
 	case EventCursor:
 		x := int(ev.X)
 		y := int(ev.Y)
-		bd := s.rnode.GetRect()
+		bd := s.rnode.Allocation
 		if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 			if s.onFocus != nil {
 				s.onFocus(s, true)
 			}
 			//
-			s.hover.Delta = gumre.Animation.PercentingByMillis(mtButtonAnimDeltaMillis)
+			s.hover.Delta = gcore.Animation.PercentingByMillis(mtButtonAnimDeltaMillis)
 			s.hover.Request(1)
 			s.cursorEnter = true
 		} else {
 			if s.onFocus != nil {
 				s.onFocus(s, false)
 			}
-			s.hover.Delta = gumre.Animation.PercentingByMillis(mtButtonAnimDeltaMillis)
+			s.hover.Delta = gcore.Animation.PercentingByMillis(mtButtonAnimDeltaMillis)
 			s.hover.Request(0)
 			s.cursorEnter = false
 		}
@@ -198,7 +188,7 @@ func (s *MTButton) GUMIHappen(event Event) {
 
 // fmt.Stringer / String					-> Define
 func (s *MTButton) String() string {
-	return fmt.Sprintf("%s", "MTButton")
+	return fmt.Sprintf("%s(text:%s)", "MTButton", s.GetText())
 }
 
 // Constructor 0

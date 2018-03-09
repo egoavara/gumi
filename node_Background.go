@@ -3,15 +3,26 @@ package gumi
 import (
 	"fmt"
 	"image"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/media"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 type NBackground struct {
 	SingleNode
 	rendererStore
 	//
-	drawer drawer.Drawer
+	drawer media.Drawer
+}
+
+// renderline.Job / BaseRender
+func (s *NBackground) BaseRender(subimg *image.RGBA) {
+	s.drawer.Draw(subimg)
+}
+
+// renderline.Job / DecalRender
+func (s *NBackground) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	return image.ZR
 }
 
 func (s *NBackground) GUMIInfomation(info Information) {
@@ -20,35 +31,20 @@ func (s *NBackground) GUMIInfomation(info Information) {
 func (s *NBackground) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
-func (s *NBackground) GUMIClip(rect image.Rectangle) {
-	s.rnode.SetRect(rect)
-	s.child.GUMIClip(rect)
-}
+
 func (s *NBackground) GUMIRender(frame *image.RGBA) {
 	s.drawer.Draw(frame)
-
 }
-func (s NBackground) GUMISize() gumre.Size {
+func (s NBackground) GUMISize() gcore.Size {
 	return s.child.GUMISize()
 }
 
-func (s *NBackground) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.rtree = tree
-	s.rnode = parentnode
-	s.child.GUMIRenderSetup(tree, s.rnode)
+func (s *NBackground) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent)
+	s.rnode.Do = s
+	s.child.GUMIRenderSetup(s.rmana, s.rnode)
 }
-func (s *NBackground) GUMIUpdate() {
-	if s.rnode.Check(){
-		if s.rnode.ValidCache(){
-			s.rnode.PopCache()
-		}else {
-			s.GUMIRender(s.rnode.SubImage())
-			s.rnode.PushCache()
-		}
-	}
-	s.child.GUMIUpdate()
-}
-
 func (s *NBackground) GUMIHappen(event Event) {
 	s.child.GUMIHappen(event)
 }
@@ -57,23 +53,24 @@ func (s *NBackground) String() string {
 	return fmt.Sprintf("%s", "NBackground")
 }
 
-func NBackground0(draw drawer.Drawer) *NBackground {
+func NBackground0(draw media.Drawer) *NBackground {
 	return &NBackground{
 		drawer:draw,
 	}
 }
 
-func (s *NBackground) Set(dw drawer.Drawer) {
+func (s *NBackground) Set(dw media.Drawer) {
 	s.SetDrawer(dw)
 }
-func (s *NBackground) Get() drawer.Drawer {
+func (s *NBackground) Get() media.Drawer {
 	return s.GetDrawer()
 }
 
-func (s *NBackground) SetDrawer(dw drawer.Drawer) {
+func (s *NBackground) SetDrawer(dw media.Drawer) {
 	s.drawer = dw
+	s.rnode.ThrowCache()
 }
 
-func (s *NBackground) GetDrawer() drawer.Drawer {
+func (s *NBackground) GetDrawer() media.Drawer {
 	return s.drawer
 }

@@ -3,9 +3,8 @@ package gumi
 import (
 	"image"
 	"fmt"
-	"sync"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // Layout::Horizontal
@@ -14,7 +13,7 @@ import (
 type LVertical struct {
 	MultipleNode
 	rendererStore
-	rule gumre.Distribute
+	rule gcore.Distribute
 }
 
 // GUMIFunction / GUMIInit 					-> SingleNode::Default
@@ -33,37 +32,9 @@ func (s *LVertical) GUMIStyle(style *Style) {
 	}
 }
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *LVertical) GUMIClip(r image.Rectangle) {
-	var tempVert = make([]gumre.Length, len(s.child))
-	var tempHori = make([]gumre.Length, len(s.child))
-
-	for i, v := range s.child{
-		tempVert[i] = v.GUMISize().Vertical
-		tempHori[i] = v.GUMISize().Horizontal
-	}
-	dis := s.rule(r.Dy(), tempVert)
-	//
-	var startat = r.Min.Y
-	for i, v := range s.child{
-		inrect := image.Rect(
-			r.Min.X,
-			startat,
-			r.Max.X,
-			startat + dis[i],
-		)
-		v.GUMIClip(inrect)
-		startat += dis[i]
-	}
-}
-
-// GUMIFunction / GUMIRender 				-> Define::Empty
-func (s *LVertical) GUMIRender(frame *image.RGBA) {
-
-}
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *LVertical) GUMISize() gumre.Size {
+func (s *LVertical) GUMISize() gcore.Size {
 	var minMax, sum uint16 = 0, 0
 	for _, v := range s.child{
 		sz := v.GUMISize()
@@ -72,9 +43,9 @@ func (s *LVertical) GUMISize() gumre.Size {
 		}
 		sum += sz.Vertical.Min
 	}
-	return gumre.Size{
-		gumre.MinLength(sum),
-		gumre.MinLength(minMax),
+	return gcore.Size{
+		gcore.MinLength(sum),
+		gcore.MinLength(minMax),
 	}
 }
 
@@ -87,28 +58,30 @@ func (s *LVertical) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> MultipleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define::Empty
-func (s *LVertical) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.rtree = tree
-	s.rnode = tree.New(parentnode)
-	for _, v := range s.child{
-		v.GUMIRenderSetup(s.rtree, s.rnode)
+func (s *LVertical) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent)
+	// 렌더링 영역 할당
+	var tempVert = make([]gcore.Length, len(s.child))
+	var tempHori = make([]gcore.Length, len(s.child))
+	for i, v := range s.child{
+		tempVert[i] = v.GUMISize().Vertical
+		tempHori[i] = v.GUMISize().Horizontal
 	}
-}
-
-// GUMIRenderer / GUMIUpdate 				-> Define
-func (s *LVertical) GUMIUpdate() {
-	if s.rnode.Check(){
-		s.rnode.Require()
-		wg := new(sync.WaitGroup)
-		wg.Add(len(s.child))
-		defer wg.Wait()
-		for _, v := range s.child{
-			go func(elem GUMI) {
-				elem.GUMIUpdate()
-				wg.Done()
-			}(v)
-		}
-		s.rnode.Complete()
+	dis := s.rule(s.rnode.Allocation.Dy(), tempVert)
+	//
+	var startat = s.rnode.Allocation.Min.Y
+	for i, v := range s.child{
+		inrect := image.Rect(
+			s.rnode.Allocation.Min.X,
+			startat,
+			s.rnode.Allocation.Max.X,
+			startat + dis[i],
+		)
+		temp := s.rmana.New(s.rnode)
+		temp.Allocation = inrect
+		v.GUMIRenderSetup(s.rmana, temp)
+		startat += dis[i]
 	}
 }
 
@@ -127,7 +100,7 @@ func (s *LVertical) String() string{
 }
 
 // Constructor 0
-func LVertical0(rule gumre.Distribute, childrun ...GUMI) *LVertical {
+func LVertical0(rule gcore.Distribute, childrun ...GUMI) *LVertical {
 	s := &LVertical{
 		rule:rule,
 	}
@@ -141,7 +114,7 @@ func LVertical0(rule gumre.Distribute, childrun ...GUMI) *LVertical {
 // Constructor 1
 func LVertical1(childrun ...GUMI) *LVertical {
 	s := &LVertical{
-		rule: gumre.Distribution.Minimalize,
+		rule: gcore.Distribution.Minimalize,
 	}
 	for _, v := range childrun{
 		v.born(s)
@@ -151,7 +124,7 @@ func LVertical1(childrun ...GUMI) *LVertical {
 }
 
 // Get Elems
-func (s *LVertical) LoadElements(index gumre.Index, count int) []GUMI {
+func (s *LVertical) LoadElements(index gcore.Index, count int) []GUMI {
 	return loadGUMIChildrun(s.child, index, count)
 }
 
@@ -161,6 +134,6 @@ func (s *LVertical) SizeElements() int {
 }
 
 // Set Elems
-func (s *LVertical) SaveElements(mode gumre.Mode, index gumre.Index, elem ...GUMI) (input int) {
+func (s *LVertical) SaveElements(mode gcore.Mode, index gcore.Index, elem ...GUMI) (input int) {
 	return saveGUMIChildrun(&s.child, mode, index, elem...)
 }

@@ -6,15 +6,15 @@ import (
 	"github.com/golang/freetype/truetype"
 	"github.com/iamGreedy/gumi"
 	"github.com/iamGreedy/gumi/glumi"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/res"
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
 	"github.com/iamGreedy/gumi/example/sdl2example"
+	"github.com/iamGreedy/gumi/example/sdl2example/asset"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 func main() {
-	var width, height = gumre.DefinedResolutions.Get("VGA")
+	var width, height = gumi.DefinedResolutions.Get("VGA")
 	var err error
 
 	// init go:runtime
@@ -27,7 +27,7 @@ func main() {
 	//fmt.Println(suf.W, suf.H)
 	//wnd.SetBordered(false)
 	ctx, err := sdl.GLCreateContext(wnd)
-	gumre.Assert(err)
+	gcore.Assert(err)
 	defer sdl.GLDeleteContext(ctx)
 	// Init GL
 	GLInit()
@@ -40,7 +40,7 @@ func main() {
 	lumi := glumi.NewGLUMI()
 	// window build
 	scr := gumi.NewScreen(width, height)
-	scr.Root(sdl2example.Buttons)
+	scr.Root(sdl2example.HelloImage)
 
 	// GLumi Screen Setup
 	lumi.SetScreen(scr)
@@ -87,7 +87,7 @@ func GLInit() {
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 }
 func SDL2Init() {
-	gumre.Assert(sdl.Init(sdl.INIT_EVERYTHING))
+	gcore.Assert(sdl.Init(sdl.INIT_EVERYTHING))
 	sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
 	sdl.GLSetAttribute(sdl.GL_CONTEXT_MINOR_VERSION, 1)
 	sdl.GLSetAttribute(sdl.GL_CONTEXT_FORWARD_COMPATIBLE_FLAG, 1)
@@ -96,7 +96,7 @@ func SDL2Init() {
 }
 func SDL2Window(w, h int) *sdl.Window {
 	var disp sdl.DisplayMode
-	gumre.Assert(sdl.GetDesktopDisplayMode(0, &disp))
+	gcore.Assert(sdl.GetDesktopDisplayMode(0, &disp))
 	var windW, windH int32
 	if int32(w) > disp.W {
 		windW = disp.W
@@ -111,11 +111,11 @@ func SDL2Window(w, h int) *sdl.Window {
 	wnd, err := sdl.CreateWindow("GUMI", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, windW, windH,
 		sdl.WINDOW_OPENGL|sdl.WINDOW_ALWAYS_ON_TOP,
 	)
-	gumre.Assert(err)
+	gcore.Assert(err)
 	return wnd
 }
 func GUMIInit() {
-	f, err := truetype.Parse(res.NanumSquareRoundR)
+	f, err := truetype.Parse(asset.MustAsset("NanumSquareRoundR.ttf"))
 	if err != nil {
 		panic(err)
 	}

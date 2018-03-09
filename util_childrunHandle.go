@@ -1,25 +1,25 @@
 package gumi
 
-import "github.com/iamGreedy/gumi/gumre"
+import "github.com/iamGreedy/gumi/gcore"
 
-func saveGUMIChildrun(dst *[]GUMI, mode gumre.Mode, index gumre.Index, src ...GUMI) (writen int) {
+func saveGUMIChildrun(dst *[]GUMI, mode gcore.Mode, index gcore.Index, src ...GUMI) (writen int) {
 	var ln = len(*dst)
 	var idx int
 	switch mode {
 	default:
 		fallthrough
-	case gumre.REPLACE:
+	case gcore.REPLACE:
 		for i, v := range src {
-			idx = (index + gumre.Index(i)).Indexize(ln)
-			if idx == gumre.IndexNotExist {
+			idx = (index + gcore.Index(i)).Indexize(ln)
+			if idx == gcore.IndexNotExist {
 				break
 			}
 			(*dst)[idx] = v
 			writen++
 		}
-	case gumre.PUSHBACKWARD:
-		idx = (index + gumre.Index(1)).Indexize(ln)
-		if idx == gumre.IndexNotExist{
+	case gcore.PUSHBACKWARD:
+		idx = (index + gcore.Index(1)).Indexize(ln)
+		if idx == gcore.IndexNotExist{
 			(*dst) = append(
 				(*dst),
 				src...,
@@ -35,7 +35,7 @@ func saveGUMIChildrun(dst *[]GUMI, mode gumre.Mode, index gumre.Index, src ...GU
 				)...,
 			)
 		}
-	case gumre.PUSHONWARD:
+	case gcore.PUSHONWARD:
 		idx = index.Indexize(ln)
 		dstforw := (*dst)[:idx]
 		dstback := (*dst)[idx:]
@@ -50,11 +50,11 @@ func saveGUMIChildrun(dst *[]GUMI, mode gumre.Mode, index gumre.Index, src ...GU
 	}
 	return writen
 }
-func loadGUMIChildrun (dst []GUMI, index gumre.Index, count int) (res []GUMI) {
+func loadGUMIChildrun (dst []GUMI, index gcore.Index, count int) (res []GUMI) {
 	var ln = len(dst)
 	var idx = index.Indexize(ln)
 	var sz int
-	if idx == gumre.IndexNotExist{
+	if idx == gcore.IndexNotExist{
 		return
 	}
 	if idx + count <= ln{

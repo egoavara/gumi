@@ -42,9 +42,9 @@ type MTDropbox struct {
 	hookid  uint64
 	//
 	mtColorSingle
-	studio  *gumre.Studio
-	stretch *gumre.Reaching
-	scroll  *gumre.Reaching
+	studio  *gcore.Studio
+	stretch *gcore.Reaching
+	scroll  *gcore.Reaching
 	//
 	Elems    mtDropboxElemList
 	selected int
@@ -71,15 +71,15 @@ func (s *MTDropbox) GUMIInit() {
 	s.deferid = s.scr.deferReserve()
 	s.hookid = s.scr.hookReserve()
 	//
-	s.studio = gumre.Animation.Studio(mtDropboxAnimationLength)
-	s.stretch = s.studio.Set(mtDropboxAnimationStreching, &gumre.Reaching{
+	s.studio = gcore.Animation.Studio(mtDropboxAnimationLength)
+	s.stretch = s.studio.Set(mtDropboxAnimationStreching, &gcore.Reaching{
 		Delta: mtDropboxStretchSpeedPerSecond,
 		Fn:    Material.DefaultAnimation.DropboxStretch,
-	}).(*gumre.Reaching)
-	s.scroll = s.studio.Set(mtDropboxAnimationScroll, &gumre.Reaching{
+	}).(*gcore.Reaching)
+	s.scroll = s.studio.Set(mtDropboxAnimationScroll, &gcore.Reaching{
 		Delta: mtDropboxScroolSpeedPerSecond,
 		Fn:    Material.DefaultAnimation.DropboxStretch,
-	}).(*gumre.Reaching)
+	}).(*gcore.Reaching)
 
 }
 
@@ -228,10 +228,10 @@ func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *MTDropbox) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.MinLength(mtDropboxMinHeight),
-		Horizontal: gumre.MinLength(mtDropboxMinWidth),
+func (s *MTDropbox) GUMISize() gcore.Size {
+	return gcore.Size{
+		Vertical:   gcore.MinLength(mtDropboxMinHeight),
+		Horizontal: gcore.MinLength(mtDropboxMinWidth),
 	}
 }
 
@@ -244,7 +244,7 @@ func (s *MTDropbox) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTDropbox) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *MTDropbox) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 	s.frame = frame
 }
 

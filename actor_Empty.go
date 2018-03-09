@@ -2,9 +2,8 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
-	"image"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // Actor::Empty
@@ -24,15 +23,12 @@ func (s AEmpty) GUMIInfomation(info Information) {
 func (s AEmpty) GUMIStyle(style *Style) {
 }
 
-// GUMIFunction / GUMIClip 			-> Define::Empty
-func (AEmpty) GUMIClip(image.Rectangle) {
-}
 
 // GUMIFunction / GUMISize 			-> Define
-func (AEmpty) GUMISize() gumre.Size {
-	return gumre.Size{
-		gumre.AUTOLENGTH,
-		gumre.AUTOLENGTH,
+func (AEmpty) GUMISize() gcore.Size {
+	return gcore.Size{
+		gcore.AUTOLENGTH,
+		gcore.AUTOLENGTH,
 	}
 }
 
@@ -45,7 +41,7 @@ func (AEmpty) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
-func (s AEmpty) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s AEmpty) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
 }
 
 // GUMIRenderer / GUMIRender				-> Define::Empty

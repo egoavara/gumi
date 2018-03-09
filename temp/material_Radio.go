@@ -33,8 +33,8 @@ type MTRadio struct {
 	rendererStore
 	//
 	mtColorFromTo
-	studio *gumre.Studio
-	onoff *gumre.Percenting
+	studio *gcore.Studio
+	onoff *gcore.Percenting
 	//
 	cursorEnter, active bool
 	onActive            MTRadioActive
@@ -47,11 +47,11 @@ type MTRadioActive func(self *MTRadio, active bool)
 
 // GUMIFunction / GUMIInit 					-> Define
 func (s *MTRadio) GUMIInit() {
-	s.studio = gumre.Animation.Studio(mtRadioAnimationLength)
-	s.onoff = s.studio.Set(mtRadioAnimationOnOff, &gumre.Percenting{
-		Delta: gumre.Animation.PercentingByMillis(mtRadioAnimationOnOffDeltaMillis),
+	s.studio = gcore.Animation.Studio(mtRadioAnimationLength)
+	s.onoff = s.studio.Set(mtRadioAnimationOnOff, &gcore.Percenting{
+		Delta: gcore.Animation.PercentingByMillis(mtRadioAnimationOnOffDeltaMillis),
 		Fn:    Material.DefaultAnimation.Radio,
-	}).(*gumre.Percenting)
+	}).(*gcore.Percenting)
 }
 
 // GUMIFunction / GUMIInfomation 			-> Define
@@ -93,10 +93,10 @@ func (s *MTRadio) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *MTRadio) GUMISize() gumre.Size {
-	return gumre.Size{
-		Vertical:   gumre.FixLength(mtRadioMinHeight),
-		Horizontal: gumre.FixLength(mtRadioMinWidth),
+func (s *MTRadio) GUMISize() gcore.Size {
+	return gcore.Size{
+		Vertical:   gcore.FixLength(mtRadioMinHeight),
+		Horizontal: gcore.FixLength(mtRadioMinWidth),
 	}
 }
 
@@ -109,7 +109,7 @@ func (s *MTRadio) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTRadio) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *MTRadio) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 	s.frame = frame
 }
 

@@ -1,13 +1,13 @@
 package gumi
 
-import "github.com/iamGreedy/gumi/gumre"
+import "github.com/iamGreedy/gumi/gcore"
 
 func (_Tool) MarginMinRegular(min uint16, gumi GUMI) GUMI {
-	temp := NMargin0(gumre.RegularBlank(gumre.MinLength(min)))
+	temp := NMargin0(gcore.RegularBlank(gcore.MinLength(min)))
 	temp2 := LinkingFrom(temp, gumi)
 	return temp2
 }
 func (_Tool) MarginMinSymmetry(minHorizontal, minVertical uint16, gumi GUMI) GUMI {
-	temp := NMargin0(gumre.SymmetryBlank(gumre.MinLength(minHorizontal), gumre.MinLength(minVertical)))
+	temp := NMargin0(gcore.SymmetryBlank(gcore.MinLength(minHorizontal), gcore.MinLength(minVertical)))
 	return LinkingFrom(temp, gumi)
 }

@@ -23,11 +23,11 @@ func (s *NStyle) GUMIClip(r image.Rectangle) {
 }
 func (s *NStyle) GUMIRender(frame *image.RGBA) {
 }
-func (s *NStyle) GUMISize() gumre.Size {
+func (s *NStyle) GUMISize() gcore.Size {
 	return s.child.GUMISize()
 }
 
-func (s *NStyle) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *NStyle) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 }
 func (s *NStyle) GUMIUpdate() {
 	panic("implement me")

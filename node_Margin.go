@@ -3,13 +3,14 @@ package gumi
 import (
 	"image"
 	"fmt"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 type NMargin struct {
 	SingleNode
-	b gumre.Blank
+	rendererStore
+	b gcore.Blank
 }
 
 func (s *NMargin) GUMIInfomation(info Information) {
@@ -19,28 +20,15 @@ func (s *NMargin) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
 func (s *NMargin) GUMIClip(rect image.Rectangle) {
-	sz := s.child.GUMISize()
-	//
-
-	var w, l, _ = calcMargin(rect.Dx(), sz.Horizontal, s.b.L, s.b.R)
-	var h, _, t = calcMargin(rect.Dy(), sz.Vertical, s.b.B, s.b.T)
-	s.child.GUMIClip(image.Rect(
-		rect.Min.X + l,
-		rect.Min.Y + t,
-		rect.Min.X + l + w,
-		rect.Min.Y + t + h,
-	))
-}
-func (s *NMargin) GUMIRender(frame *image.RGBA) {
 
 }
-func (s *NMargin) GUMISize() gumre.Size {
+func (s *NMargin) GUMISize() gcore.Size {
 	sz := s.child.GUMISize()
 
 	hmin := sz.Horizontal.Min + s.b.L.Min + s.b.R.Min
 	var hmax uint16
-	if uint(sz.Horizontal.Max) + uint(s.b.L.Max) + uint(s.b.R.Max) > uint(gumre.AUTOLENGTH.Max){
-		hmax = gumre.AUTOLENGTH.Max
+	if uint(sz.Horizontal.Max) + uint(s.b.L.Max) + uint(s.b.R.Max) > uint(gcore.AUTOLENGTH.Max){
+		hmax = gcore.AUTOLENGTH.Max
 	}else {
 		hmax = sz.Horizontal.Max + s.b.L.Max + s.b.R.Max
 	}
@@ -48,23 +36,31 @@ func (s *NMargin) GUMISize() gumre.Size {
 
 	vmin := sz.Vertical.Min + s.b.B.Min + s.b.T.Min
 	var vmax uint16
-	if uint(sz.Vertical.Max) + uint(s.b.B.Max) + uint(s.b.T.Max) > uint(gumre.AUTOLENGTH.Max){
-		vmax = gumre.AUTOLENGTH.Max
+	if uint(sz.Vertical.Max) + uint(s.b.B.Max) + uint(s.b.T.Max) > uint(gcore.AUTOLENGTH.Max){
+		vmax = gcore.AUTOLENGTH.Max
 	}else {
 		vmax = sz.Vertical.Max + s.b.L.Max + s.b.R.Max
 	}
-	return gumre.Size{
-		gumre.Length{vmin, vmax},
-		gumre.Length{hmin, hmax},
+	return gcore.Size{
+		gcore.Length{vmin, vmax},
+		gcore.Length{hmin, hmax},
 	}
 }
 
-func (s *NMargin) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.child.GUMIRenderSetup(tree, parentnode)
-}
+func (s *NMargin) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent)
 
-func (s *NMargin) GUMIUpdate() {
-	s.child.GUMIUpdate()
+	var sz = s.child.GUMISize()
+	var w, l, _ = calcMargin(parent.Allocation.Dx(), sz.Horizontal, s.b.L, s.b.R)
+	var h, _, t = calcMargin(parent.Allocation.Dy(), sz.Vertical, s.b.B, s.b.T)
+	s.rnode.Allocation = image.Rect(
+		parent.Allocation.Min.X + l,
+		parent.Allocation.Min.Y + t,
+		parent.Allocation.Min.X + l + w,
+		parent.Allocation.Min.Y + t + h,
+	)
+	s.child.GUMIRenderSetup(s.rmana, s.rnode)
 }
 
 func (s *NMargin) GUMIHappen(event Event) {
@@ -74,7 +70,7 @@ func (s *NMargin) String() string {
 	return fmt.Sprintf("%s(margin:%v)", "NMargin", s.b)
 }
 //
-func calcMargin(have int, l, a, b gumre.Length) (resl, resa, resb int) {
+func calcMargin(have int, l, a, b gcore.Length) (resl, resa, resb int) {
 	if int(l.Max) + int(a.Max) + int(b.Max) <= have{
 		// 최대값도 만족 가능
 		resl = int(l.Max)
@@ -97,27 +93,39 @@ func calcMargin(have int, l, a, b gumre.Length) (resl, resa, resb int) {
 		resa = (temp)/(int(a.Min) + int(b.Min)) * int(a.Min)
 		resb = temp - resa
 	}else {
-		resl = have
+		if int(a.Max) + int(b.Max) <= have{
+			resa = int(a.Max)
+			resb = int(b.Max)
+			resl = have - resa - resb
+		}else if int(a.Min) + int(b.Min) <= have{
+			resa = int(a.Min)
+			resb = int(b.Min)
+			resl = have - resa - resb
+		}else {
+			resa = 0
+			resb = 0
+			resl = 0
+		}
 	}
 	return
 }
 //
-func NMargin0(sz gumre.Blank) *NMargin {
+func NMargin0(sz gcore.Blank) *NMargin {
 	return &NMargin{
 		b: sz,
 	}
 }
 
-func (s *NMargin) Set(sz gumre.Blank) {
+func (s *NMargin) Set(sz gcore.Blank) {
 	s.SetMargin(sz)
 }
-func (s *NMargin) Get() gumre.Blank {
+func (s *NMargin) Get() gcore.Blank {
 	return s.GetMargin()
 }
-func (s *NMargin) SetMargin(sz gumre.Blank) {
+func (s *NMargin) SetMargin(sz gcore.Blank) {
 	s.b = sz
 }
-func (s *NMargin) GetMargin() gumre.Blank {
+func (s *NMargin) GetMargin() gcore.Blank {
 	return s.b
 }
 

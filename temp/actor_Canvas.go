@@ -45,10 +45,10 @@ func (s *ACanvas) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize					-> Define
-func (s ACanvas) GUMISize() gumre.Size {
-	return gumre.Size{
-		Horizontal: gumre.FixLength(uint16(s.w)),
-		Vertical:   gumre.FixLength(uint16(s.h)),
+func (s ACanvas) GUMISize() gcore.Size {
+	return gcore.Size{
+		Horizontal: gcore.FixLength(uint16(s.w)),
+		Vertical:   gcore.FixLength(uint16(s.h)),
 	}
 }
 
@@ -61,7 +61,7 @@ func (s ACanvas) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *ACanvas) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *ACanvas) GUMIRenderSetup(tree *media.RenderTree, parentnode *media.RenderNode) {
 	s.rtree = tree
 	s.rnode = tree.New(parentnode)
 }

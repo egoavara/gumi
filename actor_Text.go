@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // Actor::Text
@@ -16,10 +16,43 @@ type AText struct {
 	styleStore
 	rendererStore
 	//
-	align     gumre.Align
+	align     gcore.Align
 	text      string
 	textColor color.Color
 	//
+}
+
+// renderline.Job / BaseRender
+func (s *AText) BaseRender(subimg *image.RGBA) {
+	ctx := createContext(subimg)
+	s.style.useContext(ctx)
+	defer s.style.releaseContext(ctx)
+	ctx.SetColor(s.textColor)
+	expectw, expecth := ctx.MeasureString(s.text)
+	v, h := gcore.ParseAlign(s.align)
+	var drawX, drawY float64
+	switch v {
+	case gcore.AlignBottom:
+		drawY = float64(ctx.Height())
+	case gcore.AlignVertical:
+		drawY = float64(ctx.Height())/2 + expecth/2
+	case gcore.AlignTop:
+		drawY = expecth
+	}
+	switch h {
+	case gcore.AlignRight:
+		drawX = float64(ctx.Width()) - expectw
+	case gcore.AlignHorizontal:
+		drawX = float64(ctx.Width())/2 - expectw/2
+	case gcore.AlignLeft:
+		drawX = 0
+	}
+	ctx.DrawString(s.text, drawX, drawY - 1)
+}
+
+// renderline.Job / DecalRender
+func (s *AText) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	return image.ZR
 }
 
 // GUMIFunction / GUMIInfomation 			-> Define::Empty
@@ -31,49 +64,16 @@ func (s *AText) GUMIStyle(style *Style) {
 	s.style = style
 }
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *AText) GUMIClip(r image.Rectangle) {
-	s.rnode.SetRect(r)
-}
-
-// GUMIFunction / GUMIRender 				-> Define
-func (s *AText) GUMIRender(frame *image.RGBA) {
-	ctx := createContext(frame)
-	s.style.useContext(ctx)
-	defer s.style.releaseContext(ctx)
-	ctx.SetColor(s.textColor)
-	expectw, expecth := ctx.MeasureString(s.text)
-	v, h := gumre.ParseAlign(s.align)
-	var drawX, drawY float64
-	switch v {
-	case gumre.AlignBottom:
-		drawY = float64(ctx.Height())
-	case gumre.AlignVertical:
-		drawY = float64(ctx.Height())/2 + expecth/2
-	case gumre.AlignTop:
-		drawY = expecth
-	}
-	switch h {
-	case gumre.AlignRight:
-		drawX = float64(ctx.Width()) - expectw
-	case gumre.AlignHorizontal:
-		drawX = float64(ctx.Width())/2 - expectw/2
-	case gumre.AlignLeft:
-		drawX = 0
-	}
-	ctx.DrawString(s.text, drawX, drawY - 1)
-}
-
 // GUMIFunction / GUMISize 					-> Define
-func (s *AText) GUMISize() gumre.Size {
+func (s *AText) GUMISize() gcore.Size {
 	s.style.Default.Font.Use()
 	defer s.style.Default.Font.Release()
 
 	h, v := s.style.Default.Font.CalculateSize(s.text)
 
-	temp := gumre.Size{
-		Horizontal: gumre.MinLength(uint16(h)),
-		Vertical:   gumre.MinLength(uint16(v)),
+	temp := gcore.Size{
+		Horizontal: gcore.MinLength(uint16(h)),
+		Vertical:   gcore.MinLength(uint16(v)),
 	}
 
 	return temp
@@ -88,19 +88,12 @@ func (s *AText) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *AText) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.rtree = tree
-	s.rnode = tree.New(parentnode)
+func (s *AText) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent)
+	s.rnode.Do = s
 }
 
-
-// GUMIRenderer / GUMIUpdate				-> Define
-func (s *AText) GUMIUpdate() {
-	if s.rnode.Check(){
-		s.GUMIRender(s.rnode.SubImage())
-		s.rnode.Complete()
-	}
-}
 
 // GUMIEventer / GUMIHappen					-> Define
 func (s *AText) GUMIHappen(event Event) {
@@ -114,15 +107,15 @@ func (s *AText) String() string {
 // Constructor 0
 func AText0(str string) *AText {
 	temp := &AText{
-		text:str,
-		align:gumre.AlignCenter,
-		textColor:color.White,
+		text:      str,
+		align:     gcore.AlignCenter,
+		textColor: color.White,
 	}
 	return temp
 }
 
 // Constructor 1
-func AText1(str string, align gumre.Align) *AText {
+func AText1(str string, align gcore.Align) *AText {
 	temp := &AText{
 		text:str,
 		align:align,
@@ -132,7 +125,7 @@ func AText1(str string, align gumre.Align) *AText {
 }
 
 // Constructor 2
-func AText2(str string, align gumre.Align, textColor color.Color) *AText {
+func AText2(str string, align gcore.Align, textColor color.Color) *AText {
 	temp := &AText{
 		text:str,
 		align:align,
@@ -155,7 +148,7 @@ func (s *AText) Get() string {
 func (s *AText) SetText(text string) {
 	if s.text != text{
 		s.text = text
-		s.rnode.Require()
+		s.rnode.ThrowCache()
 	}
 }
 
@@ -165,15 +158,15 @@ func (s *AText) GetText() string {
 }
 
 // Method / SetAlign
-func (s *AText) SetAlign(align gumre.Align) {
+func (s *AText) SetAlign(align gcore.Align) {
 	if s.align != align{
 		s.align = align
-		s.rnode.Require()
+		s.rnode.ThrowCache()
 	}
 }
 
 // Method / GetAlign
-func (s *AText) GetAlign() gumre.Align {
+func (s *AText) GetAlign() gcore.Align {
 	return s.align
 }
 
@@ -183,7 +176,7 @@ func (s *AText) SetColor(textColor color.Color) {
 	r2,g2,b2,a2 := textColor.RGBA()
 	if r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2{
 		s.textColor = textColor
-		s.rnode.Require()
+		s.rnode.ThrowCache()
 	}
 }
 

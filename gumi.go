@@ -5,9 +5,9 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
 	"image"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // GUMI is a collection of basic elements
@@ -35,9 +35,7 @@ type GUMIFunction interface {
 	GUMIInit()                       // TODO : Relay
 	GUMIInfomation(info Information) // TODO : Relay
 	GUMIStyle(style *Style)          // TODO : Relay
-	GUMIClip(r image.Rectangle)      // TODO : Relay
-	GUMIRender(frame *image.RGBA)
-	GUMISize() gumre.Size
+	GUMISize() gcore.Size
 }
 type GUMITree interface {
 	born(gumi GUMI)
@@ -46,8 +44,7 @@ type GUMITree interface {
 	Childrun() []GUMI
 }
 type GUMIRenderer interface {
-	GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode)
-	GUMIUpdate()
+	GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node)
 }
 type GUMIEventer interface {
 	GUMIHappen(event Event)

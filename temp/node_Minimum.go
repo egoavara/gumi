@@ -8,7 +8,7 @@ import (
 )
 type NMinimum struct {
 	SingleNode
-	axis gumre.Axis
+	axis gcore.Axis
 }
 
 func (s *NMinimum) GUMIInfomation(info Information) {
@@ -22,19 +22,19 @@ func (s *NMinimum) GUMIClip(r image.Rectangle) {
 }
 func (s *NMinimum) GUMIRender(frame *image.RGBA) {
 }
-func (s *NMinimum) GUMISize() gumre.Size {
+func (s *NMinimum) GUMISize() gcore.Size {
 	sz := s.child.GUMISize()
-	if gumre.AxisVertical == gumre.AxisVertical & s.axis{
+	if gcore.AxisVertical == gcore.AxisVertical & s.axis{
 		sz.Vertical.Max = sz.Vertical.Min
 	}
-	if gumre.AxisHorizontal == gumre.AxisHorizontal & s.axis{
+	if gcore.AxisHorizontal == gcore.AxisHorizontal & s.axis{
 		sz.Horizontal.Max = sz.Horizontal.Min
 	}
 	return sz
 }
 
 
-func (s *NMinimum) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *NMinimum) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 }
 func (s *NMinimum) GUMIDraw() {
 	s.child.GUMIDraw()
@@ -51,7 +51,7 @@ func (s *NMinimum) String() string {
 	return fmt.Sprintf("%s", "NMinimum")
 }
 
-func NMinimum0(axis gumre.Axis, elem GUMI) *NMinimum {
+func NMinimum0(axis gcore.Axis, elem GUMI) *NMinimum {
 	temp := &NMinimum{
 		axis:axis,
 	}
@@ -60,15 +60,15 @@ func NMinimum0(axis gumre.Axis, elem GUMI) *NMinimum {
 	return temp
 }
 
-func (s *NMinimum) Get() gumre.Axis {
+func (s *NMinimum) Get() gcore.Axis {
 	return s.GetAxis()
 }
-func (s *NMinimum) Set(axis gumre.Axis) {
+func (s *NMinimum) Set(axis gcore.Axis) {
 	s.Set(axis)
 }
-func (s *NMinimum) GetAxis() gumre.Axis {
+func (s *NMinimum) GetAxis() gcore.Axis {
 	return s.axis
 }
-func (s *NMinimum) SetAxis(axis gumre.Axis) {
+func (s *NMinimum) SetAxis(axis gcore.Axis) {
 	s.axis = axis
 }

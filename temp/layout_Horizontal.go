@@ -13,7 +13,7 @@ import (
 // Horizontal align
 type LHorizontal struct {
 	MultipleNode
-	rule gumre.Distribute
+	rule gcore.Distribute
 }
 
 // GUMIFunction / GUMIInit 					-> SingleNode::Default
@@ -35,8 +35,8 @@ func (s *LHorizontal) GUMIStyle(style *Style) {
 // GUMIFunction / GUMIClip 					-> Define
 func (s *LHorizontal) GUMIClip(r image.Rectangle) {
 	//
-	var tempVert = make([]gumre.Length, len(s.child))
-	var tempHori = make([]gumre.Length, len(s.child))
+	var tempVert = make([]gcore.Length, len(s.child))
+	var tempHori = make([]gcore.Length, len(s.child))
 
 	for i, v := range s.child {
 		tempVert[i] = v.GUMISize().Vertical
@@ -62,7 +62,7 @@ func (s *LHorizontal) GUMIRender(frame *image.RGBA) {
 }
 
 // GUMIFunction / GUMISize 					-> Define
-func (s *LHorizontal) GUMISize() gumre.Size {
+func (s *LHorizontal) GUMISize() gcore.Size {
 	var minMax, sum uint16 = 0, 0
 	for _, v := range s.child {
 		sz := v.GUMISize()
@@ -71,9 +71,9 @@ func (s *LHorizontal) GUMISize() gumre.Size {
 		}
 		sum += sz.Horizontal.Min
 	}
-	return gumre.Size{
-		gumre.MinLength(minMax),
-		gumre.MinLength(sum),
+	return gcore.Size{
+		gcore.MinLength(minMax),
+		gcore.MinLength(sum),
 	}
 }
 
@@ -86,7 +86,7 @@ func (s *LHorizontal) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> MultipleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *LHorizontal) GUMIRenderSetup(frame *image.RGBA, tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
+func (s *LHorizontal) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
 	for _, v := range s.child {
 		v.GUMIRenderSetup(frame, tree, parentnode)
 	}
@@ -124,7 +124,7 @@ func (s *LHorizontal) String() string {
 
 
 // Constructor 0
-func LHorizontal0(rule gumre.Distribute, childrun ...GUMI) *LHorizontal {
+func LHorizontal0(rule gcore.Distribute, childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
 		rule: rule,
 	}
@@ -138,7 +138,7 @@ func LHorizontal0(rule gumre.Distribute, childrun ...GUMI) *LHorizontal {
 // Constructor 1
 func LHorizontal1(childrun ...GUMI) *LHorizontal {
 	s := &LHorizontal{
-		rule: gumre.Distribution.Minimalize,
+		rule: gcore.Distribution.Minimalize,
 	}
 	for _, v := range childrun {
 		v.born(s)
@@ -147,13 +147,13 @@ func LHorizontal1(childrun ...GUMI) *LHorizontal {
 	return s
 }
 
-func (s *LHorizontal) LoadElements(index gumre.Index, count int) []GUMI {
+func (s *LHorizontal) LoadElements(index gcore.Index, count int) []GUMI {
 	return loadGUMIChildrun(s.child, index, count)
 }
 func (s *LHorizontal) SizeElements() int {
 	return len(s.child)
 }
-func (s *LHorizontal) SaveElements(mode gumre.Mode, index gumre.Index, elem ...GUMI) (input int) {
+func (s *LHorizontal) SaveElements(mode gcore.Mode, index gcore.Index, elem ...GUMI) (input int) {
 	return saveGUMIChildrun(&s.child, mode, index, elem...)
 }
 

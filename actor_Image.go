@@ -2,9 +2,10 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
 	"image"
+	"github.com/iamGreedy/gumi/renderline"
+	"github.com/iamGreedy/gumi/media"
+	"github.com/iamGreedy/gumi/gcore"
 )
 
 // Actor::Image
@@ -15,7 +16,15 @@ type AImage struct {
 	VoidNode
 	rendererStore
 	//
-	drawer drawer.Drawer
+	drawer media.Drawer
+}
+
+func (s *AImage) BaseRender(subimg *image.RGBA) {
+	s.drawer.Draw(subimg)
+}
+
+func (s *AImage) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	return image.ZR
 }
 
 // GUMIFunction / GUMIInit 					-> VoidNode::Default
@@ -28,22 +37,12 @@ func (s *AImage) GUMIInfomation(info Information) {
 func (s *AImage) GUMIStyle(style *Style) {
 }
 
-// GUMIFunction / GUMIClip 			-> Define
-func (s *AImage) GUMIClip(rect image.Rectangle) {
-	s.rnode.SetRect(rect)
-}
-
-// GUMIFunction / GUMIRender 		-> Define
-func (s *AImage) GUMIRender(frame *image.RGBA) {
-	s.drawer.Draw(frame)
-}
-
 // GUMIFunction / GUMISize 		-> Define
-func (s AImage) GUMISize() gumre.Size {
+func (s AImage) GUMISize() gcore.Size {
 	bd := s.drawer.Bound()
-	return gumre.Size{
-		Horizontal: gumre.MinLength(uint16(bd.Dx())),
-		Vertical:   gumre.MinLength(uint16(bd.Dy())),
+	return gcore.Size{
+		Horizontal: gcore.MinLength(uint16(bd.Dx())),
+		Vertical:   gcore.MinLength(uint16(bd.Dy())),
 	}
 }
 
@@ -56,22 +55,10 @@ func (s AImage) GUMISize() gumre.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *AImage) GUMIRenderSetup(tree *drawer.RenderTree, parentnode *drawer.RenderNode) {
-	s.rtree = tree
-	s.rnode = tree.New(parentnode)
-}
-
-// GUMIRenderer / GUMIDraw					-> Define
-func (s *AImage) GUMIDraw() {
-	s.GUMIRender(s.rnode.SubImage())
-	s.rnode.Complete()
-}
-
-// GUMIRenderer / GUMIUpdate					-> Define
-func (s *AImage) GUMIUpdate() {
-	if s.rnode.Check(){
-		s.GUMIDraw()
-	}
+func (s *AImage) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent)
+	s.rnode.Do = s
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -84,7 +71,7 @@ func (s *AImage) String() string {
 }
 
 // Constructor
-func AImage0(drawer drawer.Drawer) *AImage {
+func AImage0(drawer media.Drawer) *AImage {
 	return &AImage{
 		drawer: drawer,
 	}
